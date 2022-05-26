@@ -11,6 +11,6 @@ import static org.junit.Assert.*;
 public class AppTest {
     @Test public void appHasAGreeting() {
         MuJoCoLib lib = new MuJoCoLib();
-        System.out.println("Starting "+lib);
+        System.out.println("Starting "+lib.mj_versionString());
     }
 }

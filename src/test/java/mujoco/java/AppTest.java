@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 public class AppTest {
     @Test public void appHasAGreeting() {
-        MuJoCo m = new MuJoCo();
+        MuJoCoConfig m = new MuJoCoConfig();
         System.out.println("Starting "+m);
     }
 }

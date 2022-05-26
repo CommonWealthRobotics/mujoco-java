@@ -9,3 +9,5 @@ build
 /mujoco-*
 
 /mujoco
+/javacpp-platform-*-bin*
+*.class*

@@ -17,8 +17,19 @@ else
 	ln -s /tmp/mujoco $SCRIPT_DIR/
 	cd $SCRIPT_DIR/
 fi
+JAVACPP_VER=1.5.7
+JAVACPP=javacpp-platform-$JAVACPP_VER-bin.zip
+if [ -f "$JAVACPP" ]; then
+    echo "$JAVACPP exists."
+else
+	wget https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VER/$JAVACPP -O $JAVACPP
+	unzip $JAVACPP
+fi
+cd src/main/java/
+java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 
-./gradlew jar test
+cd $SCRIPT_DIR/
+./gradlew jar  --stacktrace test
 
 
 

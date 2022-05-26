@@ -10,7 +10,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
     - name: Build
-      run: make
+      run: bash build-linux.sh
 
   windows:
     runs-on: windows-latest

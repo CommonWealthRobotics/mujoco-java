@@ -11,3 +11,4 @@ build
 /mujoco
 /javacpp-platform-*-bin*
 *.class*
+*jni*.cpp

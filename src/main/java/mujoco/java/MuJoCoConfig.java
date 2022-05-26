@@ -7,18 +7,18 @@ import org.bytedeco.javacpp.tools.*;
 
 @Properties(
     value = @Platform(
-        includepath = {"/tmp/mujoco/include/mujoco/"},
+        includepath = {"/tmp/mujoco/include/"},
         linkpath = {"/tmp/mujoco/lib/"},
         include = {
-        		"mjdata.h",
-        		"mjexport.h",
-        		"mjtnum.h",
-        		"mjmodel.h",
-        		"mjrender.h",
-        		"mjui.h",
-        		"mjvisualize.h",
-        		"mjxmacro.h",
-        		"mujoco.h"},  
+        		"mujoco/mjdata.h",
+        		"mujoco/mjexport.h",
+        		"mujoco/mjtnum.h",
+        		"mujoco/mjmodel.h",
+        		"mujoco/mjrender.h",
+        		"mujoco/mjui.h",
+        		"mujoco/mjvisualize.h",
+        		"mujoco/mjxmacro.h",
+        		"mujoco/mujoco.h"},  
         link = {"MuJoCoLib"}
     ),
     target = "org.mujoco.MuJoCoLib"
@@ -26,5 +26,26 @@ import org.bytedeco.javacpp.tools.*;
 
 public class MuJoCoConfig implements InfoMapper {
 	public void map(InfoMap infoMap) {
+		infoMap.put(new Info("MJ_STATIC").define(true));
+		infoMap.put(new Info("mjtNum").cast().valueTypes("double").pointerTypes("DoublePointer"));
+		infoMap.put(new Info("MJOPTION_VECTORS").skip());
+		infoMap.put(new Info("MJMODEL_POINTERS").skip());
+		infoMap.put(new Info("MJDATA_VECTOR").skip());
+		infoMap.put(new Info("mjFREESTACK").skip());
+		infoMap.put(new Info("mju_sqrt").skip());
+		infoMap.put(new Info("mju_exp").skip());
+		infoMap.put(new Info("mju_sin").skip());
+		infoMap.put(new Info("mju_cos").skip());
+		infoMap.put(new Info("mju_tan").skip());
+		infoMap.put(new Info("mju_asin").skip());
+		infoMap.put(new Info("mju_acos").skip());
+		infoMap.put(new Info("mju_atan2").skip());
+		infoMap.put(new Info("mju_tanh").skip());
+		infoMap.put(new Info("mju_pow").skip());
+		infoMap.put(new Info("mju_abs").skip());
+		infoMap.put(new Info("mju_log").skip());
+		infoMap.put(new Info("mju_log10").skip());
+		infoMap.put(new Info("mju_floor").skip());
+		infoMap.put(new Info("mju_ceil").skip());
     }
 }

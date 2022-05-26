@@ -27,9 +27,9 @@ else
 fi
 cd src/main/java/
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
-
+java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 cd $SCRIPT_DIR/
-./gradlew jar  --stacktrace test
+#./gradlew jar  --stacktrace test
 
 
 

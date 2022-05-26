@@ -9,7 +9,7 @@ import org.bytedeco.javacpp.annotation.*;
 public class MuJoCoLib extends mujoco.java.MuJoCoConfig {
     static { Loader.load(); }
 
-// Parsed from mjdata.h
+// Parsed from mujoco/mjdata.h
 
 // Copyright 2021 DeepMind Technologies Limited
 //
@@ -91,25 +91,25 @@ public static class mjContact_ extends Pointer {
     }
                // result of collision detection functions
   // contact parameters set by geom-specific collision detector
-  public native @ByRef mjtNum dist(); public native mjContact_ dist(mjtNum setter);                    // distance between nearest points; neg: penetration
-  public native @ByRef mjtNum pos(int i); public native mjContact_ pos(int i, mjtNum setter);
-  @MemberGetter public native mjtNum pos();                  // position of contact point: midpoint between geoms
-  public native @ByRef mjtNum frame(int i); public native mjContact_ frame(int i, mjtNum setter);
-  @MemberGetter public native mjtNum frame();                // normal is in [0-2]
+  public native @Cast("mjtNum") double dist(); public native mjContact_ dist(double setter);                    // distance between nearest points; neg: penetration
+  public native @Cast("mjtNum") double pos(int i); public native mjContact_ pos(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer pos();                  // position of contact point: midpoint between geoms
+  public native @Cast("mjtNum") double frame(int i); public native mjContact_ frame(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer frame();                // normal is in [0-2]
 
   // contact parameters set by mj_collideGeoms
-  public native @ByRef mjtNum includemargin(); public native mjContact_ includemargin(mjtNum setter);           // include if dist<includemargin=margin-gap
-  public native @ByRef mjtNum friction(int i); public native mjContact_ friction(int i, mjtNum setter);
-  @MemberGetter public native mjtNum friction();             // tangent1, 2, spin, roll1, 2
-  public native @ByRef mjtNum solref(int i); public native mjContact_ solref(int i, mjtNum setter);
-  @MemberGetter public native mjtNum solref();          // constraint solver reference
-  public native @ByRef mjtNum solimp(int i); public native mjContact_ solimp(int i, mjtNum setter);
-  @MemberGetter public native mjtNum solimp();          // constraint solver impedance
+  public native @Cast("mjtNum") double includemargin(); public native mjContact_ includemargin(double setter);           // include if dist<includemargin=margin-gap
+  public native @Cast("mjtNum") double friction(int i); public native mjContact_ friction(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer friction();             // tangent1, 2, spin, roll1, 2
+  public native @Cast("mjtNum") double solref(int i); public native mjContact_ solref(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solref();          // constraint solver reference
+  public native @Cast("mjtNum") double solimp(int i); public native mjContact_ solimp(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp();          // constraint solver impedance
 
   // internal storage used by solver
-  public native @ByRef mjtNum mu(); public native mjContact_ mu(mjtNum setter);                      // friction of regularized cone, set by mj_makeConstraint
-  public native @ByRef mjtNum H(int i); public native mjContact_ H(int i, mjtNum setter);
-  @MemberGetter public native mjtNum H();                   // cone Hessian, set by mj_updateConstraint
+  public native @Cast("mjtNum") double mu(); public native mjContact_ mu(double setter);                      // friction of regularized cone, set by mj_makeConstraint
+  public native @Cast("mjtNum") double H(int i); public native mjContact_ H(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer H();                   // cone Hessian, set by mj_updateConstraint
 
   // contact descriptors set by mj_collideGeoms
   public native int dim(); public native mjContact_ dim(int setter);                        // contact space dimensionality: 1, 3, 4 or 6
@@ -177,7 +177,7 @@ public static class mjTimerStat_ extends Pointer {
         return new mjTimerStat_((Pointer)this).offsetAddress(i);
     }
              // timer statistics
-  public native @ByRef mjtNum duration(); public native mjTimerStat_ duration(mjtNum setter);                // cumulative duration
+  public native @Cast("mjtNum") double duration(); public native mjTimerStat_ duration(double setter);                // cumulative duration
   public native int number(); public native mjTimerStat_ number(int setter);                     // how many times was timer called
 }
 @Opaque public static class mjTimerStat extends Pointer {
@@ -205,9 +205,9 @@ public static class mjSolverStat_ extends Pointer {
         return new mjSolverStat_((Pointer)this).offsetAddress(i);
     }
             // per-iteration solver statistics
-  public native @ByRef mjtNum improvement(); public native mjSolverStat_ improvement(mjtNum setter);             // cost reduction, scaled by 1/trace(M(qpos0))
-  public native @ByRef mjtNum gradient(); public native mjSolverStat_ gradient(mjtNum setter);                // gradient norm (primal only, scaled)
-  public native @ByRef mjtNum lineslope(); public native mjSolverStat_ lineslope(mjtNum setter);               // slope in linesearch
+  public native @Cast("mjtNum") double improvement(); public native mjSolverStat_ improvement(double setter);             // cost reduction, scaled by 1/trace(M(qpos0))
+  public native @Cast("mjtNum") double gradient(); public native mjSolverStat_ gradient(double setter);                // gradient norm (primal only, scaled)
+  public native @Cast("mjtNum") double lineslope(); public native mjSolverStat_ lineslope(double setter);               // slope in linesearch
   public native int nactive(); public native mjSolverStat_ nactive(int setter);                    // number of active constraints
   public native int nchange(); public native mjSolverStat_ nchange(int setter);                    // number of constraint state changes
   public native int neval(); public native mjSolverStat_ neval(int setter);                      // number of cost evaluations in line search
@@ -261,8 +261,8 @@ public static class mjData_ extends Pointer {
   @MemberGetter public native mjSolverStat solver(); // solver statistics per iteration
   public native int solver_iter(); public native mjData_ solver_iter(int setter);                // number of solver iterations
   public native int solver_nnz(); public native mjData_ solver_nnz(int setter);                 // number of non-zeros in Hessian or efc_AR
-  public native @ByRef mjtNum solver_fwdinv(int i); public native mjData_ solver_fwdinv(int i, mjtNum setter);
-  @MemberGetter public native mjtNum solver_fwdinv();        // forward-inverse comparison: qfrc, efc
+  public native @Cast("mjtNum") double solver_fwdinv(int i); public native mjData_ solver_fwdinv(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solver_fwdinv();        // forward-inverse comparison: qfrc, efc
 
   // variable sizes
   public native int ne(); public native mjData_ ne(int setter);                         // number of equality constraints
@@ -271,66 +271,66 @@ public static class mjData_ extends Pointer {
   public native int ncon(); public native mjData_ ncon(int setter);                       // number of detected contacts
 
   // global properties
-  public native @ByRef mjtNum time(); public native mjData_ time(mjtNum setter);                    // simulation time
-  public native @ByRef mjtNum energy(int i); public native mjData_ energy(int i, mjtNum setter);
-  @MemberGetter public native mjtNum energy();               // potential, kinetic energy
+  public native @Cast("mjtNum") double time(); public native mjData_ time(double setter);                    // simulation time
+  public native @Cast("mjtNum") double energy(int i); public native mjData_ energy(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer energy();               // potential, kinetic energy
 
   //-------------------------------- end of info header
 
   // buffers
   public native Pointer buffer(); public native mjData_ buffer(Pointer setter);               // main buffer; all pointers point in it    (nbuffer bytes)
-  public native mjtNum stack(); public native mjData_ stack(mjtNum setter);                // stack buffer                             (nstack mjtNums)
+  public native @Cast("mjtNum*") DoublePointer stack(); public native mjData_ stack(DoublePointer setter);                // stack buffer                             (nstack mjtNums)
 
   //-------------------------------- main inputs and outputs of the computation
 
   // state
-  public native mjtNum qpos(); public native mjData_ qpos(mjtNum setter);                 // position                                 (nq x 1)
-  public native mjtNum qvel(); public native mjData_ qvel(mjtNum setter);                 // velocity                                 (nv x 1)
-  public native mjtNum act(); public native mjData_ act(mjtNum setter);                  // actuator activation                      (na x 1)
-  public native mjtNum qacc_warmstart(); public native mjData_ qacc_warmstart(mjtNum setter);       // acceleration used for warmstart          (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qpos(); public native mjData_ qpos(DoublePointer setter);                 // position                                 (nq x 1)
+  public native @Cast("mjtNum*") DoublePointer qvel(); public native mjData_ qvel(DoublePointer setter);                 // velocity                                 (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer act(); public native mjData_ act(DoublePointer setter);                  // actuator activation                      (na x 1)
+  public native @Cast("mjtNum*") DoublePointer qacc_warmstart(); public native mjData_ qacc_warmstart(DoublePointer setter);       // acceleration used for warmstart          (nv x 1)
 
   // control
-  public native mjtNum ctrl(); public native mjData_ ctrl(mjtNum setter);                 // control                                  (nu x 1)
-  public native mjtNum qfrc_applied(); public native mjData_ qfrc_applied(mjtNum setter);         // applied generalized force                (nv x 1)
-  public native mjtNum xfrc_applied(); public native mjData_ xfrc_applied(mjtNum setter);         // applied Cartesian force/torque           (nbody x 6)
+  public native @Cast("mjtNum*") DoublePointer ctrl(); public native mjData_ ctrl(DoublePointer setter);                 // control                                  (nu x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_applied(); public native mjData_ qfrc_applied(DoublePointer setter);         // applied generalized force                (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer xfrc_applied(); public native mjData_ xfrc_applied(DoublePointer setter);         // applied Cartesian force/torque           (nbody x 6)
 
   // mocap data
-  public native mjtNum mocap_pos(); public native mjData_ mocap_pos(mjtNum setter);            // positions of mocap bodies                (nmocap x 3)
-  public native mjtNum mocap_quat(); public native mjData_ mocap_quat(mjtNum setter);           // orientations of mocap bodies             (nmocap x 4)
+  public native @Cast("mjtNum*") DoublePointer mocap_pos(); public native mjData_ mocap_pos(DoublePointer setter);            // positions of mocap bodies                (nmocap x 3)
+  public native @Cast("mjtNum*") DoublePointer mocap_quat(); public native mjData_ mocap_quat(DoublePointer setter);           // orientations of mocap bodies             (nmocap x 4)
 
   // dynamics
-  public native mjtNum qacc(); public native mjData_ qacc(mjtNum setter);                 // acceleration                             (nv x 1)
-  public native mjtNum act_dot(); public native mjData_ act_dot(mjtNum setter);              // time-derivative of actuator activation   (na x 1)
+  public native @Cast("mjtNum*") DoublePointer qacc(); public native mjData_ qacc(DoublePointer setter);                 // acceleration                             (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer act_dot(); public native mjData_ act_dot(DoublePointer setter);              // time-derivative of actuator activation   (na x 1)
 
   // user data
-  public native mjtNum userdata(); public native mjData_ userdata(mjtNum setter);             // user data, not touched by engine         (nuserdata x 1)
+  public native @Cast("mjtNum*") DoublePointer userdata(); public native mjData_ userdata(DoublePointer setter);             // user data, not touched by engine         (nuserdata x 1)
 
   // sensors
-  public native mjtNum sensordata(); public native mjData_ sensordata(mjtNum setter);           // sensor data array                        (nsensordata x 1)
+  public native @Cast("mjtNum*") DoublePointer sensordata(); public native mjData_ sensordata(DoublePointer setter);           // sensor data array                        (nsensordata x 1)
 
   //-------------------------------- POSITION dependent
 
   // computed by mj_fwdPosition/mj_kinematics
-  public native mjtNum xpos(); public native mjData_ xpos(mjtNum setter);                 // Cartesian position of body frame         (nbody x 3)
-  public native mjtNum xquat(); public native mjData_ xquat(mjtNum setter);                // Cartesian orientation of body frame      (nbody x 4)
-  public native mjtNum xmat(); public native mjData_ xmat(mjtNum setter);                 // Cartesian orientation of body frame      (nbody x 9)
-  public native mjtNum xipos(); public native mjData_ xipos(mjtNum setter);                // Cartesian position of body com           (nbody x 3)
-  public native mjtNum ximat(); public native mjData_ ximat(mjtNum setter);                // Cartesian orientation of body inertia    (nbody x 9)
-  public native mjtNum xanchor(); public native mjData_ xanchor(mjtNum setter);              // Cartesian position of joint anchor       (njnt x 3)
-  public native mjtNum xaxis(); public native mjData_ xaxis(mjtNum setter);                // Cartesian joint axis                     (njnt x 3)
-  public native mjtNum geom_xpos(); public native mjData_ geom_xpos(mjtNum setter);            // Cartesian geom position                  (ngeom x 3)
-  public native mjtNum geom_xmat(); public native mjData_ geom_xmat(mjtNum setter);            // Cartesian geom orientation               (ngeom x 9)
-  public native mjtNum site_xpos(); public native mjData_ site_xpos(mjtNum setter);            // Cartesian site position                  (nsite x 3)
-  public native mjtNum site_xmat(); public native mjData_ site_xmat(mjtNum setter);            // Cartesian site orientation               (nsite x 9)
-  public native mjtNum cam_xpos(); public native mjData_ cam_xpos(mjtNum setter);             // Cartesian camera position                (ncam x 3)
-  public native mjtNum cam_xmat(); public native mjData_ cam_xmat(mjtNum setter);             // Cartesian camera orientation             (ncam x 9)
-  public native mjtNum light_xpos(); public native mjData_ light_xpos(mjtNum setter);           // Cartesian light position                 (nlight x 3)
-  public native mjtNum light_xdir(); public native mjData_ light_xdir(mjtNum setter);           // Cartesian light direction                (nlight x 3)
+  public native @Cast("mjtNum*") DoublePointer xpos(); public native mjData_ xpos(DoublePointer setter);                 // Cartesian position of body frame         (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer xquat(); public native mjData_ xquat(DoublePointer setter);                // Cartesian orientation of body frame      (nbody x 4)
+  public native @Cast("mjtNum*") DoublePointer xmat(); public native mjData_ xmat(DoublePointer setter);                 // Cartesian orientation of body frame      (nbody x 9)
+  public native @Cast("mjtNum*") DoublePointer xipos(); public native mjData_ xipos(DoublePointer setter);                // Cartesian position of body com           (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer ximat(); public native mjData_ ximat(DoublePointer setter);                // Cartesian orientation of body inertia    (nbody x 9)
+  public native @Cast("mjtNum*") DoublePointer xanchor(); public native mjData_ xanchor(DoublePointer setter);              // Cartesian position of joint anchor       (njnt x 3)
+  public native @Cast("mjtNum*") DoublePointer xaxis(); public native mjData_ xaxis(DoublePointer setter);                // Cartesian joint axis                     (njnt x 3)
+  public native @Cast("mjtNum*") DoublePointer geom_xpos(); public native mjData_ geom_xpos(DoublePointer setter);            // Cartesian geom position                  (ngeom x 3)
+  public native @Cast("mjtNum*") DoublePointer geom_xmat(); public native mjData_ geom_xmat(DoublePointer setter);            // Cartesian geom orientation               (ngeom x 9)
+  public native @Cast("mjtNum*") DoublePointer site_xpos(); public native mjData_ site_xpos(DoublePointer setter);            // Cartesian site position                  (nsite x 3)
+  public native @Cast("mjtNum*") DoublePointer site_xmat(); public native mjData_ site_xmat(DoublePointer setter);            // Cartesian site orientation               (nsite x 9)
+  public native @Cast("mjtNum*") DoublePointer cam_xpos(); public native mjData_ cam_xpos(DoublePointer setter);             // Cartesian camera position                (ncam x 3)
+  public native @Cast("mjtNum*") DoublePointer cam_xmat(); public native mjData_ cam_xmat(DoublePointer setter);             // Cartesian camera orientation             (ncam x 9)
+  public native @Cast("mjtNum*") DoublePointer light_xpos(); public native mjData_ light_xpos(DoublePointer setter);           // Cartesian light position                 (nlight x 3)
+  public native @Cast("mjtNum*") DoublePointer light_xdir(); public native mjData_ light_xdir(DoublePointer setter);           // Cartesian light direction                (nlight x 3)
 
   // computed by mj_fwdPosition/mj_comPos
-  public native mjtNum subtree_com(); public native mjData_ subtree_com(mjtNum setter);          // center of mass of each subtree           (nbody x 3)
-  public native mjtNum cdof(); public native mjData_ cdof(mjtNum setter);                 // com-based motion axis of each dof        (nv x 6)
-  public native mjtNum cinert(); public native mjData_ cinert(mjtNum setter);               // com-based body inertia and mass          (nbody x 10)
+  public native @Cast("mjtNum*") DoublePointer subtree_com(); public native mjData_ subtree_com(DoublePointer setter);          // center of mass of each subtree           (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer cdof(); public native mjData_ cdof(DoublePointer setter);                 // com-based motion axis of each dof        (nv x 6)
+  public native @Cast("mjtNum*") DoublePointer cinert(); public native mjData_ cinert(DoublePointer setter);               // com-based body inertia and mass          (nbody x 10)
 
   // computed by mj_fwdPosition/mj_tendon
   public native IntPointer ten_wrapadr(); public native mjData_ ten_wrapadr(IntPointer setter);          // start address of tendon's path           (ntendon x 1)
@@ -338,23 +338,23 @@ public static class mjData_ extends Pointer {
   public native IntPointer ten_J_rownnz(); public native mjData_ ten_J_rownnz(IntPointer setter);         // number of non-zeros in Jacobian row      (ntendon x 1)
   public native IntPointer ten_J_rowadr(); public native mjData_ ten_J_rowadr(IntPointer setter);         // row start address in colind array        (ntendon x 1)
   public native IntPointer ten_J_colind(); public native mjData_ ten_J_colind(IntPointer setter);         // column indices in sparse Jacobian        (ntendon x nv)
-  public native mjtNum ten_length(); public native mjData_ ten_length(mjtNum setter);           // tendon lengths                           (ntendon x 1)
-  public native mjtNum ten_J(); public native mjData_ ten_J(mjtNum setter);                // tendon Jacobian                          (ntendon x nv)
+  public native @Cast("mjtNum*") DoublePointer ten_length(); public native mjData_ ten_length(DoublePointer setter);           // tendon lengths                           (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer ten_J(); public native mjData_ ten_J(DoublePointer setter);                // tendon Jacobian                          (ntendon x nv)
   public native IntPointer wrap_obj(); public native mjData_ wrap_obj(IntPointer setter);             // geom id; -1: site; -2: pulley            (nwrap*2 x 1)
-  public native mjtNum wrap_xpos(); public native mjData_ wrap_xpos(mjtNum setter);            // Cartesian 3D points in all path          (nwrap*2 x 3)
+  public native @Cast("mjtNum*") DoublePointer wrap_xpos(); public native mjData_ wrap_xpos(DoublePointer setter);            // Cartesian 3D points in all path          (nwrap*2 x 3)
 
   // computed by mj_fwdPosition/mj_transmission
-  public native mjtNum actuator_length(); public native mjData_ actuator_length(mjtNum setter);      // actuator lengths                         (nu x 1)
-  public native mjtNum actuator_moment(); public native mjData_ actuator_moment(mjtNum setter);      // actuator moments                         (nu x nv)
+  public native @Cast("mjtNum*") DoublePointer actuator_length(); public native mjData_ actuator_length(DoublePointer setter);      // actuator lengths                         (nu x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_moment(); public native mjData_ actuator_moment(DoublePointer setter);      // actuator moments                         (nu x nv)
 
   // computed by mj_fwdPosition/mj_crb
-  public native mjtNum crb(); public native mjData_ crb(mjtNum setter);                  // com-based composite inertia and mass     (nbody x 10)
-  public native mjtNum qM(); public native mjData_ qM(mjtNum setter);                   // total inertia (sparse)                   (nM x 1)
+  public native @Cast("mjtNum*") DoublePointer crb(); public native mjData_ crb(DoublePointer setter);                  // com-based composite inertia and mass     (nbody x 10)
+  public native @Cast("mjtNum*") DoublePointer qM(); public native mjData_ qM(DoublePointer setter);                   // total inertia (sparse)                   (nM x 1)
 
   // computed by mj_fwdPosition/mj_factorM
-  public native mjtNum qLD(); public native mjData_ qLD(mjtNum setter);                  // L'*D*L factorization of M (sparse)       (nM x 1)
-  public native mjtNum qLDiagInv(); public native mjData_ qLDiagInv(mjtNum setter);            // 1/diag(D)                                (nv x 1)
-  public native mjtNum qLDiagSqrtInv(); public native mjData_ qLDiagSqrtInv(mjtNum setter);        // 1/sqrt(diag(D))                          (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qLD(); public native mjData_ qLD(DoublePointer setter);                  // L'*D*L factorization of M (sparse)       (nM x 1)
+  public native @Cast("mjtNum*") DoublePointer qLDiagInv(); public native mjData_ qLDiagInv(DoublePointer setter);            // 1/diag(D)                                (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qLDiagSqrtInv(); public native mjData_ qLDiagSqrtInv(DoublePointer setter);        // 1/sqrt(diag(D))                          (nv x 1)
 
   // computed by mj_fwdPosition/mj_collision
   public native mjContact contact(); public native mjData_ contact(mjContact setter);             // list of all detected contacts            (nconmax x 1)
@@ -370,45 +370,45 @@ public static class mjData_ extends Pointer {
   public native IntPointer efc_JT_rowadr(); public native mjData_ efc_JT_rowadr(IntPointer setter);        // row start address in colind array      T (nv x 1)
   public native IntPointer efc_JT_rowsuper(); public native mjData_ efc_JT_rowsuper(IntPointer setter);      // number of subsequent rows in supernode T (nv x 1)
   public native IntPointer efc_JT_colind(); public native mjData_ efc_JT_colind(IntPointer setter);        // column indices in Jacobian             T (nv x njmax)
-  public native mjtNum efc_J(); public native mjData_ efc_J(mjtNum setter);                // constraint Jacobian                      (njmax x nv)
-  public native mjtNum efc_JT(); public native mjData_ efc_JT(mjtNum setter);               // constraint Jacobian transposed           (nv x njmax)
-  public native mjtNum efc_pos(); public native mjData_ efc_pos(mjtNum setter);              // constraint position (equality, contact)  (njmax x 1)
-  public native mjtNum efc_margin(); public native mjData_ efc_margin(mjtNum setter);           // inclusion margin (contact)               (njmax x 1)
-  public native mjtNum efc_frictionloss(); public native mjData_ efc_frictionloss(mjtNum setter);     // frictionloss (friction)                  (njmax x 1)
-  public native mjtNum efc_diagApprox(); public native mjData_ efc_diagApprox(mjtNum setter);       // approximation to diagonal of A           (njmax x 1)
-  public native mjtNum efc_KBIP(); public native mjData_ efc_KBIP(mjtNum setter);             // stiffness, damping, impedance, imp'      (njmax x 4)
-  public native mjtNum efc_D(); public native mjData_ efc_D(mjtNum setter);                // constraint mass                          (njmax x 1)
-  public native mjtNum efc_R(); public native mjData_ efc_R(mjtNum setter);                // inverse constraint mass                  (njmax x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_J(); public native mjData_ efc_J(DoublePointer setter);                // constraint Jacobian                      (njmax x nv)
+  public native @Cast("mjtNum*") DoublePointer efc_JT(); public native mjData_ efc_JT(DoublePointer setter);               // constraint Jacobian transposed           (nv x njmax)
+  public native @Cast("mjtNum*") DoublePointer efc_pos(); public native mjData_ efc_pos(DoublePointer setter);              // constraint position (equality, contact)  (njmax x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_margin(); public native mjData_ efc_margin(DoublePointer setter);           // inclusion margin (contact)               (njmax x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_frictionloss(); public native mjData_ efc_frictionloss(DoublePointer setter);     // frictionloss (friction)                  (njmax x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_diagApprox(); public native mjData_ efc_diagApprox(DoublePointer setter);       // approximation to diagonal of A           (njmax x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_KBIP(); public native mjData_ efc_KBIP(DoublePointer setter);             // stiffness, damping, impedance, imp'      (njmax x 4)
+  public native @Cast("mjtNum*") DoublePointer efc_D(); public native mjData_ efc_D(DoublePointer setter);                // constraint mass                          (njmax x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_R(); public native mjData_ efc_R(DoublePointer setter);                // inverse constraint mass                  (njmax x 1)
 
   // computed by mj_fwdPosition/mj_projectConstraint
   public native IntPointer efc_AR_rownnz(); public native mjData_ efc_AR_rownnz(IntPointer setter);        // number of non-zeros in AR                (njmax x 1)
   public native IntPointer efc_AR_rowadr(); public native mjData_ efc_AR_rowadr(IntPointer setter);        // row start address in colind array        (njmax x 1)
   public native IntPointer efc_AR_colind(); public native mjData_ efc_AR_colind(IntPointer setter);        // column indices in sparse AR              (njmax x njmax)
-  public native mjtNum efc_AR(); public native mjData_ efc_AR(mjtNum setter);               // J*inv(M)*J' + R                          (njmax x njmax)
+  public native @Cast("mjtNum*") DoublePointer efc_AR(); public native mjData_ efc_AR(DoublePointer setter);               // J*inv(M)*J' + R                          (njmax x njmax)
 
   //-------------------------------- POSITION, VELOCITY dependent
 
   // computed by mj_fwdVelocity
-  public native mjtNum ten_velocity(); public native mjData_ ten_velocity(mjtNum setter);         // tendon velocities                        (ntendon x 1)
-  public native mjtNum actuator_velocity(); public native mjData_ actuator_velocity(mjtNum setter);    // actuator velocities                      (nu x 1)
+  public native @Cast("mjtNum*") DoublePointer ten_velocity(); public native mjData_ ten_velocity(DoublePointer setter);         // tendon velocities                        (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_velocity(); public native mjData_ actuator_velocity(DoublePointer setter);    // actuator velocities                      (nu x 1)
 
   // computed by mj_fwdVelocity/mj_comVel
-  public native mjtNum cvel(); public native mjData_ cvel(mjtNum setter);                 // com-based velocity [3D rot; 3D tran]     (nbody x 6)
-  public native mjtNum cdof_dot(); public native mjData_ cdof_dot(mjtNum setter);             // time-derivative of cdof                  (nv x 6)
+  public native @Cast("mjtNum*") DoublePointer cvel(); public native mjData_ cvel(DoublePointer setter);                 // com-based velocity [3D rot; 3D tran]     (nbody x 6)
+  public native @Cast("mjtNum*") DoublePointer cdof_dot(); public native mjData_ cdof_dot(DoublePointer setter);             // time-derivative of cdof                  (nv x 6)
 
   // computed by mj_fwdVelocity/mj_rne (without acceleration)
-  public native mjtNum qfrc_bias(); public native mjData_ qfrc_bias(mjtNum setter);            // C(qpos,qvel)                             (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_bias(); public native mjData_ qfrc_bias(DoublePointer setter);            // C(qpos,qvel)                             (nv x 1)
 
   // computed by mj_fwdVelocity/mj_passive
-  public native mjtNum qfrc_passive(); public native mjData_ qfrc_passive(mjtNum setter);         // passive force                            (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_passive(); public native mjData_ qfrc_passive(DoublePointer setter);         // passive force                            (nv x 1)
 
   // computed by mj_fwdVelocity/mj_referenceConstraint
-  public native mjtNum efc_vel(); public native mjData_ efc_vel(mjtNum setter);              // velocity in constraint space: J*qvel     (njmax x 1)
-  public native mjtNum efc_aref(); public native mjData_ efc_aref(mjtNum setter);             // reference pseudo-acceleration            (njmax x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_vel(); public native mjData_ efc_vel(DoublePointer setter);              // velocity in constraint space: J*qvel     (njmax x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_aref(); public native mjData_ efc_aref(DoublePointer setter);             // reference pseudo-acceleration            (njmax x 1)
 
   // computed by mj_sensorVel/mj_subtreeVel if needed
-  public native mjtNum subtree_linvel(); public native mjData_ subtree_linvel(mjtNum setter);       // linear velocity of subtree com           (nbody x 3)
-  public native mjtNum subtree_angmom(); public native mjData_ subtree_angmom(mjtNum setter);       // angular momentum about subtree com       (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer subtree_linvel(); public native mjData_ subtree_linvel(DoublePointer setter);       // linear velocity of subtree com           (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer subtree_angmom(); public native mjData_ subtree_angmom(DoublePointer setter);       // angular momentum about subtree com       (nbody x 3)
 
   // computed by mj_implicit
   public native IntPointer D_rownnz(); public native mjData_ D_rownnz(IntPointer setter);             // non-zeros in each row                    (nv x 1)
@@ -416,35 +416,35 @@ public static class mjData_ extends Pointer {
   public native IntPointer D_colind(); public native mjData_ D_colind(IntPointer setter);             // column indices of non-zeros              (nD x 1)
 
   // computed by mj_implicit/mj_derivative
-  public native mjtNum qDeriv(); public native mjData_ qDeriv(mjtNum setter);               // d (passive + actuator - bias) / d qvel   (nD x 1)
+  public native @Cast("mjtNum*") DoublePointer qDeriv(); public native mjData_ qDeriv(DoublePointer setter);               // d (passive + actuator - bias) / d qvel   (nD x 1)
 
   // computed by mj_implicit/mju_factorLUSparse
-  public native mjtNum qLU(); public native mjData_ qLU(mjtNum setter);                  // sparse LU of (qM - dt*qDeriv)            (nD x 1)
+  public native @Cast("mjtNum*") DoublePointer qLU(); public native mjData_ qLU(DoublePointer setter);                  // sparse LU of (qM - dt*qDeriv)            (nD x 1)
 
   //-------------------------------- POSITION, VELOCITY, CONTROL/ACCELERATION dependent
 
   // computed by mj_fwdActuation
-  public native mjtNum actuator_force(); public native mjData_ actuator_force(mjtNum setter);       // actuator force in actuation space        (nu x 1)
-  public native mjtNum qfrc_actuator(); public native mjData_ qfrc_actuator(mjtNum setter);        // actuator force                           (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_force(); public native mjData_ actuator_force(DoublePointer setter);       // actuator force in actuation space        (nu x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_actuator(); public native mjData_ qfrc_actuator(DoublePointer setter);        // actuator force                           (nv x 1)
 
   // computed by mj_fwdAcceleration
-  public native mjtNum qfrc_smooth(); public native mjData_ qfrc_smooth(mjtNum setter);          // net unconstrained force                  (nv x 1)
-  public native mjtNum qacc_smooth(); public native mjData_ qacc_smooth(mjtNum setter);          // unconstrained acceleration               (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_smooth(); public native mjData_ qfrc_smooth(DoublePointer setter);          // net unconstrained force                  (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qacc_smooth(); public native mjData_ qacc_smooth(DoublePointer setter);          // unconstrained acceleration               (nv x 1)
 
   // computed by mj_fwdConstraint/mj_inverse
-  public native mjtNum efc_b(); public native mjData_ efc_b(mjtNum setter);                // linear cost term: J*qacc_smooth - aref   (njmax x 1)
-  public native mjtNum efc_force(); public native mjData_ efc_force(mjtNum setter);            // constraint force in constraint space     (njmax x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_b(); public native mjData_ efc_b(DoublePointer setter);                // linear cost term: J*qacc_smooth - aref   (njmax x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_force(); public native mjData_ efc_force(DoublePointer setter);            // constraint force in constraint space     (njmax x 1)
   public native IntPointer efc_state(); public native mjData_ efc_state(IntPointer setter);            // constraint state (mjtConstraintState)    (njmax x 1)
-  public native mjtNum qfrc_constraint(); public native mjData_ qfrc_constraint(mjtNum setter);      // constraint force                         (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_constraint(); public native mjData_ qfrc_constraint(DoublePointer setter);      // constraint force                         (nv x 1)
 
   // computed by mj_inverse
-  public native mjtNum qfrc_inverse(); public native mjData_ qfrc_inverse(mjtNum setter);         // net external force; should equal:        (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_inverse(); public native mjData_ qfrc_inverse(DoublePointer setter);         // net external force; should equal:        (nv x 1)
                                   // qfrc_applied + J'*xfrc_applied + qfrc_actuator
 
   // computed by mj_sensorAcc/mj_rnePostConstraint if needed; rotation:translation format
-  public native mjtNum cacc(); public native mjData_ cacc(mjtNum setter);                 // com-based acceleration                   (nbody x 6)
-  public native mjtNum cfrc_int(); public native mjData_ cfrc_int(mjtNum setter);             // com-based interaction force with parent  (nbody x 6)
-  public native mjtNum cfrc_ext(); public native mjData_ cfrc_ext(mjtNum setter);             // com-based external force on body         (nbody x 6)
+  public native @Cast("mjtNum*") DoublePointer cacc(); public native mjData_ cacc(DoublePointer setter);                 // com-based acceleration                   (nbody x 6)
+  public native @Cast("mjtNum*") DoublePointer cfrc_int(); public native mjData_ cfrc_int(DoublePointer setter);             // com-based interaction force with parent  (nbody x 6)
+  public native @Cast("mjtNum*") DoublePointer cfrc_ext(); public native mjData_ cfrc_ext(DoublePointer setter);             // com-based external force on body         (nbody x 6)
 }
 @Opaque public static class mjData extends Pointer {
     /** Empty constructor. Calls {@code super((Pointer)null)}. */
@@ -493,7 +493,7 @@ public static class mjfTime extends FunctionPointer {
     public    mjfTime(Pointer p) { super(p); }
     protected mjfTime() { allocate(); }
     private native void allocate();
-    public native @ByVal mjtNum call();
+    public native @Cast("mjtNum") double call();
 }
 
 // actuator dynamics, gain, bias
@@ -503,7 +503,7 @@ public static class mjfAct extends FunctionPointer {
     public    mjfAct(Pointer p) { super(p); }
     protected mjfAct() { allocate(); }
     private native void allocate();
-    public native @ByVal mjtNum call(@Const mjModel m, @Const mjData d, int id);
+    public native @Cast("mjtNum") double call(@Const mjModel m, @Const mjData d, int id);
 }
 
 // collision detection
@@ -514,13 +514,13 @@ public static class mjfCollision extends FunctionPointer {
     protected mjfCollision() { allocate(); }
     private native void allocate();
     public native int call(@Const mjModel m, @Const mjData d,
-                            mjContact con, int g1, int g2, @ByVal mjtNum margin);
+                            mjContact con, int g1, int g2, @Cast("mjtNum") double margin);
 }
 
 // #endif  // MUJOCO_MJDATA_H_
 
 
-// Parsed from mjexport.h
+// Parsed from mujoco/mjexport.h
 
 // Copyright 2021 DeepMind Technologies Limited
 //
@@ -560,18 +560,12 @@ public static class mjfCollision extends FunctionPointer {
 //   #define MJAPI
 //   #define MJLOCAL
 // #else
-//   #ifdef MUJOCO_DLL_EXPORTS
-//     #define MJAPI MUJOCO_HELPER_DLL_EXPORT
-//   #else
-//     #define MJAPI MUJOCO_HELPER_DLL_IMPORT
-//   #endif
-//   #define MJLOCAL MUJOCO_HELPER_DLL_LOCAL
 // #endif
 
 // #endif  // MUJOCO_MJEXPORT_H_
 
 
-// Parsed from mjtnum.h
+// Parsed from mujoco/mjtnum.h
 
 // Copyright 2021 DeepMind Technologies Limited
 //
@@ -606,7 +600,7 @@ public static class mjfCollision extends FunctionPointer {
 // #endif  // MUJOCO_INCLUDE_MJTNUM_H_
 
 
-// Parsed from mjmodel.h
+// Parsed from mujoco/mjmodel.h
 
 // Copyright 2021 DeepMind Technologies Limited
 //
@@ -1672,7 +1666,7 @@ public static class mjModel_ extends Pointer {
 // #endif  // MUJOCO_MJMODEL_H_
 
 
-// Parsed from mjrender.h
+// Parsed from mujoco/mjrender.h
 
 // Copyright 2021 DeepMind Technologies Limited
 //
@@ -1886,7 +1880,7 @@ public static class mjrContext_ extends Pointer {
 // #endif  // MUJOCO_MJRENDER_H_
 
 
-// Parsed from mjui.h
+// Parsed from mujoco/mjui.h
 
 // Copyright 2021 DeepMind Technologies Limited
 //
@@ -2450,7 +2444,7 @@ public static class mjuiDef_ extends Pointer {
 // #endif  // MUJOCO_MJUI_H_
 
 
-// Parsed from mjvisualize.h
+// Parsed from mujoco/mjvisualize.h
 
 // Copyright 2021 DeepMind Technologies Limited
 //
@@ -3031,7 +3025,7 @@ public static class mjvFigure_ extends Pointer {
 // #endif  // MUJOCO_MJVISUALIZE_H_
 
 
-// Parsed from mjxmacro.h
+// Parsed from mujoco/mjxmacro.h
 
 // Copyright 2021 DeepMind Technologies Limited
 //
@@ -3067,12 +3061,12 @@ public static final int MJOPTION_SCALARS = MJOPTION_SCALARS();
 
 
 // vector fields of mjOption
-public static final int MJOPTION_VECTORS =            
-    X( gravity,         3       )   
-    X( wind,            3       )   
-    X( magnetic,        3       )   
-    X( o_solref,        mjNREF  )   
-    X( o_solimp,        mjNIMP  );
+// #define MJOPTION_VECTORS
+//     X( gravity,         3       )
+//     X( wind,            3       )
+//     X( magnetic,        3       )
+//     X( o_solref,        mjNREF  )
+//     X( o_solimp,        mjNIMP  )
 
 
 //-------------------------------- mjModel ---------------------------------------------------------
@@ -3104,278 +3098,278 @@ public static final int MJMODEL_INTS = MJMODEL_INTS();
 
 
 // pointer fields of mjModel
-public static final int MJMODEL_POINTERS =                                                     
-    X( mjtNum,  qpos0,                 nq,            1                    ) 
-    X( mjtNum,  qpos_spring,           nq,            1                    ) 
-    X( int,     body_parentid,         nbody,         1                    ) 
-    X( int,     body_rootid,           nbody,         1                    ) 
-    X( int,     body_weldid,           nbody,         1                    ) 
-    X( int,     body_mocapid,          nbody,         1                    ) 
-    X( int,     body_jntnum,           nbody,         1                    ) 
-    X( int,     body_jntadr,           nbody,         1                    ) 
-    X( int,     body_dofnum,           nbody,         1                    ) 
-    X( int,     body_dofadr,           nbody,         1                    ) 
-    X( int,     body_geomnum,          nbody,         1                    ) 
-    X( int,     body_geomadr,          nbody,         1                    ) 
-    X( mjtByte, body_simple,           nbody,         1                    ) 
-    X( mjtByte, body_sameframe,        nbody,         1                    ) 
-    X( mjtNum,  body_pos,              nbody,         3                    ) 
-    X( mjtNum,  body_quat,             nbody,         4                    ) 
-    X( mjtNum,  body_ipos,             nbody,         3                    ) 
-    X( mjtNum,  body_iquat,            nbody,         4                    ) 
-    X( mjtNum,  body_mass,             nbody,         1                    ) 
-    X( mjtNum,  body_subtreemass,      nbody,         1                    ) 
-    X( mjtNum,  body_inertia,          nbody,         3                    ) 
-    X( mjtNum,  body_invweight0,       nbody,         2                    ) 
-    X( mjtNum,  body_user,             nbody,         MJ_M(nuser_body)     ) 
-    X( int,     jnt_type,              njnt,          1                    ) 
-    X( int,     jnt_qposadr,           njnt,          1                    ) 
-    X( int,     jnt_dofadr,            njnt,          1                    ) 
-    X( int,     jnt_bodyid,            njnt,          1                    ) 
-    X( int,     jnt_group,             njnt,          1                    ) 
-    X( mjtByte, jnt_limited,           njnt,          1                    ) 
-    X( mjtNum,  jnt_solref,            njnt,          mjNREF               ) 
-    X( mjtNum,  jnt_solimp,            njnt,          mjNIMP               ) 
-    X( mjtNum,  jnt_pos,               njnt,          3                    ) 
-    X( mjtNum,  jnt_axis,              njnt,          3                    ) 
-    X( mjtNum,  jnt_stiffness,         njnt,          1                    ) 
-    X( mjtNum,  jnt_range,             njnt,          2                    ) 
-    X( mjtNum,  jnt_margin,            njnt,          1                    ) 
-    X( mjtNum,  jnt_user,              njnt,          MJ_M(nuser_jnt)      ) 
-    X( int,     dof_bodyid,            nv,            1                    ) 
-    X( int,     dof_jntid,             nv,            1                    ) 
-    X( int,     dof_parentid,          nv,            1                    ) 
-    X( int,     dof_Madr,              nv,            1                    ) 
-    X( int,     dof_simplenum,         nv,            1                    ) 
-    X( mjtNum,  dof_solref,            nv,            mjNREF               ) 
-    X( mjtNum,  dof_solimp,            nv,            mjNIMP               ) 
-    X( mjtNum,  dof_frictionloss,      nv,            1                    ) 
-    X( mjtNum,  dof_armature,          nv,            1                    ) 
-    X( mjtNum,  dof_damping,           nv,            1                    ) 
-    X( mjtNum,  dof_invweight0,        nv,            1                    ) 
-    X( mjtNum,  dof_M0,                nv,            1                    ) 
-    X( int,     geom_type,             ngeom,         1                    ) 
-    X( int,     geom_contype,          ngeom,         1                    ) 
-    X( int,     geom_conaffinity,      ngeom,         1                    ) 
-    X( int,     geom_condim,           ngeom,         1                    ) 
-    X( int,     geom_bodyid,           ngeom,         1                    ) 
-    X( int,     geom_dataid,           ngeom,         1                    ) 
-    X( int,     geom_matid,            ngeom,         1                    ) 
-    X( int,     geom_group,            ngeom,         1                    ) 
-    X( int,     geom_priority,         ngeom,         1                    ) 
-    X( mjtByte, geom_sameframe,        ngeom,         1                    ) 
-    X( mjtNum,  geom_solmix,           ngeom,         1                    ) 
-    X( mjtNum,  geom_solref,           ngeom,         mjNREF               ) 
-    X( mjtNum,  geom_solimp,           ngeom,         mjNIMP               ) 
-    X( mjtNum,  geom_size,             ngeom,         3                    ) 
-    X( mjtNum,  geom_rbound,           ngeom,         1                    ) 
-    X( mjtNum,  geom_pos,              ngeom,         3                    ) 
-    X( mjtNum,  geom_quat,             ngeom,         4                    ) 
-    X( mjtNum,  geom_friction,         ngeom,         3                    ) 
-    X( mjtNum,  geom_margin,           ngeom,         1                    ) 
-    X( mjtNum,  geom_gap,              ngeom,         1                    ) 
-    X( mjtNum,  geom_fluid,            ngeom,         mjNFLUID             ) 
-    X( mjtNum,  geom_user,             ngeom,         MJ_M(nuser_geom)     ) 
-    X( float,   geom_rgba,             ngeom,         4                    ) 
-    X( int,     site_type,             nsite,         1                    ) 
-    X( int,     site_bodyid,           nsite,         1                    ) 
-    X( int,     site_matid,            nsite,         1                    ) 
-    X( int,     site_group,            nsite,         1                    ) 
-    X( mjtByte, site_sameframe,        nsite,         1                    ) 
-    X( mjtNum,  site_size,             nsite,         3                    ) 
-    X( mjtNum,  site_pos,              nsite,         3                    ) 
-    X( mjtNum,  site_quat,             nsite,         4                    ) 
-    X( mjtNum,  site_user,             nsite,         MJ_M(nuser_site)     ) 
-    X( float,   site_rgba,             nsite,         4                    ) 
-    X( int,     cam_mode,              ncam,          1                    ) 
-    X( int,     cam_bodyid,            ncam,          1                    ) 
-    X( int,     cam_targetbodyid,      ncam,          1                    ) 
-    X( mjtNum,  cam_pos,               ncam,          3                    ) 
-    X( mjtNum,  cam_quat,              ncam,          4                    ) 
-    X( mjtNum,  cam_poscom0,           ncam,          3                    ) 
-    X( mjtNum,  cam_pos0,              ncam,          3                    ) 
-    X( mjtNum,  cam_mat0,              ncam,          9                    ) 
-    X( mjtNum,  cam_fovy,              ncam,          1                    ) 
-    X( mjtNum,  cam_ipd,               ncam,          1                    ) 
-    X( mjtNum,  cam_user,              ncam,          MJ_M(nuser_cam)      ) 
-    X( int,     light_mode,            nlight,        1                    ) 
-    X( int,     light_bodyid,          nlight,        1                    ) 
-    X( int,     light_targetbodyid,    nlight,        1                    ) 
-    X( mjtByte, light_directional,     nlight,        1                    ) 
-    X( mjtByte, light_castshadow,      nlight,        1                    ) 
-    X( mjtByte, light_active,          nlight,        1                    ) 
-    X( mjtNum,  light_pos,             nlight,        3                    ) 
-    X( mjtNum,  light_dir,             nlight,        3                    ) 
-    X( mjtNum,  light_poscom0,         nlight,        3                    ) 
-    X( mjtNum,  light_pos0,            nlight,        3                    ) 
-    X( mjtNum,  light_dir0,            nlight,        3                    ) 
-    X( float,   light_attenuation,     nlight,        3                    ) 
-    X( float,   light_cutoff,          nlight,        1                    ) 
-    X( float,   light_exponent,        nlight,        1                    ) 
-    X( float,   light_ambient,         nlight,        3                    ) 
-    X( float,   light_diffuse,         nlight,        3                    ) 
-    X( float,   light_specular,        nlight,        3                    ) 
-    X( int,     mesh_vertadr,          nmesh,         1                    ) 
-    X( int,     mesh_vertnum,          nmesh,         1                    ) 
-    X( int,     mesh_texcoordadr,      nmesh,         1                    ) 
-    X( int,     mesh_faceadr,          nmesh,         1                    ) 
-    X( int,     mesh_facenum,          nmesh,         1                    ) 
-    X( int,     mesh_graphadr,         nmesh,         1                    ) 
-    X( float,   mesh_vert,             nmeshvert,     3                    ) 
-    X( float,   mesh_normal,           nmeshvert,     3                    ) 
-    X( float,   mesh_texcoord,         nmeshtexvert,  2                    ) 
-    X( int,     mesh_face,             nmeshface,     3                    ) 
-    X( int,     mesh_graph,            nmeshgraph,    1                    ) 
-    X( int,     skin_matid,            nskin,         1                    ) 
-    X( float,   skin_rgba,             nskin,         4                    ) 
-    X( float,   skin_inflate,          nskin,         1                    ) 
-    X( int,     skin_vertadr,          nskin,         1                    ) 
-    X( int,     skin_vertnum,          nskin,         1                    ) 
-    X( int,     skin_texcoordadr,      nskin,         1                    ) 
-    X( int,     skin_faceadr,          nskin,         1                    ) 
-    X( int,     skin_facenum,          nskin,         1                    ) 
-    X( int,     skin_boneadr,          nskin,         1                    ) 
-    X( int,     skin_bonenum,          nskin,         1                    ) 
-    X( float,   skin_vert,             nskinvert,     3                    ) 
-    X( float,   skin_texcoord,         nskintexvert,  2                    ) 
-    X( int,     skin_face,             nskinface,     3                    ) 
-    X( int,     skin_bonevertadr,      nskinbone,     1                    ) 
-    X( int,     skin_bonevertnum,      nskinbone,     1                    ) 
-    X( float,   skin_bonebindpos,      nskinbone,     3                    ) 
-    X( float,   skin_bonebindquat,     nskinbone,     4                    ) 
-    X( int,     skin_bonebodyid,       nskinbone,     1                    ) 
-    X( int,     skin_bonevertid,       nskinbonevert, 1                    ) 
-    X( float,   skin_bonevertweight,   nskinbonevert, 1                    ) 
-    X( mjtNum,  hfield_size,           nhfield,       4                    ) 
-    X( int,     hfield_nrow,           nhfield,       1                    ) 
-    X( int,     hfield_ncol,           nhfield,       1                    ) 
-    X( int,     hfield_adr,            nhfield,       1                    ) 
-    X( float,   hfield_data,           nhfielddata,   1                    ) 
-    X( int,     tex_type,              ntex,          1                    ) 
-    X( int,     tex_height,            ntex,          1                    ) 
-    X( int,     tex_width,             ntex,          1                    ) 
-    X( int,     tex_adr,               ntex,          1                    ) 
-    X( mjtByte, tex_rgb,               ntexdata,      1                    ) 
-    X( int,     mat_texid,             nmat,          1                    ) 
-    X( mjtByte, mat_texuniform,        nmat,          1                    ) 
-    X( float,   mat_texrepeat,         nmat,          2                    ) 
-    X( float,   mat_emission,          nmat,          1                    ) 
-    X( float,   mat_specular,          nmat,          1                    ) 
-    X( float,   mat_shininess,         nmat,          1                    ) 
-    X( float,   mat_reflectance,       nmat,          1                    ) 
-    X( float,   mat_rgba,              nmat,          4                    ) 
-    X( int,     pair_dim,              npair,         1                    ) 
-    X( int,     pair_geom1,            npair,         1                    ) 
-    X( int,     pair_geom2,            npair,         1                    ) 
-    X( int,     pair_signature,        npair,         1                    ) 
-    X( mjtNum,  pair_solref,           npair,         mjNREF               ) 
-    X( mjtNum,  pair_solimp,           npair,         mjNIMP               ) 
-    X( mjtNum,  pair_margin,           npair,         1                    ) 
-    X( mjtNum,  pair_gap,              npair,         1                    ) 
-    X( mjtNum,  pair_friction,         npair,         5                    ) 
-    X( int,     exclude_signature,     nexclude,      1                    ) 
-    X( int,     eq_type,               neq,           1                    ) 
-    X( int,     eq_obj1id,             neq,           1                    ) 
-    X( int,     eq_obj2id,             neq,           1                    ) 
-    X( mjtByte, eq_active,             neq,           1                    ) 
-    X( mjtNum,  eq_solref,             neq,           mjNREF               ) 
-    X( mjtNum,  eq_solimp,             neq,           mjNIMP               ) 
-    X( mjtNum,  eq_data,               neq,           mjNEQDATA            ) 
-    X( int,     tendon_adr,            ntendon,       1                    ) 
-    X( int,     tendon_num,            ntendon,       1                    ) 
-    X( int,     tendon_matid,          ntendon,       1                    ) 
-    X( int,     tendon_group,          ntendon,       1                    ) 
-    X( mjtByte, tendon_limited,        ntendon,       1                    ) 
-    X( mjtNum,  tendon_width,          ntendon,       1                    ) 
-    X( mjtNum,  tendon_solref_lim,     ntendon,       mjNREF               ) 
-    X( mjtNum,  tendon_solimp_lim,     ntendon,       mjNIMP               ) 
-    X( mjtNum,  tendon_solref_fri,     ntendon,       mjNREF               ) 
-    X( mjtNum,  tendon_solimp_fri,     ntendon,       mjNIMP               ) 
-    X( mjtNum,  tendon_range,          ntendon,       2                    ) 
-    X( mjtNum,  tendon_margin,         ntendon,       1                    ) 
-    X( mjtNum,  tendon_stiffness,      ntendon,       1                    ) 
-    X( mjtNum,  tendon_damping,        ntendon,       1                    ) 
-    X( mjtNum,  tendon_frictionloss,   ntendon,       1                    ) 
-    X( mjtNum,  tendon_lengthspring,   ntendon,       1                    ) 
-    X( mjtNum,  tendon_length0,        ntendon,       1                    ) 
-    X( mjtNum,  tendon_invweight0,     ntendon,       1                    ) 
-    X( mjtNum,  tendon_user,           ntendon,       MJ_M(nuser_tendon)   ) 
-    X( float,   tendon_rgba,           ntendon,       4                    ) 
-    X( int,     wrap_type,             nwrap,         1                    ) 
-    X( int,     wrap_objid,            nwrap,         1                    ) 
-    X( mjtNum,  wrap_prm,              nwrap,         1                    ) 
-    X( int,     actuator_trntype,      nu,            1                    ) 
-    X( int,     actuator_dyntype,      nu,            1                    ) 
-    X( int,     actuator_gaintype,     nu,            1                    ) 
-    X( int,     actuator_biastype,     nu,            1                    ) 
-    X( int,     actuator_trnid,        nu,            2                    ) 
-    X( int,     actuator_group,        nu,            1                    ) 
-    X( mjtByte, actuator_ctrllimited,  nu,            1                    ) 
-    X( mjtByte, actuator_forcelimited, nu,            1                    ) 
-    X( mjtByte, actuator_actlimited,   nu,            1                    ) 
-    X( mjtNum,  actuator_dynprm,       nu,            mjNDYN               ) 
-    X( mjtNum,  actuator_gainprm,      nu,            mjNGAIN              ) 
-    X( mjtNum,  actuator_biasprm,      nu,            mjNBIAS              ) 
-    X( mjtNum,  actuator_ctrlrange,    nu,            2                    ) 
-    X( mjtNum,  actuator_forcerange,   nu,            2                    ) 
-    X( mjtNum,  actuator_actrange,     nu,            2                    ) 
-    X( mjtNum,  actuator_gear,         nu,            6                    ) 
-    X( mjtNum,  actuator_cranklength,  nu,            1                    ) 
-    X( mjtNum,  actuator_acc0,         nu,            1                    ) 
-    X( mjtNum,  actuator_length0,      nu,            1                    ) 
-    X( mjtNum,  actuator_lengthrange,  nu,            2                    ) 
-    X( mjtNum,  actuator_user,         nu,            MJ_M(nuser_actuator) ) 
-    X( int,     sensor_type,           nsensor,       1                    ) 
-    X( int,     sensor_datatype,       nsensor,       1                    ) 
-    X( int,     sensor_needstage,      nsensor,       1                    ) 
-    X( int,     sensor_objtype,        nsensor,       1                    ) 
-    X( int,     sensor_objid,          nsensor,       1                    ) 
-    X( int,     sensor_reftype,        nsensor,       1                    ) 
-    X( int,     sensor_refid,          nsensor,       1                    ) 
-    X( int,     sensor_dim,            nsensor,       1                    ) 
-    X( int,     sensor_adr,            nsensor,       1                    ) 
-    X( mjtNum,  sensor_cutoff,         nsensor,       1                    ) 
-    X( mjtNum,  sensor_noise,          nsensor,       1                    ) 
-    X( mjtNum,  sensor_user,           nsensor,       MJ_M(nuser_sensor)   ) 
-    X( int,     numeric_adr,           nnumeric,      1                    ) 
-    X( int,     numeric_size,          nnumeric,      1                    ) 
-    X( mjtNum,  numeric_data,          nnumericdata,  1                    ) 
-    X( int,     text_adr,              ntext,         1                    ) 
-    X( int,     text_size,             ntext,         1                    ) 
-    X( char,    text_data,             ntextdata,     1                    ) 
-    X( int,     tuple_adr,             ntuple,        1                    ) 
-    X( int,     tuple_size,            ntuple,        1                    ) 
-    X( int,     tuple_objtype,         ntupledata,    1                    ) 
-    X( int,     tuple_objid,           ntupledata,    1                    ) 
-    X( mjtNum,  tuple_objprm,          ntupledata,    1                    ) 
-    X( mjtNum,  key_time,              nkey,          1                    ) 
-    X( mjtNum,  key_qpos,              nkey,          MJ_M(nq)             ) 
-    X( mjtNum,  key_qvel,              nkey,          MJ_M(nv)             ) 
-    X( mjtNum,  key_act,               nkey,          MJ_M(na)             ) 
-    X( mjtNum,  key_mpos,              nkey,          MJ_M(nmocap)*3       ) 
-    X( mjtNum,  key_mquat,             nkey,          MJ_M(nmocap)*4       ) 
-    X( int,     name_bodyadr,          nbody,         1                    ) 
-    X( int,     name_jntadr,           njnt,          1                    ) 
-    X( int,     name_geomadr,          ngeom,         1                    ) 
-    X( int,     name_siteadr,          nsite,         1                    ) 
-    X( int,     name_camadr,           ncam,          1                    ) 
-    X( int,     name_lightadr,         nlight,        1                    ) 
-    X( int,     name_meshadr,          nmesh,         1                    ) 
-    X( int,     name_skinadr,          nskin,         1                    ) 
-    X( int,     name_hfieldadr,        nhfield,       1                    ) 
-    X( int,     name_texadr,           ntex,          1                    ) 
-    X( int,     name_matadr,           nmat,          1                    ) 
-    X( int,     name_pairadr,          npair,         1                    ) 
-    X( int,     name_excludeadr,       nexclude,      1                    ) 
-    X( int,     name_eqadr,            neq,           1                    ) 
-    X( int,     name_tendonadr,        ntendon,       1                    ) 
-    X( int,     name_actuatoradr,      nu,            1                    ) 
-    X( int,     name_sensoradr,        nsensor,       1                    ) 
-    X( int,     name_numericadr,       nnumeric,      1                    ) 
-    X( int,     name_textadr,          ntext,         1                    ) 
-    X( int,     name_tupleadr,         ntuple,        1                    ) 
-    X( int,     name_keyadr,           nkey,          1                    ) 
-    X( char,    names,                 nnames,        1                    );
+// #define MJMODEL_POINTERS
+//     X( mjtNum,  qpos0,                 nq,            1                    )
+//     X( mjtNum,  qpos_spring,           nq,            1                    )
+//     X( int,     body_parentid,         nbody,         1                    )
+//     X( int,     body_rootid,           nbody,         1                    )
+//     X( int,     body_weldid,           nbody,         1                    )
+//     X( int,     body_mocapid,          nbody,         1                    )
+//     X( int,     body_jntnum,           nbody,         1                    )
+//     X( int,     body_jntadr,           nbody,         1                    )
+//     X( int,     body_dofnum,           nbody,         1                    )
+//     X( int,     body_dofadr,           nbody,         1                    )
+//     X( int,     body_geomnum,          nbody,         1                    )
+//     X( int,     body_geomadr,          nbody,         1                    )
+//     X( mjtByte, body_simple,           nbody,         1                    )
+//     X( mjtByte, body_sameframe,        nbody,         1                    )
+//     X( mjtNum,  body_pos,              nbody,         3                    )
+//     X( mjtNum,  body_quat,             nbody,         4                    )
+//     X( mjtNum,  body_ipos,             nbody,         3                    )
+//     X( mjtNum,  body_iquat,            nbody,         4                    )
+//     X( mjtNum,  body_mass,             nbody,         1                    )
+//     X( mjtNum,  body_subtreemass,      nbody,         1                    )
+//     X( mjtNum,  body_inertia,          nbody,         3                    )
+//     X( mjtNum,  body_invweight0,       nbody,         2                    )
+//     X( mjtNum,  body_user,             nbody,         MJ_M(nuser_body)     )
+//     X( int,     jnt_type,              njnt,          1                    )
+//     X( int,     jnt_qposadr,           njnt,          1                    )
+//     X( int,     jnt_dofadr,            njnt,          1                    )
+//     X( int,     jnt_bodyid,            njnt,          1                    )
+//     X( int,     jnt_group,             njnt,          1                    )
+//     X( mjtByte, jnt_limited,           njnt,          1                    )
+//     X( mjtNum,  jnt_solref,            njnt,          mjNREF               )
+//     X( mjtNum,  jnt_solimp,            njnt,          mjNIMP               )
+//     X( mjtNum,  jnt_pos,               njnt,          3                    )
+//     X( mjtNum,  jnt_axis,              njnt,          3                    )
+//     X( mjtNum,  jnt_stiffness,         njnt,          1                    )
+//     X( mjtNum,  jnt_range,             njnt,          2                    )
+//     X( mjtNum,  jnt_margin,            njnt,          1                    )
+//     X( mjtNum,  jnt_user,              njnt,          MJ_M(nuser_jnt)      )
+//     X( int,     dof_bodyid,            nv,            1                    )
+//     X( int,     dof_jntid,             nv,            1                    )
+//     X( int,     dof_parentid,          nv,            1                    )
+//     X( int,     dof_Madr,              nv,            1                    )
+//     X( int,     dof_simplenum,         nv,            1                    )
+//     X( mjtNum,  dof_solref,            nv,            mjNREF               )
+//     X( mjtNum,  dof_solimp,            nv,            mjNIMP               )
+//     X( mjtNum,  dof_frictionloss,      nv,            1                    )
+//     X( mjtNum,  dof_armature,          nv,            1                    )
+//     X( mjtNum,  dof_damping,           nv,            1                    )
+//     X( mjtNum,  dof_invweight0,        nv,            1                    )
+//     X( mjtNum,  dof_M0,                nv,            1                    )
+//     X( int,     geom_type,             ngeom,         1                    )
+//     X( int,     geom_contype,          ngeom,         1                    )
+//     X( int,     geom_conaffinity,      ngeom,         1                    )
+//     X( int,     geom_condim,           ngeom,         1                    )
+//     X( int,     geom_bodyid,           ngeom,         1                    )
+//     X( int,     geom_dataid,           ngeom,         1                    )
+//     X( int,     geom_matid,            ngeom,         1                    )
+//     X( int,     geom_group,            ngeom,         1                    )
+//     X( int,     geom_priority,         ngeom,         1                    )
+//     X( mjtByte, geom_sameframe,        ngeom,         1                    )
+//     X( mjtNum,  geom_solmix,           ngeom,         1                    )
+//     X( mjtNum,  geom_solref,           ngeom,         mjNREF               )
+//     X( mjtNum,  geom_solimp,           ngeom,         mjNIMP               )
+//     X( mjtNum,  geom_size,             ngeom,         3                    )
+//     X( mjtNum,  geom_rbound,           ngeom,         1                    )
+//     X( mjtNum,  geom_pos,              ngeom,         3                    )
+//     X( mjtNum,  geom_quat,             ngeom,         4                    )
+//     X( mjtNum,  geom_friction,         ngeom,         3                    )
+//     X( mjtNum,  geom_margin,           ngeom,         1                    )
+//     X( mjtNum,  geom_gap,              ngeom,         1                    )
+//     X( mjtNum,  geom_fluid,            ngeom,         mjNFLUID             )
+//     X( mjtNum,  geom_user,             ngeom,         MJ_M(nuser_geom)     )
+//     X( float,   geom_rgba,             ngeom,         4                    )
+//     X( int,     site_type,             nsite,         1                    )
+//     X( int,     site_bodyid,           nsite,         1                    )
+//     X( int,     site_matid,            nsite,         1                    )
+//     X( int,     site_group,            nsite,         1                    )
+//     X( mjtByte, site_sameframe,        nsite,         1                    )
+//     X( mjtNum,  site_size,             nsite,         3                    )
+//     X( mjtNum,  site_pos,              nsite,         3                    )
+//     X( mjtNum,  site_quat,             nsite,         4                    )
+//     X( mjtNum,  site_user,             nsite,         MJ_M(nuser_site)     )
+//     X( float,   site_rgba,             nsite,         4                    )
+//     X( int,     cam_mode,              ncam,          1                    )
+//     X( int,     cam_bodyid,            ncam,          1                    )
+//     X( int,     cam_targetbodyid,      ncam,          1                    )
+//     X( mjtNum,  cam_pos,               ncam,          3                    )
+//     X( mjtNum,  cam_quat,              ncam,          4                    )
+//     X( mjtNum,  cam_poscom0,           ncam,          3                    )
+//     X( mjtNum,  cam_pos0,              ncam,          3                    )
+//     X( mjtNum,  cam_mat0,              ncam,          9                    )
+//     X( mjtNum,  cam_fovy,              ncam,          1                    )
+//     X( mjtNum,  cam_ipd,               ncam,          1                    )
+//     X( mjtNum,  cam_user,              ncam,          MJ_M(nuser_cam)      )
+//     X( int,     light_mode,            nlight,        1                    )
+//     X( int,     light_bodyid,          nlight,        1                    )
+//     X( int,     light_targetbodyid,    nlight,        1                    )
+//     X( mjtByte, light_directional,     nlight,        1                    )
+//     X( mjtByte, light_castshadow,      nlight,        1                    )
+//     X( mjtByte, light_active,          nlight,        1                    )
+//     X( mjtNum,  light_pos,             nlight,        3                    )
+//     X( mjtNum,  light_dir,             nlight,        3                    )
+//     X( mjtNum,  light_poscom0,         nlight,        3                    )
+//     X( mjtNum,  light_pos0,            nlight,        3                    )
+//     X( mjtNum,  light_dir0,            nlight,        3                    )
+//     X( float,   light_attenuation,     nlight,        3                    )
+//     X( float,   light_cutoff,          nlight,        1                    )
+//     X( float,   light_exponent,        nlight,        1                    )
+//     X( float,   light_ambient,         nlight,        3                    )
+//     X( float,   light_diffuse,         nlight,        3                    )
+//     X( float,   light_specular,        nlight,        3                    )
+//     X( int,     mesh_vertadr,          nmesh,         1                    )
+//     X( int,     mesh_vertnum,          nmesh,         1                    )
+//     X( int,     mesh_texcoordadr,      nmesh,         1                    )
+//     X( int,     mesh_faceadr,          nmesh,         1                    )
+//     X( int,     mesh_facenum,          nmesh,         1                    )
+//     X( int,     mesh_graphadr,         nmesh,         1                    )
+//     X( float,   mesh_vert,             nmeshvert,     3                    )
+//     X( float,   mesh_normal,           nmeshvert,     3                    )
+//     X( float,   mesh_texcoord,         nmeshtexvert,  2                    )
+//     X( int,     mesh_face,             nmeshface,     3                    )
+//     X( int,     mesh_graph,            nmeshgraph,    1                    )
+//     X( int,     skin_matid,            nskin,         1                    )
+//     X( float,   skin_rgba,             nskin,         4                    )
+//     X( float,   skin_inflate,          nskin,         1                    )
+//     X( int,     skin_vertadr,          nskin,         1                    )
+//     X( int,     skin_vertnum,          nskin,         1                    )
+//     X( int,     skin_texcoordadr,      nskin,         1                    )
+//     X( int,     skin_faceadr,          nskin,         1                    )
+//     X( int,     skin_facenum,          nskin,         1                    )
+//     X( int,     skin_boneadr,          nskin,         1                    )
+//     X( int,     skin_bonenum,          nskin,         1                    )
+//     X( float,   skin_vert,             nskinvert,     3                    )
+//     X( float,   skin_texcoord,         nskintexvert,  2                    )
+//     X( int,     skin_face,             nskinface,     3                    )
+//     X( int,     skin_bonevertadr,      nskinbone,     1                    )
+//     X( int,     skin_bonevertnum,      nskinbone,     1                    )
+//     X( float,   skin_bonebindpos,      nskinbone,     3                    )
+//     X( float,   skin_bonebindquat,     nskinbone,     4                    )
+//     X( int,     skin_bonebodyid,       nskinbone,     1                    )
+//     X( int,     skin_bonevertid,       nskinbonevert, 1                    )
+//     X( float,   skin_bonevertweight,   nskinbonevert, 1                    )
+//     X( mjtNum,  hfield_size,           nhfield,       4                    )
+//     X( int,     hfield_nrow,           nhfield,       1                    )
+//     X( int,     hfield_ncol,           nhfield,       1                    )
+//     X( int,     hfield_adr,            nhfield,       1                    )
+//     X( float,   hfield_data,           nhfielddata,   1                    )
+//     X( int,     tex_type,              ntex,          1                    )
+//     X( int,     tex_height,            ntex,          1                    )
+//     X( int,     tex_width,             ntex,          1                    )
+//     X( int,     tex_adr,               ntex,          1                    )
+//     X( mjtByte, tex_rgb,               ntexdata,      1                    )
+//     X( int,     mat_texid,             nmat,          1                    )
+//     X( mjtByte, mat_texuniform,        nmat,          1                    )
+//     X( float,   mat_texrepeat,         nmat,          2                    )
+//     X( float,   mat_emission,          nmat,          1                    )
+//     X( float,   mat_specular,          nmat,          1                    )
+//     X( float,   mat_shininess,         nmat,          1                    )
+//     X( float,   mat_reflectance,       nmat,          1                    )
+//     X( float,   mat_rgba,              nmat,          4                    )
+//     X( int,     pair_dim,              npair,         1                    )
+//     X( int,     pair_geom1,            npair,         1                    )
+//     X( int,     pair_geom2,            npair,         1                    )
+//     X( int,     pair_signature,        npair,         1                    )
+//     X( mjtNum,  pair_solref,           npair,         mjNREF               )
+//     X( mjtNum,  pair_solimp,           npair,         mjNIMP               )
+//     X( mjtNum,  pair_margin,           npair,         1                    )
+//     X( mjtNum,  pair_gap,              npair,         1                    )
+//     X( mjtNum,  pair_friction,         npair,         5                    )
+//     X( int,     exclude_signature,     nexclude,      1                    )
+//     X( int,     eq_type,               neq,           1                    )
+//     X( int,     eq_obj1id,             neq,           1                    )
+//     X( int,     eq_obj2id,             neq,           1                    )
+//     X( mjtByte, eq_active,             neq,           1                    )
+//     X( mjtNum,  eq_solref,             neq,           mjNREF               )
+//     X( mjtNum,  eq_solimp,             neq,           mjNIMP               )
+//     X( mjtNum,  eq_data,               neq,           mjNEQDATA            )
+//     X( int,     tendon_adr,            ntendon,       1                    )
+//     X( int,     tendon_num,            ntendon,       1                    )
+//     X( int,     tendon_matid,          ntendon,       1                    )
+//     X( int,     tendon_group,          ntendon,       1                    )
+//     X( mjtByte, tendon_limited,        ntendon,       1                    )
+//     X( mjtNum,  tendon_width,          ntendon,       1                    )
+//     X( mjtNum,  tendon_solref_lim,     ntendon,       mjNREF               )
+//     X( mjtNum,  tendon_solimp_lim,     ntendon,       mjNIMP               )
+//     X( mjtNum,  tendon_solref_fri,     ntendon,       mjNREF               )
+//     X( mjtNum,  tendon_solimp_fri,     ntendon,       mjNIMP               )
+//     X( mjtNum,  tendon_range,          ntendon,       2                    )
+//     X( mjtNum,  tendon_margin,         ntendon,       1                    )
+//     X( mjtNum,  tendon_stiffness,      ntendon,       1                    )
+//     X( mjtNum,  tendon_damping,        ntendon,       1                    )
+//     X( mjtNum,  tendon_frictionloss,   ntendon,       1                    )
+//     X( mjtNum,  tendon_lengthspring,   ntendon,       1                    )
+//     X( mjtNum,  tendon_length0,        ntendon,       1                    )
+//     X( mjtNum,  tendon_invweight0,     ntendon,       1                    )
+//     X( mjtNum,  tendon_user,           ntendon,       MJ_M(nuser_tendon)   )
+//     X( float,   tendon_rgba,           ntendon,       4                    )
+//     X( int,     wrap_type,             nwrap,         1                    )
+//     X( int,     wrap_objid,            nwrap,         1                    )
+//     X( mjtNum,  wrap_prm,              nwrap,         1                    )
+//     X( int,     actuator_trntype,      nu,            1                    )
+//     X( int,     actuator_dyntype,      nu,            1                    )
+//     X( int,     actuator_gaintype,     nu,            1                    )
+//     X( int,     actuator_biastype,     nu,            1                    )
+//     X( int,     actuator_trnid,        nu,            2                    )
+//     X( int,     actuator_group,        nu,            1                    )
+//     X( mjtByte, actuator_ctrllimited,  nu,            1                    )
+//     X( mjtByte, actuator_forcelimited, nu,            1                    )
+//     X( mjtByte, actuator_actlimited,   nu,            1                    )
+//     X( mjtNum,  actuator_dynprm,       nu,            mjNDYN               )
+//     X( mjtNum,  actuator_gainprm,      nu,            mjNGAIN              )
+//     X( mjtNum,  actuator_biasprm,      nu,            mjNBIAS              )
+//     X( mjtNum,  actuator_ctrlrange,    nu,            2                    )
+//     X( mjtNum,  actuator_forcerange,   nu,            2                    )
+//     X( mjtNum,  actuator_actrange,     nu,            2                    )
+//     X( mjtNum,  actuator_gear,         nu,            6                    )
+//     X( mjtNum,  actuator_cranklength,  nu,            1                    )
+//     X( mjtNum,  actuator_acc0,         nu,            1                    )
+//     X( mjtNum,  actuator_length0,      nu,            1                    )
+//     X( mjtNum,  actuator_lengthrange,  nu,            2                    )
+//     X( mjtNum,  actuator_user,         nu,            MJ_M(nuser_actuator) )
+//     X( int,     sensor_type,           nsensor,       1                    )
+//     X( int,     sensor_datatype,       nsensor,       1                    )
+//     X( int,     sensor_needstage,      nsensor,       1                    )
+//     X( int,     sensor_objtype,        nsensor,       1                    )
+//     X( int,     sensor_objid,          nsensor,       1                    )
+//     X( int,     sensor_reftype,        nsensor,       1                    )
+//     X( int,     sensor_refid,          nsensor,       1                    )
+//     X( int,     sensor_dim,            nsensor,       1                    )
+//     X( int,     sensor_adr,            nsensor,       1                    )
+//     X( mjtNum,  sensor_cutoff,         nsensor,       1                    )
+//     X( mjtNum,  sensor_noise,          nsensor,       1                    )
+//     X( mjtNum,  sensor_user,           nsensor,       MJ_M(nuser_sensor)   )
+//     X( int,     numeric_adr,           nnumeric,      1                    )
+//     X( int,     numeric_size,          nnumeric,      1                    )
+//     X( mjtNum,  numeric_data,          nnumericdata,  1                    )
+//     X( int,     text_adr,              ntext,         1                    )
+//     X( int,     text_size,             ntext,         1                    )
+//     X( char,    text_data,             ntextdata,     1                    )
+//     X( int,     tuple_adr,             ntuple,        1                    )
+//     X( int,     tuple_size,            ntuple,        1                    )
+//     X( int,     tuple_objtype,         ntupledata,    1                    )
+//     X( int,     tuple_objid,           ntupledata,    1                    )
+//     X( mjtNum,  tuple_objprm,          ntupledata,    1                    )
+//     X( mjtNum,  key_time,              nkey,          1                    )
+//     X( mjtNum,  key_qpos,              nkey,          MJ_M(nq)             )
+//     X( mjtNum,  key_qvel,              nkey,          MJ_M(nv)             )
+//     X( mjtNum,  key_act,               nkey,          MJ_M(na)             )
+//     X( mjtNum,  key_mpos,              nkey,          MJ_M(nmocap)*3       )
+//     X( mjtNum,  key_mquat,             nkey,          MJ_M(nmocap)*4       )
+//     X( int,     name_bodyadr,          nbody,         1                    )
+//     X( int,     name_jntadr,           njnt,          1                    )
+//     X( int,     name_geomadr,          ngeom,         1                    )
+//     X( int,     name_siteadr,          nsite,         1                    )
+//     X( int,     name_camadr,           ncam,          1                    )
+//     X( int,     name_lightadr,         nlight,        1                    )
+//     X( int,     name_meshadr,          nmesh,         1                    )
+//     X( int,     name_skinadr,          nskin,         1                    )
+//     X( int,     name_hfieldadr,        nhfield,       1                    )
+//     X( int,     name_texadr,           ntex,          1                    )
+//     X( int,     name_matadr,           nmat,          1                    )
+//     X( int,     name_pairadr,          npair,         1                    )
+//     X( int,     name_excludeadr,       nexclude,      1                    )
+//     X( int,     name_eqadr,            neq,           1                    )
+//     X( int,     name_tendonadr,        ntendon,       1                    )
+//     X( int,     name_actuatoradr,      nu,            1                    )
+//     X( int,     name_sensoradr,        nsensor,       1                    )
+//     X( int,     name_numericadr,       nnumeric,      1                    )
+//     X( int,     name_textadr,          ntext,         1                    )
+//     X( int,     name_tupleadr,         ntuple,        1                    )
+//     X( int,     name_keyadr,           nkey,          1                    )
+//     X( char,    names,                 nnames,        1                    )
 
 
 //-------------------------------- mjData ----------------------------------------------------------
@@ -3397,18 +3391,18 @@ public static final int MJDATA_SCALAR = MJDATA_SCALAR();
 
 
 // vector fields of mjData
-public static final int MJDATA_VECTOR =                                   
-    X( mjWarningStat,  warning,        mjNWARNING,  1 ) 
-    X( mjTimerStat,    timer,          mjNTIMER,    1 ) 
-    X( mjSolverStat,   solver,         mjNSOLVER,   1 ) 
-    X( mjtNum,         solver_fwdinv,  2,           1 ) 
-    X( mjtNum,         energy,         2,           1 );
+// #define MJDATA_VECTOR
+//     X( mjWarningStat,  warning,        mjNWARNING,  1 )
+//     X( mjTimerStat,    timer,          mjNTIMER,    1 )
+//     X( mjSolverStat,   solver,         mjNSOLVER,   1 )
+//     X( mjtNum,         solver_fwdinv,  2,           1 )
+//     X( mjtNum,         energy,         2,           1 )
 
 
 // #endif  // MUJOCO_MJXMACRO_H_
 
 
-// Parsed from mujoco.h
+// Parsed from mujoco/mujoco.h
 
 // Copyright 2021 DeepMind Technologies Limited
 //
@@ -3454,7 +3448,7 @@ public static final int mjVERSION_HEADER = 220;
 // macros
 public static native @MemberGetter int mjMARKSTACK();
 public static final int mjMARKSTACK = mjMARKSTACK();
-public static final int mjFREESTACK =   d->pstack = _mark;;
+// #define mjFREESTACK   d->pstack = _mark;
 // #define mjDISABLED(x) (m->opt.disableflags & (x))
 // #define mjENABLED(x)  (m->opt.enableflags & (x))
 
@@ -3638,8 +3632,6 @@ public static native void mj_defaultLROpt(mjLROpt opt);
 
 // Set solver parameters to default values.
 public static native void mj_defaultSolRefImp(@Cast("mjtNum*") DoublePointer solref, @Cast("mjtNum*") DoublePointer solimp);
-public static native void mj_defaultSolRefImp(@Cast("mjtNum*") DoubleBuffer solref, @Cast("mjtNum*") DoubleBuffer solimp);
-public static native void mj_defaultSolRefImp(@Cast("mjtNum*") double[] solref, @Cast("mjtNum*") double[] solimp);
 
 // Set physics options to default values.
 public static native void mj_defaultOption(mjOption opt);
@@ -3727,15 +3719,13 @@ public static native void mj_printData(@Const mjModel m, mjData d, String filena
 
 // Print matrix to screen.
 public static native void mju_printMat(@Cast("const mjtNum*") DoublePointer mat, int nr, int nc);
-public static native void mju_printMat(@Cast("const mjtNum*") DoubleBuffer mat, int nr, int nc);
-public static native void mju_printMat(@Cast("const mjtNum*") double[] mat, int nr, int nc);
 
 // Print sparse matrix to screen.
 public static native void mju_printMatSparse(@Cast("const mjtNum*") DoublePointer mat, int nr,
                               @Const IntPointer rownnz, @Const IntPointer rowadr, @Const IntPointer colind);
-public static native void mju_printMatSparse(@Cast("const mjtNum*") DoubleBuffer mat, int nr,
+public static native void mju_printMatSparse(@Cast("const mjtNum*") DoublePointer mat, int nr,
                               @Const IntBuffer rownnz, @Const IntBuffer rowadr, @Const IntBuffer colind);
-public static native void mju_printMatSparse(@Cast("const mjtNum*") double[] mat, int nr,
+public static native void mju_printMatSparse(@Cast("const mjtNum*") DoublePointer mat, int nr,
                               @Const int[] rownnz, @Const int[] rowadr, @Const int[] colind);
 
 
@@ -3824,13 +3814,9 @@ public static native void mj_factorM(@Const mjModel m, mjData d);
 
 // Solve linear system M * x = y using factorization:  x = inv(L'*D*L)*y
 public static native void mj_solveM(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer x, @Cast("const mjtNum*") DoublePointer y, int n);
-public static native void mj_solveM(@Const mjModel m, mjData d, @Cast("mjtNum*") DoubleBuffer x, @Cast("const mjtNum*") DoubleBuffer y, int n);
-public static native void mj_solveM(@Const mjModel m, mjData d, @Cast("mjtNum*") double[] x, @Cast("const mjtNum*") double[] y, int n);
 
 // Half of linear solve:  x = sqrt(inv(D))*inv(L')*y
 public static native void mj_solveM2(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer x, @Cast("const mjtNum*") DoublePointer y, int n);
-public static native void mj_solveM2(@Const mjModel m, mjData d, @Cast("mjtNum*") DoubleBuffer x, @Cast("const mjtNum*") DoubleBuffer y, int n);
-public static native void mj_solveM2(@Const mjModel m, mjData d, @Cast("mjtNum*") double[] x, @Cast("const mjtNum*") double[] y, int n);
 
 // Compute cvel, cdof_dot.
 public static native void mj_comVel(@Const mjModel m, mjData d);
@@ -3843,8 +3829,6 @@ public static native void mj_subtreeVel(@Const mjModel m, mjData d);
 
 // RNE: compute M(qpos)*qacc + C(qpos,qvel); flg_acc=0 removes inertial term.
 public static native void mj_rne(@Const mjModel m, mjData d, int flg_acc, @Cast("mjtNum*") DoublePointer result);
-public static native void mj_rne(@Const mjModel m, mjData d, int flg_acc, @Cast("mjtNum*") DoubleBuffer result);
-public static native void mj_rne(@Const mjModel m, mjData d, int flg_acc, @Cast("mjtNum*") double[] result);
 
 // RNE with complete data: compute cacc, cfrc_ext, cfrc_int.
 public static native void mj_rnePostConstraint(@Const mjModel m, mjData d);
@@ -3865,10 +3849,6 @@ public static native void mj_referenceConstraint(@Const mjModel m, mjData d);
 // If cost is not NULL, set *cost = s(jar) where jar = Jac*qacc-aref.
 public static native void mj_constraintUpdate(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer jar,
                                @Cast("mjtNum*") DoublePointer cost, int flg_coneHessian);
-public static native void mj_constraintUpdate(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoubleBuffer jar,
-                               @Cast("mjtNum*") DoubleBuffer cost, int flg_coneHessian);
-public static native void mj_constraintUpdate(@Const mjModel m, mjData d, @Cast("const mjtNum*") double[] jar,
-                               @Cast("mjtNum*") double[] cost, int flg_coneHessian);
 
 
 //---------------------------------- Support -------------------------------------------------------
@@ -3887,49 +3867,29 @@ public static native int mj_isDual(@Const mjModel m);
 
 // Multiply dense or sparse constraint Jacobian by vector.
 public static native void mj_mulJacVec(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec);
-public static native void mj_mulJacVec(@Const mjModel m, mjData d, @Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec);
-public static native void mj_mulJacVec(@Const mjModel m, mjData d, @Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec);
 
 // Multiply dense or sparse constraint Jacobian transpose by vector.
 public static native void mj_mulJacTVec(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec);
-public static native void mj_mulJacTVec(@Const mjModel m, mjData d, @Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec);
-public static native void mj_mulJacTVec(@Const mjModel m, mjData d, @Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec);
 
 // Compute 3/6-by-nv end-effector Jacobian of global point attached to given body.
 public static native void mj_jac(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr,
                   @Cast("const mjtNum*") DoublePointer point, int body);
-public static native void mj_jac(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoubleBuffer jacp, @Cast("mjtNum*") DoubleBuffer jacr,
-                  @Cast("const mjtNum*") DoubleBuffer point, int body);
-public static native void mj_jac(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") double[] jacp, @Cast("mjtNum*") double[] jacr,
-                  @Cast("const mjtNum*") double[] point, int body);
 
 // Compute body frame end-effector Jacobian.
 public static native void mj_jacBody(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr, int body);
-public static native void mj_jacBody(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoubleBuffer jacp, @Cast("mjtNum*") DoubleBuffer jacr, int body);
-public static native void mj_jacBody(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") double[] jacp, @Cast("mjtNum*") double[] jacr, int body);
 
 // Compute body center-of-mass end-effector Jacobian.
 public static native void mj_jacBodyCom(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr, int body);
-public static native void mj_jacBodyCom(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoubleBuffer jacp, @Cast("mjtNum*") DoubleBuffer jacr, int body);
-public static native void mj_jacBodyCom(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") double[] jacp, @Cast("mjtNum*") double[] jacr, int body);
 
 // Compute geom end-effector Jacobian.
 public static native void mj_jacGeom(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr, int geom);
-public static native void mj_jacGeom(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoubleBuffer jacp, @Cast("mjtNum*") DoubleBuffer jacr, int geom);
-public static native void mj_jacGeom(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") double[] jacp, @Cast("mjtNum*") double[] jacr, int geom);
 
 // Compute site end-effector Jacobian.
 public static native void mj_jacSite(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr, int site);
-public static native void mj_jacSite(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoubleBuffer jacp, @Cast("mjtNum*") DoubleBuffer jacr, int site);
-public static native void mj_jacSite(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") double[] jacp, @Cast("mjtNum*") double[] jacr, int site);
 
 // Compute translation end-effector Jacobian of point, and rotation Jacobian of axis.
 public static native void mj_jacPointAxis(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer jacPoint, @Cast("mjtNum*") DoublePointer jacAxis,
                            @Cast("const mjtNum*") DoublePointer point, @Cast("const mjtNum*") DoublePointer axis, int body);
-public static native void mj_jacPointAxis(@Const mjModel m, mjData d, @Cast("mjtNum*") DoubleBuffer jacPoint, @Cast("mjtNum*") DoubleBuffer jacAxis,
-                           @Cast("const mjtNum*") DoubleBuffer point, @Cast("const mjtNum*") DoubleBuffer axis, int body);
-public static native void mj_jacPointAxis(@Const mjModel m, mjData d, @Cast("mjtNum*") double[] jacPoint, @Cast("mjtNum*") double[] jacAxis,
-                           @Cast("const mjtNum*") double[] point, @Cast("const mjtNum*") double[] axis, int body);
 
 // Get id of object with specified name, return -1 if not found; type is mjtObj.
 public static native int mj_name2id(@Const mjModel m, int type, @Cast("const char*") BytePointer name);
@@ -3940,79 +3900,47 @@ public static native @Cast("const char*") BytePointer mj_id2name(@Const mjModel 
 
 // Convert sparse inertia matrix M into full (i.e. dense) matrix.
 public static native void mj_fullM(@Const mjModel m, @Cast("mjtNum*") DoublePointer dst, @Cast("const mjtNum*") DoublePointer M);
-public static native void mj_fullM(@Const mjModel m, @Cast("mjtNum*") DoubleBuffer dst, @Cast("const mjtNum*") DoubleBuffer M);
-public static native void mj_fullM(@Const mjModel m, @Cast("mjtNum*") double[] dst, @Cast("const mjtNum*") double[] M);
 
 // Multiply vector by inertia matrix.
 public static native void mj_mulM(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec);
-public static native void mj_mulM(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec);
-public static native void mj_mulM(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec);
 
 // Multiply vector by (inertia matrix)^(1/2).
 public static native void mj_mulM2(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec);
-public static native void mj_mulM2(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec);
-public static native void mj_mulM2(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec);
 
 // Add inertia matrix to destination matrix.
 // Destination can be sparse uncompressed, or dense when all int* are NULL
 public static native void mj_addM(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer dst, IntPointer rownnz, IntPointer rowadr, IntPointer colind);
-public static native void mj_addM(@Const mjModel m, mjData d, @Cast("mjtNum*") DoubleBuffer dst, IntBuffer rownnz, IntBuffer rowadr, IntBuffer colind);
-public static native void mj_addM(@Const mjModel m, mjData d, @Cast("mjtNum*") double[] dst, int[] rownnz, int[] rowadr, int[] colind);
+public static native void mj_addM(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer dst, IntBuffer rownnz, IntBuffer rowadr, IntBuffer colind);
+public static native void mj_addM(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer dst, int[] rownnz, int[] rowadr, int[] colind);
 
 // Apply cartesian force and torque (outside xfrc_applied mechanism).
 public static native void mj_applyFT(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer force, @Cast("const mjtNum*") DoublePointer torque,
                       @Cast("const mjtNum*") DoublePointer point, int body, @Cast("mjtNum*") DoublePointer qfrc_target);
-public static native void mj_applyFT(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoubleBuffer force, @Cast("const mjtNum*") DoubleBuffer torque,
-                      @Cast("const mjtNum*") DoubleBuffer point, int body, @Cast("mjtNum*") DoubleBuffer qfrc_target);
-public static native void mj_applyFT(@Const mjModel m, mjData d, @Cast("const mjtNum*") double[] force, @Cast("const mjtNum*") double[] torque,
-                      @Cast("const mjtNum*") double[] point, int body, @Cast("mjtNum*") double[] qfrc_target);
 
 // Compute object 6D velocity in object-centered frame, world/local orientation.
 public static native void mj_objectVelocity(@Const mjModel m, @Const mjData d,
                              int objtype, int objid, @Cast("mjtNum*") DoublePointer res, int flg_local);
-public static native void mj_objectVelocity(@Const mjModel m, @Const mjData d,
-                             int objtype, int objid, @Cast("mjtNum*") DoubleBuffer res, int flg_local);
-public static native void mj_objectVelocity(@Const mjModel m, @Const mjData d,
-                             int objtype, int objid, @Cast("mjtNum*") double[] res, int flg_local);
 
 // Compute object 6D acceleration in object-centered frame, world/local orientation.
 public static native void mj_objectAcceleration(@Const mjModel m, @Const mjData d,
                                  int objtype, int objid, @Cast("mjtNum*") DoublePointer res, int flg_local);
-public static native void mj_objectAcceleration(@Const mjModel m, @Const mjData d,
-                                 int objtype, int objid, @Cast("mjtNum*") DoubleBuffer res, int flg_local);
-public static native void mj_objectAcceleration(@Const mjModel m, @Const mjData d,
-                                 int objtype, int objid, @Cast("mjtNum*") double[] res, int flg_local);
 
 // Extract 6D force:torque given contact id, in the contact frame.
 public static native void mj_contactForce(@Const mjModel m, @Const mjData d, int id, @Cast("mjtNum*") DoublePointer result);
-public static native void mj_contactForce(@Const mjModel m, @Const mjData d, int id, @Cast("mjtNum*") DoubleBuffer result);
-public static native void mj_contactForce(@Const mjModel m, @Const mjData d, int id, @Cast("mjtNum*") double[] result);
 
 // Compute velocity by finite-differencing two positions.
 public static native void mj_differentiatePos(@Const mjModel m, @Cast("mjtNum*") DoublePointer qvel, @Cast("mjtNum") double dt,
                                @Cast("const mjtNum*") DoublePointer qpos1, @Cast("const mjtNum*") DoublePointer qpos2);
-public static native void mj_differentiatePos(@Const mjModel m, @Cast("mjtNum*") DoubleBuffer qvel, @Cast("mjtNum") double dt,
-                               @Cast("const mjtNum*") DoubleBuffer qpos1, @Cast("const mjtNum*") DoubleBuffer qpos2);
-public static native void mj_differentiatePos(@Const mjModel m, @Cast("mjtNum*") double[] qvel, @Cast("mjtNum") double dt,
-                               @Cast("const mjtNum*") double[] qpos1, @Cast("const mjtNum*") double[] qpos2);
 
 // Integrate position with given velocity.
 public static native void mj_integratePos(@Const mjModel m, @Cast("mjtNum*") DoublePointer qpos, @Cast("const mjtNum*") DoublePointer qvel, @Cast("mjtNum") double dt);
-public static native void mj_integratePos(@Const mjModel m, @Cast("mjtNum*") DoubleBuffer qpos, @Cast("const mjtNum*") DoubleBuffer qvel, @Cast("mjtNum") double dt);
-public static native void mj_integratePos(@Const mjModel m, @Cast("mjtNum*") double[] qpos, @Cast("const mjtNum*") double[] qvel, @Cast("mjtNum") double dt);
 
 // Normalize all quaterions in qpos-type vector.
 public static native void mj_normalizeQuat(@Const mjModel m, @Cast("mjtNum*") DoublePointer qpos);
-public static native void mj_normalizeQuat(@Const mjModel m, @Cast("mjtNum*") DoubleBuffer qpos);
-public static native void mj_normalizeQuat(@Const mjModel m, @Cast("mjtNum*") double[] qpos);
 
 // Map from body local to global Cartesian coordinates.
 public static native void mj_local2Global(mjData d, @Cast("mjtNum*") DoublePointer xpos, @Cast("mjtNum*") DoublePointer xmat, @Cast("const mjtNum*") DoublePointer pos,
                            @Cast("const mjtNum*") DoublePointer quat, int body, @Cast("mjtByte") byte sameframe);
-public static native void mj_local2Global(mjData d, @Cast("mjtNum*") DoubleBuffer xpos, @Cast("mjtNum*") DoubleBuffer xmat, @Cast("const mjtNum*") DoubleBuffer pos,
-                           @Cast("const mjtNum*") DoubleBuffer quat, int body, @Cast("mjtByte") byte sameframe);
-public static native void mj_local2Global(mjData d, @Cast("mjtNum*") double[] xpos, @Cast("mjtNum*") double[] xmat, @Cast("const mjtNum*") double[] pos,
-                           @Cast("const mjtNum*") double[] quat, int body, @Cast("mjtByte") byte sameframe);
 
 // Sum all body masses.
 public static native @Cast("mjtNum") double mj_getTotalmass(@Const mjModel m);
@@ -4035,45 +3963,33 @@ public static native @Cast("const char*") BytePointer mj_versionString();
 public static native @Cast("mjtNum") double mj_ray(@Const mjModel m, @Const mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
                     @Cast("const mjtByte*") BytePointer geomgroup, @Cast("mjtByte") byte flg_static, int bodyexclude,
                     IntPointer geomid);
-public static native @Cast("mjtNum") double mj_ray(@Const mjModel m, @Const mjData d, @Cast("const mjtNum*") DoubleBuffer pnt, @Cast("const mjtNum*") DoubleBuffer vec,
+public static native @Cast("mjtNum") double mj_ray(@Const mjModel m, @Const mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
                     @Cast("const mjtByte*") ByteBuffer geomgroup, @Cast("mjtByte") byte flg_static, int bodyexclude,
                     IntBuffer geomid);
-public static native @Cast("mjtNum") double mj_ray(@Const mjModel m, @Const mjData d, @Cast("const mjtNum*") double[] pnt, @Cast("const mjtNum*") double[] vec,
+public static native @Cast("mjtNum") double mj_ray(@Const mjModel m, @Const mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
                     @Cast("const mjtByte*") byte[] geomgroup, @Cast("mjtByte") byte flg_static, int bodyexclude,
                     int[] geomid);
 
 // Interect ray with hfield, return nearest distance or -1 if no intersection.
 public static native @Cast("mjtNum") double mj_rayHfield(@Const mjModel m, @Const mjData d, int geomid,
                           @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec);
-public static native @Cast("mjtNum") double mj_rayHfield(@Const mjModel m, @Const mjData d, int geomid,
-                          @Cast("const mjtNum*") DoubleBuffer pnt, @Cast("const mjtNum*") DoubleBuffer vec);
-public static native @Cast("mjtNum") double mj_rayHfield(@Const mjModel m, @Const mjData d, int geomid,
-                          @Cast("const mjtNum*") double[] pnt, @Cast("const mjtNum*") double[] vec);
 
 // Interect ray with mesh, return nearest distance or -1 if no intersection.
 public static native @Cast("mjtNum") double mj_rayMesh(@Const mjModel m, @Const mjData d, int geomid,
                         @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec);
-public static native @Cast("mjtNum") double mj_rayMesh(@Const mjModel m, @Const mjData d, int geomid,
-                        @Cast("const mjtNum*") DoubleBuffer pnt, @Cast("const mjtNum*") DoubleBuffer vec);
-public static native @Cast("mjtNum") double mj_rayMesh(@Const mjModel m, @Const mjData d, int geomid,
-                        @Cast("const mjtNum*") double[] pnt, @Cast("const mjtNum*") double[] vec);
 
 // Interect ray with pure geom, return nearest distance or -1 if no intersection.
 public static native @Cast("mjtNum") double mju_rayGeom(@Cast("const mjtNum*") DoublePointer pos, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer size,
                          @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, int geomtype);
-public static native @Cast("mjtNum") double mju_rayGeom(@Cast("const mjtNum*") DoubleBuffer pos, @Cast("const mjtNum*") DoubleBuffer mat, @Cast("const mjtNum*") DoubleBuffer size,
-                         @Cast("const mjtNum*") DoubleBuffer pnt, @Cast("const mjtNum*") DoubleBuffer vec, int geomtype);
-public static native @Cast("mjtNum") double mju_rayGeom(@Cast("const mjtNum*") double[] pos, @Cast("const mjtNum*") double[] mat, @Cast("const mjtNum*") double[] size,
-                         @Cast("const mjtNum*") double[] pnt, @Cast("const mjtNum*") double[] vec, int geomtype);
 
 // Interect ray with skin, return nearest distance or -1 if no intersection,
 // and also output nearest vertex id.
 public static native @Cast("mjtNum") double mju_raySkin(int nface, int nvert, @Const IntPointer face, @Const FloatPointer vert,
                          @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, IntPointer vertid);
 public static native @Cast("mjtNum") double mju_raySkin(int nface, int nvert, @Const IntBuffer face, @Const FloatBuffer vert,
-                         @Cast("const mjtNum*") DoubleBuffer pnt, @Cast("const mjtNum*") DoubleBuffer vec, IntBuffer vertid);
+                         @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, IntBuffer vertid);
 public static native @Cast("mjtNum") double mju_raySkin(int nface, int nvert, @Const int[] face, @Const float[] vert,
-                         @Cast("const mjtNum*") double[] pnt, @Cast("const mjtNum*") double[] vec, int[] vertid);
+                         @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, int[] vertid);
 
 
 //---------------------------------- Interaction ---------------------------------------------------
@@ -4087,33 +4003,17 @@ public static native void mjv_defaultPerturb(mjvPerturb pert);
 // Transform pose from room to model space.
 public static native void mjv_room2model(@Cast("mjtNum*") DoublePointer modelpos, @Cast("mjtNum*") DoublePointer modelquat, @Cast("const mjtNum*") DoublePointer roompos,
                           @Cast("const mjtNum*") DoublePointer roomquat, @Const mjvScene scn);
-public static native void mjv_room2model(@Cast("mjtNum*") DoubleBuffer modelpos, @Cast("mjtNum*") DoubleBuffer modelquat, @Cast("const mjtNum*") DoubleBuffer roompos,
-                          @Cast("const mjtNum*") DoubleBuffer roomquat, @Const mjvScene scn);
-public static native void mjv_room2model(@Cast("mjtNum*") double[] modelpos, @Cast("mjtNum*") double[] modelquat, @Cast("const mjtNum*") double[] roompos,
-                          @Cast("const mjtNum*") double[] roomquat, @Const mjvScene scn);
 
 // Transform pose from model to room space.
 public static native void mjv_model2room(@Cast("mjtNum*") DoublePointer roompos, @Cast("mjtNum*") DoublePointer roomquat, @Cast("const mjtNum*") DoublePointer modelpos,
                           @Cast("const mjtNum*") DoublePointer modelquat, @Const mjvScene scn);
-public static native void mjv_model2room(@Cast("mjtNum*") DoubleBuffer roompos, @Cast("mjtNum*") DoubleBuffer roomquat, @Cast("const mjtNum*") DoubleBuffer modelpos,
-                          @Cast("const mjtNum*") DoubleBuffer modelquat, @Const mjvScene scn);
-public static native void mjv_model2room(@Cast("mjtNum*") double[] roompos, @Cast("mjtNum*") double[] roomquat, @Cast("const mjtNum*") double[] modelpos,
-                          @Cast("const mjtNum*") double[] modelquat, @Const mjvScene scn);
 
 // Get camera info in model space; average left and right OpenGL cameras.
 public static native void mjv_cameraInModel(@Cast("mjtNum*") DoublePointer headpos, @Cast("mjtNum*") DoublePointer forward, @Cast("mjtNum*") DoublePointer up,
                              @Const mjvScene scn);
-public static native void mjv_cameraInModel(@Cast("mjtNum*") DoubleBuffer headpos, @Cast("mjtNum*") DoubleBuffer forward, @Cast("mjtNum*") DoubleBuffer up,
-                             @Const mjvScene scn);
-public static native void mjv_cameraInModel(@Cast("mjtNum*") double[] headpos, @Cast("mjtNum*") double[] forward, @Cast("mjtNum*") double[] up,
-                             @Const mjvScene scn);
 
 // Get camera info in room space; average left and right OpenGL cameras.
 public static native void mjv_cameraInRoom(@Cast("mjtNum*") DoublePointer headpos, @Cast("mjtNum*") DoublePointer forward, @Cast("mjtNum*") DoublePointer up,
-                            @Const mjvScene scn);
-public static native void mjv_cameraInRoom(@Cast("mjtNum*") DoubleBuffer headpos, @Cast("mjtNum*") DoubleBuffer forward, @Cast("mjtNum*") DoubleBuffer up,
-                            @Const mjvScene scn);
-public static native void mjv_cameraInRoom(@Cast("mjtNum*") double[] headpos, @Cast("mjtNum*") double[] forward, @Cast("mjtNum*") double[] up,
                             @Const mjvScene scn);
 
 // Get frustum height at unit distance from camera; average left and right OpenGL cameras.
@@ -4121,8 +4021,6 @@ public static native @Cast("mjtNum") double mjv_frustumHeight(@Const mjvScene sc
 
 // Rotate 3D vec in horizontal plane by angle between (0,1) and (forward_x,forward_y).
 public static native void mjv_alignToCamera(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("const mjtNum*") DoublePointer forward);
-public static native void mjv_alignToCamera(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, @Cast("const mjtNum*") DoubleBuffer forward);
-public static native void mjv_alignToCamera(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, @Cast("const mjtNum*") double[] forward);
 
 // Move camera with mouse; action is mjtMouse.
 public static native void mjv_moveCamera(@Const mjModel m, int action, @Cast("mjtNum") double reldx, @Cast("mjtNum") double reldy,
@@ -4135,10 +4033,6 @@ public static native void mjv_movePerturb(@Const mjModel m, @Const mjData d, int
 // Move model with mouse; action is mjtMouse.
 public static native void mjv_moveModel(@Const mjModel m, int action, @Cast("mjtNum") double reldx, @Cast("mjtNum") double reldy,
                          @Cast("const mjtNum*") DoublePointer roomup, mjvScene scn);
-public static native void mjv_moveModel(@Const mjModel m, int action, @Cast("mjtNum") double reldx, @Cast("mjtNum") double reldy,
-                         @Cast("const mjtNum*") DoubleBuffer roomup, mjvScene scn);
-public static native void mjv_moveModel(@Const mjModel m, int action, @Cast("mjtNum") double reldx, @Cast("mjtNum") double reldy,
-                         @Cast("const mjtNum*") double[] roomup, mjvScene scn);
 
 // Copy perturb pos,quat from selected body; set scale for perturbation.
 public static native void mjv_initPerturb(@Const mjModel m, @Const mjData d,
@@ -4161,10 +4055,10 @@ public static native int mjv_select(@Const mjModel m, @Const mjData d, @Const mj
                      @Const mjvScene scn, @Cast("mjtNum*") DoublePointer selpnt, IntPointer geomid, IntPointer skinid);
 public static native int mjv_select(@Const mjModel m, @Const mjData d, @Const mjvOption vopt,
                      @Cast("mjtNum") double aspectratio, @Cast("mjtNum") double relx, @Cast("mjtNum") double rely,
-                     @Const mjvScene scn, @Cast("mjtNum*") DoubleBuffer selpnt, IntBuffer geomid, IntBuffer skinid);
+                     @Const mjvScene scn, @Cast("mjtNum*") DoublePointer selpnt, IntBuffer geomid, IntBuffer skinid);
 public static native int mjv_select(@Const mjModel m, @Const mjData d, @Const mjvOption vopt,
                      @Cast("mjtNum") double aspectratio, @Cast("mjtNum") double relx, @Cast("mjtNum") double rely,
-                     @Const mjvScene scn, @Cast("mjtNum*") double[] selpnt, int[] geomid, int[] skinid);
+                     @Const mjvScene scn, @Cast("mjtNum*") DoublePointer selpnt, int[] geomid, int[] skinid);
 
 
 //---------------------------------- Visualization -------------------------------------------------
@@ -4178,10 +4072,10 @@ public static native void mjv_defaultFigure(mjvFigure fig);
 // Initialize given geom fields when not NULL, set the rest to their default values.
 public static native void mjv_initGeom(mjvGeom geom, int type, @Cast("const mjtNum*") DoublePointer size,
                         @Cast("const mjtNum*") DoublePointer pos, @Cast("const mjtNum*") DoublePointer mat, @Const FloatPointer rgba);
-public static native void mjv_initGeom(mjvGeom geom, int type, @Cast("const mjtNum*") DoubleBuffer size,
-                        @Cast("const mjtNum*") DoubleBuffer pos, @Cast("const mjtNum*") DoubleBuffer mat, @Const FloatBuffer rgba);
-public static native void mjv_initGeom(mjvGeom geom, int type, @Cast("const mjtNum*") double[] size,
-                        @Cast("const mjtNum*") double[] pos, @Cast("const mjtNum*") double[] mat, @Const float[] rgba);
+public static native void mjv_initGeom(mjvGeom geom, int type, @Cast("const mjtNum*") DoublePointer size,
+                        @Cast("const mjtNum*") DoublePointer pos, @Cast("const mjtNum*") DoublePointer mat, @Const FloatBuffer rgba);
+public static native void mjv_initGeom(mjvGeom geom, int type, @Cast("const mjtNum*") DoublePointer size,
+                        @Cast("const mjtNum*") DoublePointer pos, @Cast("const mjtNum*") DoublePointer mat, @Const float[] rgba);
 
 // Set (type, size, pos, mat) for connector-type geom between given points.
 // Assume that mjv_initGeom was already called to set all other properties.
@@ -4407,23 +4301,38 @@ public static native void mj_deactivate();
 // #define mjMIN(a,b) (((a) < (b)) ? (a) : (b))
 
 // #ifdef mjUSEDOUBLE
-  public static final int mju_sqrt =    sqrt;
-  public static final int mju_exp =     exp;
-  public static final int mju_sin =     sin;
-  public static final int mju_cos =     cos;
-  public static final int mju_tan =     tan;
-  public static final int mju_asin =    asin;
-  public static final int mju_acos =    acos;
-  public static final int mju_atan2 =   atan2;
-  public static final int mju_tanh =    tanh;
-  public static final int mju_pow =     pow;
-  public static final int mju_abs =     fabs;
-  public static final int mju_log =     log;
-  public static final int mju_log10 =   log10;
-  public static final int mju_floor =   floor;
-  public static final int mju_ceil =    ceil;
+//   #define mju_sqrt    sqrt
+//   #define mju_exp     exp
+//   #define mju_sin     sin
+//   #define mju_cos     cos
+//   #define mju_tan     tan
+//   #define mju_asin    asin
+//   #define mju_acos    acos
+//   #define mju_atan2   atan2
+//   #define mju_tanh    tanh
+//   #define mju_pow     pow
+//   #define mju_abs     fabs
+//   #define mju_log     log
+//   #define mju_log10   log10
+//   #define mju_floor   floor
+//   #define mju_ceil    ceil
 
 // #else
+//   #define mju_sqrt    sqrtf
+//   #define mju_exp     expf
+//   #define mju_sin     sinf
+//   #define mju_cos     cosf
+//   #define mju_tan     tanf
+//   #define mju_asin    asinf
+//   #define mju_acos    acosf
+//   #define mju_atan2   atan2f
+//   #define mju_tanh    tanhf
+//   #define mju_pow     powf
+//   #define mju_abs     fabsf
+//   #define mju_log     logf
+//   #define mju_log10   log10f
+//   #define mju_floor   floorf
+//   #define mju_ceil    ceilf
 // #endif
 
 
@@ -4431,292 +4340,174 @@ public static native void mj_deactivate();
 
 // Set res = 0.
 public static native void mju_zero3(@Cast("mjtNum*") DoublePointer res);
-public static native void mju_zero3(@Cast("mjtNum*") DoubleBuffer res);
-public static native void mju_zero3(@Cast("mjtNum*") double[] res);
 
 // Set res = vec.
 public static native void mju_copy3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer data);
-public static native void mju_copy3(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer data);
-public static native void mju_copy3(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] data);
 
 // Set res = vec*scl.
 public static native void mju_scl3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("mjtNum") double scl);
-public static native void mju_scl3(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, @Cast("mjtNum") double scl);
-public static native void mju_scl3(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, @Cast("mjtNum") double scl);
 
 // Set res = vec1 + vec2.
 public static native void mju_add3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer vec2);
-public static native void mju_add3(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec1, @Cast("const mjtNum*") DoubleBuffer vec2);
-public static native void mju_add3(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec1, @Cast("const mjtNum*") double[] vec2);
 
 // Set res = vec1 - vec2.
 public static native void mju_sub3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer vec2);
-public static native void mju_sub3(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec1, @Cast("const mjtNum*") DoubleBuffer vec2);
-public static native void mju_sub3(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec1, @Cast("const mjtNum*") double[] vec2);
 
 // Set res = res + vec.
 public static native void mju_addTo3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec);
-public static native void mju_addTo3(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec);
-public static native void mju_addTo3(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec);
 
 // Set res = res - vec.
 public static native void mju_subFrom3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec);
-public static native void mju_subFrom3(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec);
-public static native void mju_subFrom3(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec);
 
 // Set res = res + vec*scl.
 public static native void mju_addToScl3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("mjtNum") double scl);
-public static native void mju_addToScl3(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, @Cast("mjtNum") double scl);
-public static native void mju_addToScl3(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, @Cast("mjtNum") double scl);
 
 // Set res = vec1 + vec2*scl.
 public static native void mju_addScl3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer vec2, @Cast("mjtNum") double scl);
-public static native void mju_addScl3(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec1, @Cast("const mjtNum*") DoubleBuffer vec2, @Cast("mjtNum") double scl);
-public static native void mju_addScl3(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec1, @Cast("const mjtNum*") double[] vec2, @Cast("mjtNum") double scl);
 
 // Normalize vector, return length before normalization.
 public static native @Cast("mjtNum") double mju_normalize3(@Cast("mjtNum*") DoublePointer res);
-public static native @Cast("mjtNum") double mju_normalize3(@Cast("mjtNum*") DoubleBuffer res);
-public static native @Cast("mjtNum") double mju_normalize3(@Cast("mjtNum*") double[] res);
 
 // Return vector length (without normalizing the vector).
 public static native @Cast("mjtNum") double mju_norm3(@Cast("const mjtNum*") DoublePointer vec);
-public static native @Cast("mjtNum") double mju_norm3(@Cast("const mjtNum*") DoubleBuffer vec);
-public static native @Cast("mjtNum") double mju_norm3(@Cast("const mjtNum*") double[] vec);
 
 // Return dot-product of vec1 and vec2.
 public static native @Cast("mjtNum") double mju_dot3(@Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer vec2);
-public static native @Cast("mjtNum") double mju_dot3(@Cast("const mjtNum*") DoubleBuffer vec1, @Cast("const mjtNum*") DoubleBuffer vec2);
-public static native @Cast("mjtNum") double mju_dot3(@Cast("const mjtNum*") double[] vec1, @Cast("const mjtNum*") double[] vec2);
 
 // Return Cartesian distance between 3D vectors pos1 and pos2.
 public static native @Cast("mjtNum") double mju_dist3(@Cast("const mjtNum*") DoublePointer pos1, @Cast("const mjtNum*") DoublePointer pos2);
-public static native @Cast("mjtNum") double mju_dist3(@Cast("const mjtNum*") DoubleBuffer pos1, @Cast("const mjtNum*") DoubleBuffer pos2);
-public static native @Cast("mjtNum") double mju_dist3(@Cast("const mjtNum*") double[] pos1, @Cast("const mjtNum*") double[] pos2);
 
 // Multiply vector by 3D rotation matrix: res = mat * vec.
 public static native void mju_rotVecMat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("const mjtNum*") DoublePointer mat);
-public static native void mju_rotVecMat(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, @Cast("const mjtNum*") DoubleBuffer mat);
-public static native void mju_rotVecMat(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, @Cast("const mjtNum*") double[] mat);
 
 // Multiply vector by transposed 3D rotation matrix: res = mat' * vec.
 public static native void mju_rotVecMatT(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("const mjtNum*") DoublePointer mat);
-public static native void mju_rotVecMatT(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, @Cast("const mjtNum*") DoubleBuffer mat);
-public static native void mju_rotVecMatT(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, @Cast("const mjtNum*") double[] mat);
 
 // Compute cross-product: res = cross(a, b).
 public static native void mju_cross(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer a, @Cast("const mjtNum*") DoublePointer b);
-public static native void mju_cross(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer a, @Cast("const mjtNum*") DoubleBuffer b);
-public static native void mju_cross(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] a, @Cast("const mjtNum*") double[] b);
 
 // Set res = 0.
 public static native void mju_zero4(@Cast("mjtNum*") DoublePointer res);
-public static native void mju_zero4(@Cast("mjtNum*") DoubleBuffer res);
-public static native void mju_zero4(@Cast("mjtNum*") double[] res);
 
 // Set res = (1,0,0,0).
 public static native void mju_unit4(@Cast("mjtNum*") DoublePointer res);
-public static native void mju_unit4(@Cast("mjtNum*") DoubleBuffer res);
-public static native void mju_unit4(@Cast("mjtNum*") double[] res);
 
 // Set res = vec.
 public static native void mju_copy4(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer data);
-public static native void mju_copy4(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer data);
-public static native void mju_copy4(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] data);
 
 // Normalize vector, return length before normalization.
 public static native @Cast("mjtNum") double mju_normalize4(@Cast("mjtNum*") DoublePointer res);
-public static native @Cast("mjtNum") double mju_normalize4(@Cast("mjtNum*") DoubleBuffer res);
-public static native @Cast("mjtNum") double mju_normalize4(@Cast("mjtNum*") double[] res);
 
 // Set res = 0.
 public static native void mju_zero(@Cast("mjtNum*") DoublePointer res, int n);
-public static native void mju_zero(@Cast("mjtNum*") DoubleBuffer res, int n);
-public static native void mju_zero(@Cast("mjtNum*") double[] res, int n);
 
 // Set res = vec.
 public static native void mju_copy(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer data, int n);
-public static native void mju_copy(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer data, int n);
-public static native void mju_copy(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] data, int n);
 
 // Return sum(vec).
 public static native @Cast("mjtNum") double mju_sum(@Cast("const mjtNum*") DoublePointer vec, int n);
-public static native @Cast("mjtNum") double mju_sum(@Cast("const mjtNum*") DoubleBuffer vec, int n);
-public static native @Cast("mjtNum") double mju_sum(@Cast("const mjtNum*") double[] vec, int n);
 
 // Return L1 norm: sum(abs(vec)).
 public static native @Cast("mjtNum") double mju_L1(@Cast("const mjtNum*") DoublePointer vec, int n);
-public static native @Cast("mjtNum") double mju_L1(@Cast("const mjtNum*") DoubleBuffer vec, int n);
-public static native @Cast("mjtNum") double mju_L1(@Cast("const mjtNum*") double[] vec, int n);
 
 // Set res = vec*scl.
 public static native void mju_scl(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("mjtNum") double scl, int n);
-public static native void mju_scl(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, @Cast("mjtNum") double scl, int n);
-public static native void mju_scl(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, @Cast("mjtNum") double scl, int n);
 
 // Set res = vec1 + vec2.
 public static native void mju_add(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer vec2, int n);
-public static native void mju_add(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec1, @Cast("const mjtNum*") DoubleBuffer vec2, int n);
-public static native void mju_add(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec1, @Cast("const mjtNum*") double[] vec2, int n);
 
 // Set res = vec1 - vec2.
 public static native void mju_sub(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer vec2, int n);
-public static native void mju_sub(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec1, @Cast("const mjtNum*") DoubleBuffer vec2, int n);
-public static native void mju_sub(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec1, @Cast("const mjtNum*") double[] vec2, int n);
 
 // Set res = res + vec.
 public static native void mju_addTo(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, int n);
-public static native void mju_addTo(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, int n);
-public static native void mju_addTo(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, int n);
 
 // Set res = res - vec.
 public static native void mju_subFrom(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, int n);
-public static native void mju_subFrom(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, int n);
-public static native void mju_subFrom(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, int n);
 
 // Set res = res + vec*scl.
 public static native void mju_addToScl(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("mjtNum") double scl, int n);
-public static native void mju_addToScl(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, @Cast("mjtNum") double scl, int n);
-public static native void mju_addToScl(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, @Cast("mjtNum") double scl, int n);
 
 // Set res = vec1 + vec2*scl.
 public static native void mju_addScl(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer vec2, @Cast("mjtNum") double scl, int n);
-public static native void mju_addScl(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec1, @Cast("const mjtNum*") DoubleBuffer vec2, @Cast("mjtNum") double scl, int n);
-public static native void mju_addScl(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec1, @Cast("const mjtNum*") double[] vec2, @Cast("mjtNum") double scl, int n);
 
 // Normalize vector, return length before normalization.
 public static native @Cast("mjtNum") double mju_normalize(@Cast("mjtNum*") DoublePointer res, int n);
-public static native @Cast("mjtNum") double mju_normalize(@Cast("mjtNum*") DoubleBuffer res, int n);
-public static native @Cast("mjtNum") double mju_normalize(@Cast("mjtNum*") double[] res, int n);
 
 // Return vector length (without normalizing vector).
 public static native @Cast("mjtNum") double mju_norm(@Cast("const mjtNum*") DoublePointer res, int n);
-public static native @Cast("mjtNum") double mju_norm(@Cast("const mjtNum*") DoubleBuffer res, int n);
-public static native @Cast("mjtNum") double mju_norm(@Cast("const mjtNum*") double[] res, int n);
 
 // Return dot-product of vec1 and vec2.
 public static native @Cast("mjtNum") double mju_dot(@Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer vec2, int n);
-public static native @Cast("mjtNum") double mju_dot(@Cast("const mjtNum*") DoubleBuffer vec1, @Cast("const mjtNum*") DoubleBuffer vec2, int n);
-public static native @Cast("mjtNum") double mju_dot(@Cast("const mjtNum*") double[] vec1, @Cast("const mjtNum*") double[] vec2, int n);
 
 // Multiply matrix and vector: res = mat * vec.
 public static native void mju_mulMatVec(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer vec, int nr, int nc);
-public static native void mju_mulMatVec(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer mat, @Cast("const mjtNum*") DoubleBuffer vec, int nr, int nc);
-public static native void mju_mulMatVec(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] mat, @Cast("const mjtNum*") double[] vec, int nr, int nc);
 
 // Multiply transposed matrix and vector: res = mat' * vec.
 public static native void mju_mulMatTVec(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer vec, int nr, int nc);
-public static native void mju_mulMatTVec(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer mat, @Cast("const mjtNum*") DoubleBuffer vec, int nr, int nc);
-public static native void mju_mulMatTVec(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] mat, @Cast("const mjtNum*") double[] vec, int nr, int nc);
 
 // Transpose matrix: res = mat'.
 public static native void mju_transpose(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int nr, int nc);
-public static native void mju_transpose(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer mat, int nr, int nc);
-public static native void mju_transpose(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] mat, int nr, int nc);
 
 // Multiply matrices: res = mat1 * mat2.
 public static native void mju_mulMatMat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat1, @Cast("const mjtNum*") DoublePointer mat2,
-                         int r1, int c1, int c2);
-public static native void mju_mulMatMat(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer mat1, @Cast("const mjtNum*") DoubleBuffer mat2,
-                         int r1, int c1, int c2);
-public static native void mju_mulMatMat(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] mat1, @Cast("const mjtNum*") double[] mat2,
                          int r1, int c1, int c2);
 
 // Multiply matrices, second argument transposed: res = mat1 * mat2'.
 public static native void mju_mulMatMatT(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat1, @Cast("const mjtNum*") DoublePointer mat2,
                           int r1, int c1, int r2);
-public static native void mju_mulMatMatT(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer mat1, @Cast("const mjtNum*") DoubleBuffer mat2,
-                          int r1, int c1, int r2);
-public static native void mju_mulMatMatT(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] mat1, @Cast("const mjtNum*") double[] mat2,
-                          int r1, int c1, int r2);
 
 // Multiply matrices, first argument transposed: res = mat1' * mat2.
 public static native void mju_mulMatTMat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat1, @Cast("const mjtNum*") DoublePointer mat2,
                           int r1, int c1, int c2);
-public static native void mju_mulMatTMat(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer mat1, @Cast("const mjtNum*") DoubleBuffer mat2,
-                          int r1, int c1, int c2);
-public static native void mju_mulMatTMat(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] mat1, @Cast("const mjtNum*") double[] mat2,
-                          int r1, int c1, int c2);
 
 // Set res = mat' * diag * mat if diag is not NULL, and res = mat' * mat otherwise.
 public static native void mju_sqrMatTD(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer diag, int nr, int nc);
-public static native void mju_sqrMatTD(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer mat, @Cast("const mjtNum*") DoubleBuffer diag, int nr, int nc);
-public static native void mju_sqrMatTD(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] mat, @Cast("const mjtNum*") double[] diag, int nr, int nc);
 
 // Coordinate transform of 6D motion or force vector in rotation:translation format.
 // rotnew2old is 3-by-3, NULL means no rotation; flg_force specifies force or motion type.
 public static native void mju_transformSpatial(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, int flg_force,
                                 @Cast("const mjtNum*") DoublePointer newpos, @Cast("const mjtNum*") DoublePointer oldpos,
                                 @Cast("const mjtNum*") DoublePointer rotnew2old);
-public static native void mju_transformSpatial(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, int flg_force,
-                                @Cast("const mjtNum*") DoubleBuffer newpos, @Cast("const mjtNum*") DoubleBuffer oldpos,
-                                @Cast("const mjtNum*") DoubleBuffer rotnew2old);
-public static native void mju_transformSpatial(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, int flg_force,
-                                @Cast("const mjtNum*") double[] newpos, @Cast("const mjtNum*") double[] oldpos,
-                                @Cast("const mjtNum*") double[] rotnew2old);
 
 
 //---------------------------------- Quaternions ---------------------------------------------------
 
 // Rotate vector by quaternion.
 public static native void mju_rotVecQuat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("const mjtNum*") DoublePointer quat);
-public static native void mju_rotVecQuat(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, @Cast("const mjtNum*") DoubleBuffer quat);
-public static native void mju_rotVecQuat(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] vec, @Cast("const mjtNum*") double[] quat);
 
 // Conjugate quaternion, corresponding to opposite rotation.
 public static native void mju_negQuat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer quat);
-public static native void mju_negQuat(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer quat);
-public static native void mju_negQuat(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] quat);
 
 // Multiply quaternions.
 public static native void mju_mulQuat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer quat1, @Cast("const mjtNum*") DoublePointer quat2);
-public static native void mju_mulQuat(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer quat1, @Cast("const mjtNum*") DoubleBuffer quat2);
-public static native void mju_mulQuat(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] quat1, @Cast("const mjtNum*") double[] quat2);
 
 // Multiply quaternion and axis.
 public static native void mju_mulQuatAxis(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer axis);
-public static native void mju_mulQuatAxis(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer quat, @Cast("const mjtNum*") DoubleBuffer axis);
-public static native void mju_mulQuatAxis(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] quat, @Cast("const mjtNum*") double[] axis);
 
 // Convert axisAngle to quaternion.
 public static native void mju_axisAngle2Quat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer axis, @Cast("mjtNum") double angle);
-public static native void mju_axisAngle2Quat(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer axis, @Cast("mjtNum") double angle);
-public static native void mju_axisAngle2Quat(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] axis, @Cast("mjtNum") double angle);
 
 // Convert quaternion (corresponding to orientation difference) to 3D velocity.
 public static native void mju_quat2Vel(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer quat, @Cast("mjtNum") double dt);
-public static native void mju_quat2Vel(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer quat, @Cast("mjtNum") double dt);
-public static native void mju_quat2Vel(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] quat, @Cast("mjtNum") double dt);
 
 // Subtract quaternions, express as 3D velocity: qb*quat(res) = qa.
 public static native void mju_subQuat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer qa, @Cast("const mjtNum*") DoublePointer qb);
-public static native void mju_subQuat(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer qa, @Cast("const mjtNum*") DoubleBuffer qb);
-public static native void mju_subQuat(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] qa, @Cast("const mjtNum*") double[] qb);
 
 // Convert quaternion to 3D rotation matrix.
 public static native void mju_quat2Mat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer quat);
-public static native void mju_quat2Mat(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer quat);
-public static native void mju_quat2Mat(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] quat);
 
 // Convert 3D rotation matrix to quaterion.
 public static native void mju_mat2Quat(@Cast("mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer mat);
-public static native void mju_mat2Quat(@Cast("mjtNum*") DoubleBuffer quat, @Cast("const mjtNum*") DoubleBuffer mat);
-public static native void mju_mat2Quat(@Cast("mjtNum*") double[] quat, @Cast("const mjtNum*") double[] mat);
 
 // Compute time-derivative of quaternion, given 3D rotational velocity.
 public static native void mju_derivQuat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer vel);
-public static native void mju_derivQuat(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer quat, @Cast("const mjtNum*") DoubleBuffer vel);
-public static native void mju_derivQuat(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] quat, @Cast("const mjtNum*") double[] vel);
 
 // Integrate quaterion given 3D angular velocity.
 public static native void mju_quatIntegrate(@Cast("mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer vel, @Cast("mjtNum") double scale);
-public static native void mju_quatIntegrate(@Cast("mjtNum*") DoubleBuffer quat, @Cast("const mjtNum*") DoubleBuffer vel, @Cast("mjtNum") double scale);
-public static native void mju_quatIntegrate(@Cast("mjtNum*") double[] quat, @Cast("const mjtNum*") double[] vel, @Cast("mjtNum") double scale);
 
 // Construct quaternion performing rotation from z-axis to given vector.
 public static native void mju_quatZ2Vec(@Cast("mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer vec);
-public static native void mju_quatZ2Vec(@Cast("mjtNum*") DoubleBuffer quat, @Cast("const mjtNum*") DoubleBuffer vec);
-public static native void mju_quatZ2Vec(@Cast("mjtNum*") double[] quat, @Cast("const mjtNum*") double[] vec);
 
 
 //---------------------------------- Poses ---------------------------------------------------------
@@ -4725,51 +4516,29 @@ public static native void mju_quatZ2Vec(@Cast("mjtNum*") double[] quat, @Cast("c
 public static native void mju_mulPose(@Cast("mjtNum*") DoublePointer posres, @Cast("mjtNum*") DoublePointer quatres,
                        @Cast("const mjtNum*") DoublePointer pos1, @Cast("const mjtNum*") DoublePointer quat1,
                        @Cast("const mjtNum*") DoublePointer pos2, @Cast("const mjtNum*") DoublePointer quat2);
-public static native void mju_mulPose(@Cast("mjtNum*") DoubleBuffer posres, @Cast("mjtNum*") DoubleBuffer quatres,
-                       @Cast("const mjtNum*") DoubleBuffer pos1, @Cast("const mjtNum*") DoubleBuffer quat1,
-                       @Cast("const mjtNum*") DoubleBuffer pos2, @Cast("const mjtNum*") DoubleBuffer quat2);
-public static native void mju_mulPose(@Cast("mjtNum*") double[] posres, @Cast("mjtNum*") double[] quatres,
-                       @Cast("const mjtNum*") double[] pos1, @Cast("const mjtNum*") double[] quat1,
-                       @Cast("const mjtNum*") double[] pos2, @Cast("const mjtNum*") double[] quat2);
 
 // Conjugate pose, corresponding to the opposite spatial transformation.
 public static native void mju_negPose(@Cast("mjtNum*") DoublePointer posres, @Cast("mjtNum*") DoublePointer quatres,
                        @Cast("const mjtNum*") DoublePointer pos, @Cast("const mjtNum*") DoublePointer quat);
-public static native void mju_negPose(@Cast("mjtNum*") DoubleBuffer posres, @Cast("mjtNum*") DoubleBuffer quatres,
-                       @Cast("const mjtNum*") DoubleBuffer pos, @Cast("const mjtNum*") DoubleBuffer quat);
-public static native void mju_negPose(@Cast("mjtNum*") double[] posres, @Cast("mjtNum*") double[] quatres,
-                       @Cast("const mjtNum*") double[] pos, @Cast("const mjtNum*") double[] quat);
 
 // Transform vector by pose.
 public static native void mju_trnVecPose(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer pos, @Cast("const mjtNum*") DoublePointer quat,
                           @Cast("const mjtNum*") DoublePointer vec);
-public static native void mju_trnVecPose(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer pos, @Cast("const mjtNum*") DoubleBuffer quat,
-                          @Cast("const mjtNum*") DoubleBuffer vec);
-public static native void mju_trnVecPose(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] pos, @Cast("const mjtNum*") double[] quat,
-                          @Cast("const mjtNum*") double[] vec);
 
 
 //--------------------------------- Decompositions -------------------------------------------------
 
 // Cholesky decomposition: mat = L*L'; return rank, decomposition performed in-place into mat.
 public static native int mju_cholFactor(@Cast("mjtNum*") DoublePointer mat, int n, @Cast("mjtNum") double mindiag);
-public static native int mju_cholFactor(@Cast("mjtNum*") DoubleBuffer mat, int n, @Cast("mjtNum") double mindiag);
-public static native int mju_cholFactor(@Cast("mjtNum*") double[] mat, int n, @Cast("mjtNum") double mindiag);
 
 // Solve mat * res = vec, where mat is Cholesky-factorized
 public static native void mju_cholSolve(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer vec, int n);
-public static native void mju_cholSolve(@Cast("mjtNum*") DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer mat, @Cast("const mjtNum*") DoubleBuffer vec, int n);
-public static native void mju_cholSolve(@Cast("mjtNum*") double[] res, @Cast("const mjtNum*") double[] mat, @Cast("const mjtNum*") double[] vec, int n);
 
 // Cholesky rank-one update: L*L' +/- x*x'; return rank.
 public static native int mju_cholUpdate(@Cast("mjtNum*") DoublePointer mat, @Cast("mjtNum*") DoublePointer x, int n, int flg_plus);
-public static native int mju_cholUpdate(@Cast("mjtNum*") DoubleBuffer mat, @Cast("mjtNum*") DoubleBuffer x, int n, int flg_plus);
-public static native int mju_cholUpdate(@Cast("mjtNum*") double[] mat, @Cast("mjtNum*") double[] x, int n, int flg_plus);
 
 // Eigenvalue decomposition of symmetric 3x3 matrix.
 public static native int mju_eig3(@Cast("mjtNum*") DoublePointer eigval, @Cast("mjtNum*") DoublePointer eigvec, @Cast("mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer mat);
-public static native int mju_eig3(@Cast("mjtNum*") DoubleBuffer eigval, @Cast("mjtNum*") DoubleBuffer eigvec, @Cast("mjtNum*") DoubleBuffer quat, @Cast("const mjtNum*") DoubleBuffer mat);
-public static native int mju_eig3(@Cast("mjtNum*") double[] eigval, @Cast("mjtNum*") double[] eigvec, @Cast("mjtNum*") double[] quat, @Cast("const mjtNum*") double[] mat);
 
 
 //---------------------- Miscellaneous --------------------------------------------------
@@ -4777,33 +4546,19 @@ public static native int mju_eig3(@Cast("mjtNum*") double[] eigval, @Cast("mjtNu
 // Muscle active force, prm = (range[2], force, scale, lmin, lmax, vmax, fpmax, fvmax).
 public static native @Cast("mjtNum") double mju_muscleGain(@Cast("mjtNum") double len, @Cast("mjtNum") double vel, @Cast("const mjtNum*") DoublePointer lengthrange,
                             @Cast("mjtNum") double acc0, @Cast("const mjtNum*") DoublePointer prm);
-public static native @Cast("mjtNum") double mju_muscleGain(@Cast("mjtNum") double len, @Cast("mjtNum") double vel, @Cast("const mjtNum*") DoubleBuffer lengthrange,
-                            @Cast("mjtNum") double acc0, @Cast("const mjtNum*") DoubleBuffer prm);
-public static native @Cast("mjtNum") double mju_muscleGain(@Cast("mjtNum") double len, @Cast("mjtNum") double vel, @Cast("const mjtNum*") double[] lengthrange,
-                            @Cast("mjtNum") double acc0, @Cast("const mjtNum*") double[] prm);
 
 // Muscle passive force, prm = (range[2], force, scale, lmin, lmax, vmax, fpmax, fvmax).
 public static native @Cast("mjtNum") double mju_muscleBias(@Cast("mjtNum") double len, @Cast("const mjtNum*") DoublePointer lengthrange,
                             @Cast("mjtNum") double acc0, @Cast("const mjtNum*") DoublePointer prm);
-public static native @Cast("mjtNum") double mju_muscleBias(@Cast("mjtNum") double len, @Cast("const mjtNum*") DoubleBuffer lengthrange,
-                            @Cast("mjtNum") double acc0, @Cast("const mjtNum*") DoubleBuffer prm);
-public static native @Cast("mjtNum") double mju_muscleBias(@Cast("mjtNum") double len, @Cast("const mjtNum*") double[] lengthrange,
-                            @Cast("mjtNum") double acc0, @Cast("const mjtNum*") double[] prm);
 
 // Muscle activation dynamics, prm = (tau_act, tau_deact).
 public static native @Cast("mjtNum") double mju_muscleDynamics(@Cast("mjtNum") double ctrl, @Cast("mjtNum") double act, @Cast("const mjtNum*") DoublePointer prm);
-public static native @Cast("mjtNum") double mju_muscleDynamics(@Cast("mjtNum") double ctrl, @Cast("mjtNum") double act, @Cast("const mjtNum*") DoubleBuffer prm);
-public static native @Cast("mjtNum") double mju_muscleDynamics(@Cast("mjtNum") double ctrl, @Cast("mjtNum") double act, @Cast("const mjtNum*") double[] prm);
 
 // Convert contact force to pyramid representation.
 public static native void mju_encodePyramid(@Cast("mjtNum*") DoublePointer pyramid, @Cast("const mjtNum*") DoublePointer force, @Cast("const mjtNum*") DoublePointer mu, int dim);
-public static native void mju_encodePyramid(@Cast("mjtNum*") DoubleBuffer pyramid, @Cast("const mjtNum*") DoubleBuffer force, @Cast("const mjtNum*") DoubleBuffer mu, int dim);
-public static native void mju_encodePyramid(@Cast("mjtNum*") double[] pyramid, @Cast("const mjtNum*") double[] force, @Cast("const mjtNum*") double[] mu, int dim);
 
 // Convert pyramid representation to contact force.
 public static native void mju_decodePyramid(@Cast("mjtNum*") DoublePointer force, @Cast("const mjtNum*") DoublePointer pyramid, @Cast("const mjtNum*") DoublePointer mu, int dim);
-public static native void mju_decodePyramid(@Cast("mjtNum*") DoubleBuffer force, @Cast("const mjtNum*") DoubleBuffer pyramid, @Cast("const mjtNum*") DoubleBuffer mu, int dim);
-public static native void mju_decodePyramid(@Cast("mjtNum*") double[] force, @Cast("const mjtNum*") double[] pyramid, @Cast("const mjtNum*") double[] mu, int dim);
 
 // Integrate spring-damper analytically, return pos(dt).
 public static native @Cast("mjtNum") double mju_springDamper(@Cast("mjtNum") double pos0, @Cast("mjtNum") double vel0, @Cast("mjtNum") double Kp, @Cast("mjtNum") double Kv, @Cast("mjtNum") double dt);
@@ -4835,38 +4590,32 @@ public static native int mju_isBad(@Cast("mjtNum") double x);
 
 // Return 1 if all elements are 0.
 public static native int mju_isZero(@Cast("mjtNum*") DoublePointer vec, int n);
-public static native int mju_isZero(@Cast("mjtNum*") DoubleBuffer vec, int n);
-public static native int mju_isZero(@Cast("mjtNum*") double[] vec, int n);
 
 // Standard normal random number generator (optional second number).
 public static native @Cast("mjtNum") double mju_standardNormal(@Cast("mjtNum*") DoublePointer num2);
-public static native @Cast("mjtNum") double mju_standardNormal(@Cast("mjtNum*") DoubleBuffer num2);
-public static native @Cast("mjtNum") double mju_standardNormal(@Cast("mjtNum*") double[] num2);
 
 // Convert from float to mjtNum.
 public static native void mju_f2n(@Cast("mjtNum*") DoublePointer res, @Const FloatPointer vec, int n);
-public static native void mju_f2n(@Cast("mjtNum*") DoubleBuffer res, @Const FloatBuffer vec, int n);
-public static native void mju_f2n(@Cast("mjtNum*") double[] res, @Const float[] vec, int n);
+public static native void mju_f2n(@Cast("mjtNum*") DoublePointer res, @Const FloatBuffer vec, int n);
+public static native void mju_f2n(@Cast("mjtNum*") DoublePointer res, @Const float[] vec, int n);
 
 // Convert from mjtNum to float.
 public static native void mju_n2f(FloatPointer res, @Cast("const mjtNum*") DoublePointer vec, int n);
-public static native void mju_n2f(FloatBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, int n);
-public static native void mju_n2f(float[] res, @Cast("const mjtNum*") double[] vec, int n);
+public static native void mju_n2f(FloatBuffer res, @Cast("const mjtNum*") DoublePointer vec, int n);
+public static native void mju_n2f(float[] res, @Cast("const mjtNum*") DoublePointer vec, int n);
 
 // Convert from double to mjtNum.
 public static native void mju_d2n(@Cast("mjtNum*") DoublePointer res, @Const DoublePointer vec, int n);
-public static native void mju_d2n(@Cast("mjtNum*") DoubleBuffer res, @Const DoubleBuffer vec, int n);
-public static native void mju_d2n(@Cast("mjtNum*") double[] res, @Const double[] vec, int n);
+public static native void mju_d2n(@Cast("mjtNum*") DoublePointer res, @Const DoubleBuffer vec, int n);
+public static native void mju_d2n(@Cast("mjtNum*") DoublePointer res, @Const double[] vec, int n);
 
 // Convert from mjtNum to double.
 public static native void mju_n2d(DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, int n);
-public static native void mju_n2d(DoubleBuffer res, @Cast("const mjtNum*") DoubleBuffer vec, int n);
-public static native void mju_n2d(double[] res, @Cast("const mjtNum*") double[] vec, int n);
+public static native void mju_n2d(DoubleBuffer res, @Cast("const mjtNum*") DoublePointer vec, int n);
+public static native void mju_n2d(double[] res, @Cast("const mjtNum*") DoublePointer vec, int n);
 
 // Insertion sort, resulting list is in increasing order.
 public static native void mju_insertionSort(@Cast("mjtNum*") DoublePointer list, int n);
-public static native void mju_insertionSort(@Cast("mjtNum*") DoubleBuffer list, int n);
-public static native void mju_insertionSort(@Cast("mjtNum*") double[] list, int n);
 
 // Integer insertion sort, resulting list is in increasing order.
 public static native void mju_insertionSortInt(IntPointer list, int n);

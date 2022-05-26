@@ -10,15 +10,15 @@ import org.bytedeco.javacpp.tools.*;
         includepath = {"/tmp/mujoco/include/"},
         linkpath = {"/tmp/mujoco/lib/"},
         include = {
-        		"mujoco/mjdata.h",
         		"mujoco/mjexport.h",
-        		"mujoco/mjtnum.h",
+        		"mujoco/mjdata.h",
         		"mujoco/mjmodel.h",
         		"mujoco/mjrender.h",
+        		"mujoco/mjtnum.h",
         		"mujoco/mjui.h",
         		"mujoco/mjvisualize.h",
-        		"mujoco/mjxmacro.h",
-        		"mujoco/mujoco.h"},  
+        		"mujoco/mujoco.h"      		
+        		},  
         link = {"MuJoCoLib"}
     ),
     target = "org.mujoco.MuJoCoLib"
@@ -32,6 +32,7 @@ public class MuJoCoConfig implements InfoMapper {
 		infoMap.put(new Info("MJMODEL_POINTERS").skip());
 		infoMap.put(new Info("MJDATA_VECTOR").skip());
 		infoMap.put(new Info("mjFREESTACK").skip());
+		infoMap.put(new Info("mjMARKSTACK").skip());
 		infoMap.put(new Info("mju_sqrt").skip());
 		infoMap.put(new Info("mju_exp").skip());
 		infoMap.put(new Info("mju_sin").skip());
@@ -47,5 +48,9 @@ public class MuJoCoConfig implements InfoMapper {
 		infoMap.put(new Info("mju_log10").skip());
 		infoMap.put(new Info("mju_floor").skip());
 		infoMap.put(new Info("mju_ceil").skip());
+		infoMap.put(new Info("MUJOCO_HELPER_DLL_IMPORT").skip());
+		infoMap.put(new Info("MUJOCO_HELPER_DLL_EXPORT").skip());
+		infoMap.put(new Info("MUJOCO_HELPER_DLL_LOCAL").skip());
+		infoMap.put(new Info("mjCOLLISIONFUNC").skip());
     }
 }

@@ -7,14 +7,14 @@ import org.bytedeco.javacpp.tools.*;
 
 @Properties(
     value = @Platform(
-        includepath = {"/path/to/include/"},
-        preloadpath = {"/path/to/deps/"},
-        linkpath = {"/path/to/lib/"},
-        include = {"NativeLibrary.h"},
-        preload = {"DependentLib"},
-        link = {"NativeLibrary"}
+        includepath = {"/tmp/mujoco/include/mujoco/"},
+        preloadpath = {"/tmp/mujoco/lib/"},
+        linkpath = {"/tmp/mujoco/lib/"},
+        include = {"mujoco.h"},
+        preload = {"libmujoco.so"},
+        link = {"MuJoCo"}
     ),
-    target = "NativeLibrary"
+    target = "MuJoCo"
 )
 
 public class MuJoCo implements InfoMapper {

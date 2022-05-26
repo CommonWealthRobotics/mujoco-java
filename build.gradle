@@ -9,6 +9,8 @@ repositories {
 
 dependencies {
     implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
+    testCompile 'junit:junit:4.12'
+    compile 'junit:junit:4.12'
 }
   
 tasks.named('test') {

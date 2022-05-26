@@ -15,6 +15,7 @@ else
 	tar -xf $ARCHIVE
 	mv /tmp/mujoco-$VER /tmp/mujoco/
 	ln -s /tmp/mujoco $SCRIPT_DIR/
+	cd $SCRIPT_DIR/
 fi
 
 ./gradlew jar test

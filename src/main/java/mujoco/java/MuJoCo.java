@@ -12,9 +12,9 @@ import org.bytedeco.javacpp.tools.*;
         linkpath = {"/tmp/mujoco/lib/"},
         include = {"mujoco.h"},
         preload = {"libmujoco.so"},
-        link = {"MuJoCo"}
+        link = {"MuJoCoLib"}
     ),
-    target = "MuJoCo"
+    target = "MuJoCoLib"
 )
 
 public class MuJoCo implements InfoMapper {

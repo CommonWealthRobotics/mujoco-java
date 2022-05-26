@@ -1,5 +1,6 @@
 plugins {
-    id 'application' 
+    // Apply the java plugin 
+    id 'java'
 }
 
 repositories {
@@ -9,10 +10,13 @@ repositories {
 
 dependencies {
     implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
-    testCompile 'junit:junit:4.12'
-    compile 'junit:junit:4.12'
+    // Use JUnit test framework.
+    testImplementation 'junit:junit:4.13'
+    compile 'junit:junit:4.13'
 }
   
-tasks.named('test') {
-    useJUnitPlatform() 
+test {
+    useJUnit()
+
+    maxHeapSize = '1G'
 }

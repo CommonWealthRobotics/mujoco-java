@@ -19,7 +19,7 @@ import org.bytedeco.javacpp.tools.*;
         		"mujoco/mjvisualize.h",
         		"mujoco/mujoco.h"      		
         		},  
-        link = {"MuJoCoLib"}
+        link = {"mujoco"}
     ),
     target = "org.mujoco.MuJoCoLib"
 )

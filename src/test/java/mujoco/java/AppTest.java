@@ -4,11 +4,13 @@
 package mujoco.java;
 
 import org.junit.Test;
+import org.mujoco.MuJoCoLib;
+
 import static org.junit.Assert.*;
 
 public class AppTest {
     @Test public void appHasAGreeting() {
-        MuJoCoConfig m = new MuJoCoConfig();
-        System.out.println("Starting "+m);
+        MuJoCoLib lib = new MuJoCoLib();
+        System.out.println("Starting "+lib);
     }
 }

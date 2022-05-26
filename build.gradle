@@ -1,0 +1,16 @@
+plugins {
+    id 'application' 
+}
+
+repositories {
+    mavenCentral() 
+}
+
+
+dependencies {
+    implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
+}
+  
+tasks.named('test') {
+    useJUnitPlatform() 
+}

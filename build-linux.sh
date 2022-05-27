@@ -8,8 +8,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 if [ -f "/tmp/$ARCHIVE" ]; then
     echo "/tmp/$ARCHIVE exists."
 else
-	rm -rf /tmp/mujoco-$VER
-	rm  mujoco-$VER
+	rm -rf /tmp/mujoco*
 	wget https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -O /tmp/$ARCHIVE
 	cd /tmp/
 	tar -xf $ARCHIVE
@@ -17,6 +16,7 @@ else
 	ln -s /tmp/mujoco $SCRIPT_DIR/
 	cd $SCRIPT_DIR/
 fi
+set -e
 JAVACPP_VER=1.5.7
 JAVACPP=javacpp-platform-$JAVACPP_VER-bin.zip
 if [ -f "$JAVACPP" ]; then
@@ -29,7 +29,15 @@ fi
 cd src/main/java/
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar org/mujoco/MuJoCoLib.java
-mv linux-x86_64/ ../resources/
+LIBPATH=$PWD/../resources/linux-x86_64/
+if [ -d "$LIBPATH" ] 
+then
+	rm $LIBPATH/libjni*.so
+    mv linux-x86_64/* $LIBPATH 
+else
+    mv linux-x86_64/ ../resources/
+fi
+
 cd $SCRIPT_DIR/
 
 ./gradlew jar  --stacktrace test

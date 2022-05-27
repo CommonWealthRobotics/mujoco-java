@@ -11,6 +11,7 @@ plugins {
     id 'application'
     id 'eclipse'
     id 'java'
+    id 'maven-publish'
 }
 
 repositories {
@@ -27,4 +28,20 @@ dependencies {
 application {
     // Define the main class for the application.
     mainClass = 'mujoco.java.App'
+}
+
+publishing {
+
+    groupId = 'org.commonwealthrobotics'
+    artifactId = 'mujoco-java'
+    version = System.getenv("VERSION_SEMVER")
+    maven {
+      name = "GitHubPackages"
+      url = "https://maven.pkg.github.com/CommonWealthRobotics/mujoco-java/"
+      credentials {
+        username = System.getenv("GITHUB_ACTOR")
+        password = System.getenv("GITHUB_TOKEN")
+      }
+    }
+  }
 }

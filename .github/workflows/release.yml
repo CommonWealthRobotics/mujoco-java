@@ -13,7 +13,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
           java-version: '8'
-          distribution: 'azul'
+          distribution: 'zulu'
     - name: Build
       run: bash build-linux.sh
 
@@ -26,7 +26,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
           java-version: '8'
-          distribution: 'azul'
+          distribution: 'zulu'
     - name: Build
       run: bash build-windows.sh
 
@@ -39,7 +39,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
           java-version: '8'
-          distribution: 'azul' 
+          distribution: 'zulu' 
     - name: Build
       run: bash build-mac.sh
       
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           java-version: '8'
-          distribution: 'azul'
+          distribution: 'zulu'
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
       - name: Publish package

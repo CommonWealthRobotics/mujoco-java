@@ -32,16 +32,24 @@ application {
 
 publishing {
 
-    groupId = 'org.commonwealthrobotics'
-    artifactId = 'mujoco-java'
-    version = System.getenv("VERSION_SEMVER")
-    maven {
-      name = "GitHubPackages"
-      url = "https://maven.pkg.github.com/CommonWealthRobotics/mujoco-java/"
-      credentials {
-        username = System.getenv("GITHUB_ACTOR")
-        password = System.getenv("GITHUB_TOKEN")
-      }
-    }
-  }
+//	String user =project.findProperty("gpr.user") ?: "madhephaestus"
+	repositories {
+		maven {
+			name = 'GitHubPackages'
+			url = uri("https://maven.pkg.github.com/CommonWealthRobotics/mujoco-java")
+			credentials {
+		        username = System.getenv("GITHUB_ACTOR")
+		        password = System.getenv("GITHUB_TOKEN")
+		           
+			}
+		}
+	}
+	publications {
+		gpr(MavenPublication) {
+			groupId='com.commonwealthrobotics'
+			artifactId='mujoco-java'
+			version = System.getenv("VERSION_SEMVER")
+			from(components.java)
+		}
+	}
 }

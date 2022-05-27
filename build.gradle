@@ -30,6 +30,9 @@ application {
     mainClass = 'mujoco.java.App'
 }
 
+group='com.commonwealthrobotics'
+archivesBaseName='mujoco-java'
+version = System.getenv("VERSION_SEMVER")
 publishing {
 
 //	String user =project.findProperty("gpr.user") ?: "madhephaestus"
@@ -44,12 +47,12 @@ publishing {
 			}
 		}
 	}
-	publications {
-		gpr(MavenPublication) {
-			groupId='com.commonwealthrobotics'
-			artifactId='mujoco-java'
-			version = System.getenv("VERSION_SEMVER")
-			from(components.java)
-		}
-	}
+    publications {
+        register("jar", MavenPublication) {
+            from(components["java"])
+            pom {
+                url.set("https://github.com/CommonWealthRobotics/mujoco-java.git")
+            }
+        }
+    }
 }

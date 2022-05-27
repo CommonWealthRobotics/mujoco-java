@@ -10,6 +10,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+    - uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'azul'
     - name: Build
       run: bash build-linux.sh
 
@@ -19,6 +23,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+    - uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'azul'
     - name: Build
       run: bash build-windows.sh
 
@@ -28,6 +36,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+    - uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'azul' 
     - name: Build
       run: echo "Not Building Macos"
       

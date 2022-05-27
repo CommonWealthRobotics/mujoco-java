@@ -1,8 +1,9 @@
 # test
 name: Publish package to GitHub Packages
-on:
-  release:
-    types: [created]
+on: 
+   push:
+       tags:       
+         - '*'
 
 jobs:
   linux:

@@ -49,15 +49,16 @@ cd $SCRIPT_DIR/src/main/java/
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/$TYPE/
-ls -al
 mkdir -p $SCRIPT_DIR/src/main/resources/
 
-rm -rf $SCRIPT_DIR/src/main/java/../resources/$TYPE
-mv $SCRIPT_DIR/src/main/java/$TYPE/ $SCRIPT_DIR/src/main/java/../resources/
-
+rm -rf $JAVADIR../resources/$TYPE
+mv $JAVADIR/$TYPE/ $JAVADIR../resources/
+echo "ls -al $JAVADIR../resources/"
+ls -al $JAVADIR../resources/
 
 cd $SCRIPT_DIR/
-
+echo "Resource File: "
+ls -al $JAVADIR../resources/$TYPE
 ./gradlew jar  --stacktrace test
 
 

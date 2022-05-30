@@ -10,14 +10,14 @@ import org.bytedeco.javacpp.tools.*;
         includepath = {"/tmp/mujoco/include/"},
         linkpath = {"/tmp/mujoco/lib/"},
         include = {
-        		"/tmp/mujoco/include/mujoco/mjexport.h",
-        		"/tmp/mujoco/include/mujoco/mjdata.h",
-        		"/tmp/mujoco/include/mujoco/mjmodel.h",
-        		"/tmp/mujoco/include/mujoco/mjrender.h",
-        		"/tmp/mujoco/include/mujoco/mjtnum.h",
-        		"/tmp/mujoco/include/mujoco/mjui.h",
-        		"/tmp/mujoco/include/mujoco/mjvisualize.h",
-        		"/tmp/mujoco/include/mujoco/mujoco.h"      		
+        		"mujoco/mjexport.h",
+        		"mujoco/mjdata.h",
+        		"mujoco/mjmodel.h",
+        		"mujoco/mjrender.h",
+        		"mujoco/mjtnum.h",
+        		"mujoco/mjui.h",
+        		"mujoco/mjvisualize.h",
+        		"mujoco/mujoco.h"      		
         		},  
         link = {"mujoco"}
     ),

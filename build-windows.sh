@@ -7,7 +7,7 @@ ARCHIVE=mujoco-$VER-$TYPE.zip
 URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
 echo "https://github.com/deepmind/mujoco/releases/download/2.2.0/mujoco-2.2.0-windows-x86_64.zip"
 echo "$URL"
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$( pwd )
 mkdir -p /tmp/
 if [ -f "/tmp/$ARCHIVE" ]; then
     echo "/tmp/$ARCHIVE exists."
@@ -46,8 +46,8 @@ LIBPATH=$PWD/../resources/$TYPE/
 ls -al
 mkdir -p $SCRIPT_DIR/src/main/resources/
 
-rm -rf ../resources/$TYPE
-mv $TYPE/ ../resources/
+rm -rf $SCRIPT_DIR/src/main/java/../resources/$TYPE
+mv $SCRIPT_DIR/src/main/java/$TYPE/ $SCRIPT_DIR/src/main/java/../resources/
 
 
 cd $SCRIPT_DIR/

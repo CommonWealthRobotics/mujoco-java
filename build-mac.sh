@@ -1,0 +1,1 @@
+touch src/main/resources/mac.build

@@ -30,9 +30,9 @@ cd src/main/java/
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/linux-x86_64/
-if [ -d "$LIBPATH" ] 
+if [ -e "$LIBPATH/libjniMuJoCoLib.so" ] 
 then
-	rm $LIBPATH/libjni*.so
+	rm $LIBPATH/
     mv linux-x86_64/* $LIBPATH 
 else
     mv linux-x86_64/ ../resources/

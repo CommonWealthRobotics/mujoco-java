@@ -14,7 +14,6 @@ else
 	cd /tmp/
 	tar -xf $ARCHIVE
 	mv /tmp/mujoco-$VER /tmp/mujoco/
-	ln -s /tmp/mujoco $SCRIPT_DIR/
 	cd $SCRIPT_DIR/
 fi
 set -e
@@ -27,7 +26,7 @@ else
 	unzip $JAVACPP
 fi
 
-cd src/main/java/
+cd $SCRIPT_DIR/src/main/java/
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/$TYPE/

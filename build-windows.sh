@@ -35,14 +35,16 @@ else
 	mkdir javacpp-platform-$JAVACPP_VER-bin
 	cd javacpp-platform-$JAVACPP_VER-bin
 	7z x ../$JAVACPP
+	cd $SCRIPT_DIR/
+	
 fi
 
-cd src/main/java/
+cd $SCRIPT_DIR/src/main/java/
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/$TYPE/
 ls -al
-mkdir -p src/main/resources/
+mkdir -p $SCRIPT_DIR/src/main/resources/
 
 rm -rf ../resources/$TYPE
 mv $TYPE/ ../resources/

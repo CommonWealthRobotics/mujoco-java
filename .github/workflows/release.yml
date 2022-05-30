@@ -63,3 +63,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_SEMVER: ${{ steps.get_version.outputs.VERSION  }}
+          
+          

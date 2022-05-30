@@ -12,3 +12,4 @@ build
 /javacpp-platform-*-bin*
 *.class*
 *jni*.cpp
+bin

@@ -7,6 +7,7 @@ import org.bytedeco.javacpp.tools.*;
 
 @Properties(
     value = @Platform(
+    	value = {"linux-x86_64", "macosx", "windows_64"}, 
         includepath = {"/tmp/mujoco/include/"},
         linkpath = {"/tmp/mujoco/lib/"},
         include = {

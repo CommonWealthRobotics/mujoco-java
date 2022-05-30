@@ -2,7 +2,7 @@
 
 echo "Linux Build"
 VER=$(cat mujocoRelease.txt)
-TYPE=$TYPE
+TYPE=linux-x86_64
 ARCHIVE=mujoco-$VER-$TYPE.tar.gz
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 

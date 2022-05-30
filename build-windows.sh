@@ -17,7 +17,12 @@ else
 	cd /tmp/
 	mkdir mujoco
 	cd mujoco
-	7z x $ARCHIVE
+	7z x ../$ARCHIVE
+	echo /tmp/mujoco/
+	ls -al /tmp/mujoco/
+	cd /tmp
+	echo /tmp
+	ls -al
 	cd $SCRIPT_DIR/
 fi
 set -e
@@ -29,7 +34,7 @@ else
 	curl -L  --location-trusted  https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VER/$JAVACPP -o $JAVACPP
 	mkdir javacpp-platform-$JAVACPP_VER-bin
 	cd javacpp-platform-$JAVACPP_VER-bin
-	7z x $JAVACPP
+	7z x ../$JAVACPP
 fi
 
 cd src/main/java/

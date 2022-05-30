@@ -10,7 +10,7 @@ if [ -f "/tmp/$ARCHIVE" ]; then
     echo "/tmp/$ARCHIVE exists."
 else
 	rm -rf /tmp/mujoco*
-	wget https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -O /tmp/$ARCHIVE
+	curl https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o /tmp/$ARCHIVE
 	cd /tmp/
 	unzip $ARCHIVE
 	mv /tmp/mujoco-$VER /tmp/mujoco/
@@ -23,7 +23,7 @@ JAVACPP=javacpp-platform-$JAVACPP_VER-bin.zip
 if [ -f "$JAVACPP" ]; then
     echo "$JAVACPP exists."
 else
-	wget https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VER/$JAVACPP -O $JAVACPP
+	curl https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VER/$JAVACPP -o $JAVACPP
 	unzip $JAVACPP
 fi
 

@@ -26,16 +26,20 @@ else
 	unzip $JAVACPP
 fi
 
-cd $SCRIPT_DIR/src/main/java/
+JAVADIR=$SCRIPT_DIR/src/main/java/
+cd $JAVADIR
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/$TYPE/
-mkdir -p src/main/resources/
+mkdir -p $SCRIPT_DIR/src/main/resources/
 
-rm -rf ../resources/$TYPE
-mv $TYPE/ ../resources/
+rm -rf $JAVADIR../resources/$TYPE
+mv $JAVADIR/$TYPE/ $JAVADIR../resources/
+echo "ls -al $JAVADIR../resources/"
+ls -al $JAVADIR../resources/
 
 cd $SCRIPT_DIR/
+echo "Resources: "
 
 ./gradlew jar  --stacktrace test
 

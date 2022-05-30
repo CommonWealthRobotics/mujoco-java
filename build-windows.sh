@@ -15,10 +15,9 @@ else
 	rm -rf /tmp/mujoco*
 	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o /tmp/$ARCHIVE
 	cd /tmp/
+	mkdir mujoco
+	cd mujoco
 	7z x $ARCHIVE
-	ls -al .
-	ls -al mujoco*
-	mv /tmp/mujoco-$VER /tmp/mujoco/
 	cd $SCRIPT_DIR/
 fi
 set -e
@@ -28,12 +27,14 @@ if [ -f "$JAVACPP" ]; then
     echo "$JAVACPP exists."
 else
 	curl -L  --location-trusted  https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VER/$JAVACPP -o $JAVACPP
+	mkdir javacpp-platform-$JAVACPP_VER-bin
+	cd javacpp-platform-$JAVACPP_VER-bin
 	7z x $JAVACPP
 fi
 
 cd src/main/java/
-java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
-java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar org/mujoco/MuJoCoLib.java
+java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
+java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/$TYPE/
 ls -al
 mkdir -p src/main/resources/

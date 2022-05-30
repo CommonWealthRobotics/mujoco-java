@@ -24,7 +24,9 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 	implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
 }
-
+if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+    throw new GradleException("This build must be run with java 8")
+}
 application {
     // Define the main class for the application.
     mainClass = 'mujoco.java.App'

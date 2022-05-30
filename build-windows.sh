@@ -16,6 +16,8 @@ else
 	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o /tmp/$ARCHIVE
 	cd /tmp/
 	7z x $ARCHIVE
+	ls -al .
+	ls -al mujoco*
 	mv /tmp/mujoco-$VER /tmp/mujoco/
 	cd $SCRIPT_DIR/
 fi

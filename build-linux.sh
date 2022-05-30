@@ -2,7 +2,8 @@
 
 echo "Linux Build"
 VER=$(cat mujocoRelease.txt)
-ARCHIVE=mujoco-$VER-linux-x86_64.tar.gz
+TYPE=$TYPE
+ARCHIVE=mujoco-$VER-$TYPE.tar.gz
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 if [ -f "/tmp/$ARCHIVE" ]; then
@@ -29,7 +30,7 @@ fi
 cd src/main/java/
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar org/mujoco/MuJoCoLib.java
-LIBPATH=$PWD/../resources/linux-x86_64/
+LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p src/main/resources/
 
 rm -rf ../resources/$TYPE

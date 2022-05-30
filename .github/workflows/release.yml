@@ -18,6 +18,11 @@ jobs:
           distribution: 'zulu'
     - name: Build
       run: bash build-linux.sh
+    - name: Upload math result for job Linux
+      uses: actions/upload-artifact@v3
+      with:
+          name: linux-lib
+          path: src/main/resources/linux-x86_64/libjniMuJoCoLib.so
 
   windows:
     runs-on: windows-latest
@@ -66,7 +71,10 @@ jobs:
         run: |
           echo $VERSION_SEMVER
           echo ${{ steps.vars.outputs.tag }}
-          
+      - name: Download math result for job Linux
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-lib  
         
       - name: Publish package
         uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee

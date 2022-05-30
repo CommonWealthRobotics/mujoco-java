@@ -4,7 +4,8 @@ on:
    push:
        tags:       
          - '*'
-
+env:
+  VERSION_SEMVER: ${GITHUB_REF##*/}
 jobs:
   linux:
     runs-on: ubuntu-latest
@@ -60,7 +61,7 @@ jobs:
         run: echo "User $GITHUB_ACTOR version $VERSION_SEMVER"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION_SEMVER: ${{ steps.get_version.outputs.VERSION  }}
+          
         
       - name: Publish package
         uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
@@ -68,6 +69,5 @@ jobs:
           arguments: jar publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION_SEMVER: ${{ steps.get_version.outputs.VERSION  }}
           
           

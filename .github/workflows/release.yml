@@ -57,10 +57,15 @@ jobs:
           distribution: 'zulu'
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
-      - name: Verify data
-        run: echo "User $GITHUB_ACTOR version $VERSION_SEMVER"
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: Check output
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_SEMVER: ${{ steps.vars.outputs.tag }}
+        run: |
+          echo $VERSION_SEMVER
+          echo ${{ steps.vars.outputs.tag }}
           
         
       - name: Publish package
@@ -69,5 +74,7 @@ jobs:
           arguments: jar publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_SEMVER: ${{ steps.vars.outputs.tag }}
+          
           
           

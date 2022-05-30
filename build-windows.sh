@@ -12,7 +12,7 @@ else
 	rm -rf /tmp/mujoco*
 	curl https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o /tmp/$ARCHIVE
 	cd /tmp/
-	tar -xf $ARCHIVE
+	7z x $ARCHIVE
 	mv /tmp/mujoco-$VER /tmp/mujoco/
 	ln -s /tmp/mujoco $SCRIPT_DIR/
 	cd $SCRIPT_DIR/
@@ -24,7 +24,7 @@ if [ -f "$JAVACPP" ]; then
     echo "$JAVACPP exists."
 else
 	curl https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VER/$JAVACPP -o $JAVACPP
-	tar -xf $JAVACPP
+	7z x $JAVACPP
 fi
 
 cd src/main/java/
@@ -34,7 +34,7 @@ LIBPATH=$PWD/../resources/$TYPE/
 ls -al
 if [ -d "$LIBPATH" ] 
 then
-	rm $LIBPATH/libjni*.so
+	rm $LIBPATH/libjniMuJoCoLib.*
     mv $TYPE/* $LIBPATH 
 else
     mv $TYPE/ ../resources/

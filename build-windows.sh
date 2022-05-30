@@ -35,6 +35,8 @@ else
 	mkdir javacpp-platform-$JAVACPP_VER-bin
 	cd javacpp-platform-$JAVACPP_VER-bin
 	7z x ../$JAVACPP
+	echo "JavaCPP:"
+	ls -al .
 	cd $SCRIPT_DIR/
 	
 fi

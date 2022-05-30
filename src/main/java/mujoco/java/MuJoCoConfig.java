@@ -7,18 +7,17 @@ import org.bytedeco.javacpp.tools.*;
 
 @Properties(
     value = @Platform(
-    	value = {"linux-x86_64", "macosx", "windows-x86_64"}, 
         includepath = {"/tmp/mujoco/include/"},
         linkpath = {"/tmp/mujoco/lib/"},
         include = {
-        		"mujoco/mjexport.h",
-        		"mujoco/mjdata.h",
-        		"mujoco/mjmodel.h",
-        		"mujoco/mjrender.h",
-        		"mujoco/mjtnum.h",
-        		"mujoco/mjui.h",
-        		"mujoco/mjvisualize.h",
-        		"mujoco/mujoco.h"      		
+        		"/tmp/mujoco/include/mujoco/mjexport.h",
+        		"/tmp/mujoco/include/mujoco/mjdata.h",
+        		"/tmp/mujoco/include/mujoco/mjmodel.h",
+        		"/tmp/mujoco/include/mujoco/mjrender.h",
+        		"/tmp/mujoco/include/mujoco/mjtnum.h",
+        		"/tmp/mujoco/include/mujoco/mjui.h",
+        		"/tmp/mujoco/include/mujoco/mjvisualize.h",
+        		"/tmp/mujoco/include/mujoco/mujoco.h"      		
         		},  
         link = {"mujoco"}
     ),

@@ -1,5 +1,6 @@
 #!/bin/bash
-
+bash --version
+g++ --version
 echo "Windows Build"
 VER=$(cat mujocoRelease.txt)
 TYPE=windows-x86_64

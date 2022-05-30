@@ -25,6 +25,10 @@ else
 	ls -al
 	cd $SCRIPT_DIR/
 fi
+echo "Include"
+ls /tmp/mujoco/include/
+echo "Lib"
+ls /tmp/mujoco/lib/
 set -e
 JAVACPP_VER=1.5.7
 JAVACPPDIR=javacpp-platform-$JAVACPP_VER-bin

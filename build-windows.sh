@@ -8,7 +8,7 @@ URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
 echo "https://github.com/deepmind/mujoco/releases/download/2.2.0/mujoco-2.2.0-windows-x86_64.zip"
 echo "$URL"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
+mkdir -p /tmp/
 if [ -f "/tmp/$ARCHIVE" ]; then
     echo "/tmp/$ARCHIVE exists."
 else
@@ -17,7 +17,6 @@ else
 	cd /tmp/
 	7z x $ARCHIVE
 	mv /tmp/mujoco-$VER /tmp/mujoco/
-	ln -s /tmp/mujoco $SCRIPT_DIR/
 	cd $SCRIPT_DIR/
 fi
 set -e
@@ -35,6 +34,8 @@ java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar mujoco/java/MuJoCoConf
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/$TYPE/
 ls -al
+mkdir -p src/main/resources/
+
 rm -rf ../resources/$TYPE
 mv $TYPE/ ../resources/
 

@@ -30,6 +30,8 @@ cd src/main/java/
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/linux-x86_64/
+mkdir -p src/main/resources/
+
 rm -rf ../resources/$TYPE
 mv $TYPE/ ../resources/
 

@@ -13,7 +13,7 @@ if [ -f "/tmp/$ARCHIVE" ]; then
     echo "/tmp/$ARCHIVE exists."
 else
 	rm -rf /tmp/mujoco*
-	curl https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o /tmp/$ARCHIVE
+	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o /tmp/$ARCHIVE
 	cd /tmp/
 	7z x $ARCHIVE
 	mv /tmp/mujoco-$VER /tmp/mujoco/
@@ -26,7 +26,7 @@ JAVACPP=javacpp-platform-$JAVACPP_VER-bin.zip
 if [ -f "$JAVACPP" ]; then
     echo "$JAVACPP exists."
 else
-	curl https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VER/$JAVACPP -o $JAVACPP
+	curl -L  --location-trusted  https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VER/$JAVACPP -o $JAVACPP
 	7z x $JAVACPP
 fi
 

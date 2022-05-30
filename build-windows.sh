@@ -35,13 +35,9 @@ java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar mujoco/java/MuJoCoConf
 java -jar ../../../javacpp-platform-1.5.7-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/$TYPE/
 ls -al
-if [ -d "$LIBPATH" ] 
-then
-	rm $LIBPATH/libjniMuJoCoLib.*
-    mv $TYPE/* $LIBPATH 
-else
-    mv $TYPE/ ../resources/
-fi
+rm -rf ../resources/$TYPE
+mv $TYPE/ ../resources/
+
 
 cd $SCRIPT_DIR/
 

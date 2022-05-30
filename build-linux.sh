@@ -40,7 +40,7 @@ ls -al $JAVADIR../resources/
 
 cd $SCRIPT_DIR/
 echo "Resources: "
-
+ls -al $JAVADIR../resources/$TYPE
 ./gradlew jar  --stacktrace test
 
 

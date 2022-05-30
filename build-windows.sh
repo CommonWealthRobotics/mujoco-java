@@ -27,16 +27,15 @@ else
 fi
 set -e
 JAVACPP_VER=1.5.7
-JAVACPP=javacpp-platform-$JAVACPP_VER-bin.zip
+JAVACPPDIR=javacpp-platform-$JAVACPP_VER-bin
+JAVACPP=$JAVACPPDIR.zip
 if [ -f "$JAVACPP" ]; then
     echo "$JAVACPP exists."
 else
 	curl -L  --location-trusted  https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VER/$JAVACPP -o $JAVACPP
-	mkdir javacpp-platform-$JAVACPP_VER-bin
-	cd javacpp-platform-$JAVACPP_VER-bin
-	7z x ../$JAVACPP
+	7z x $JAVACPP
 	echo "JavaCPP:"
-	ls -al .
+	ls -al $JAVACPPDIR
 	cd $SCRIPT_DIR/
 	
 fi

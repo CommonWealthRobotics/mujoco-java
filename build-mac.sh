@@ -19,8 +19,8 @@ else
 	cd /tmp/
 	mkdir mujoco
 	cd mujoco
-	7z x ../$ARCHIVE
-	7z x 4.$ARCH
+	hdiutil attach  ../$ARCHIVE
+	ls -al /Volumes/
 	echo /tmp/mujoco/
 	ls -al /tmp/mujoco/
 	cd /tmp

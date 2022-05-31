@@ -20,8 +20,8 @@ else
 	cd mujoco
 	hdiutil attach  ../$ARCHIVE
 	find /Volumes/MuJoCo/ -name '*.dylib'
-	
-	cp -R /Volumes/MuJoCo/mujoco.framework/Headers/ /tmp/mujoco/include
+	mkdir /tmp/mujoco/include
+	cp -R /Volumes/MuJoCo/mujoco.framework/Headers/ /tmp/mujoco/include/mujoco
     mkdir /tmp/mujoco/lib/
     cp /Volumes/MuJoCo/mujoco.framework/Versions/A/libmujoco.$VER.dylib /tmp/mujoco/lib/libmujoco.dylib
 	
@@ -33,9 +33,10 @@ else
 	cd $SCRIPT_DIR/
 fi
 echo "Include"
-ls -al /tmp/mujoco/include/
+ls /tmp/mujoco/include/
+ls /tmp/mujoco/include/mujoco/
 echo "Lib"
-ls -al /tmp/mujoco/lib/
+ls /tmp/mujoco/lib/
 
 set -e
 JAVACPP_VER=1.5.7
@@ -52,7 +53,6 @@ else
 	
 fi
 
-exit 0
 cd $SCRIPT_DIR/src/main/java/
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java

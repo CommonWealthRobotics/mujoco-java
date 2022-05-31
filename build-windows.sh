@@ -28,6 +28,7 @@ else
 fi
 echo "Include"
 ls /tmp/mujoco/include/
+ls /tmp/mujoco/include/mujoco/
 echo "Lib"
 ls /tmp/mujoco/lib/
 set -e

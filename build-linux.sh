@@ -25,7 +25,11 @@ else
 	wget https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VER/$JAVACPP -O $JAVACPP
 	unzip $JAVACPP
 fi
-
+echo "Include"
+ls /tmp/mujoco/include/
+ls /tmp/mujoco/include/mujoco/
+echo "Lib"
+ls /tmp/mujoco/lib/
 JAVADIR=$SCRIPT_DIR/src/main/java/
 cd $JAVADIR
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java

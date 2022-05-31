@@ -20,6 +20,9 @@ else
 	cd mujoco
 	hdiutil attach  ../$ARCHIVE
 	ls -al /Volumes/MuJoCo/mujoco.framework
+	mv /Volumes/MuJoCo/mujoco.framework/Headers/ /tmp/mujoco/include
+    mv /Volumes/MuJoCo/mujoco.framework/Modules/ /tmp/mujoco/lib
+	
 	echo /tmp/mujoco/
 	ls -al /tmp/mujoco/
 	cd /tmp

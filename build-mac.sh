@@ -3,6 +3,7 @@ bash --version
 g++ --version
 echo "Windows Build"
 VER=$(cat mujocoRelease.txt)
+ARCH=x64
 TYPE=macos-universal2
 ARCHIVE=mujoco-$VER-$TYPE.dmg
 URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
@@ -19,7 +20,7 @@ else
 	mkdir mujoco
 	cd mujoco
 	7z x ../$ARCHIVE
-	mv x64/* .
+	7z x 4.$ARCH
 	echo /tmp/mujoco/
 	ls -al /tmp/mujoco/
 	cd /tmp

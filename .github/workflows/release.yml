@@ -85,7 +85,7 @@ jobs:
           name: mac-lib
       - name: Print Working Dir
         run: |
-             ls -al .
+             ls -al ./build/libs/
              mkdir -p src/main/resources/macosx-x86_64/
              mkdir -p src/main/resources/linux-x86_64/
              mv libjniMuJoCoLib.dylib src/main/resources/macosx-x86_64/
@@ -116,7 +116,7 @@ jobs:
                GITHUB_TOKEN: ${{ github.token }}
         with:
                upload_url: ${{ steps.create_release.outputs.upload_url }}
-               asset_path: ./build/libs/mujoco-java.jar
+               asset_path: build/libs/mujoco-java.jar
                asset_name: mujoco-java.jar
                asset_content_type: application/jar          
           

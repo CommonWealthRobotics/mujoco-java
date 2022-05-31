@@ -19,9 +19,7 @@ else
 	mkdir mujoco
 	cd mujoco
 	hdiutil attach  ../$ARCHIVE
-	ls -al /Volumes/MuJoCo/mujoco.framework
-	ls -al /Volumes/MuJoCo/mujoco.framework/Modules
-	ls -al /Volumes/MuJoCo/mujoco.framework/Resources
+	find /Volumes/MuJoCo/ -name '*.dylib'
 	
 	cp -R /Volumes/MuJoCo/mujoco.framework/Headers/ /tmp/mujoco/include
     cp -R /Volumes/MuJoCo/mujoco.framework/Resources/ /tmp/mujoco/lib

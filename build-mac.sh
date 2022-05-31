@@ -20,8 +20,11 @@ else
 	cd mujoco
 	hdiutil attach  ../$ARCHIVE
 	ls -al /Volumes/MuJoCo/mujoco.framework
+	ls -al /Volumes/MuJoCo/mujoco.framework/Modules
+	ls -al /Volumes/MuJoCo/mujoco.framework/Resources
+	
 	cp -R /Volumes/MuJoCo/mujoco.framework/Headers/ /tmp/mujoco/include
-    cp -R /Volumes/MuJoCo/mujoco.framework/Modules/ /tmp/mujoco/lib
+    cp -R /Volumes/MuJoCo/mujoco.framework/Resources/ /tmp/mujoco/lib
 	
 	echo /tmp/mujoco/
 	ls -al /tmp/mujoco/
@@ -31,9 +34,9 @@ else
 	cd $SCRIPT_DIR/
 fi
 echo "Include"
-ls /tmp/mujoco/include/
+ls -al /tmp/mujoco/include/
 echo "Lib"
-ls /tmp/mujoco/lib/
+ls -al /tmp/mujoco/lib/
 exit 0
 
 set -e

@@ -84,7 +84,13 @@ jobs:
         with:
           name: mac-lib
       - name: Print Working Dir
-        run: ls -al .         
+        run: |
+             ls -al .
+             mkdir -p src/main/resources/macosx-x86_64/
+             mkdir -p src/main/resources/linux-x86_64/
+             mv libjniMuJoCoLib.dylib src/main/resources/macosx-x86_64/
+             mv libjniMuJoCoLib.so src/main/resources/linux-x86_64/
+                 
       - name: Publish package
         uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
         with:

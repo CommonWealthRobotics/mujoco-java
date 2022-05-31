@@ -47,7 +47,11 @@ jobs:
           distribution: 'zulu' 
     - name: Build
       run: bash build-mac.sh
-      
+    - name: Upload math result for job Mac
+      uses: actions/upload-artifact@v3
+      with:
+          name: mac-lib
+          path: src/main/resources/macosx-x86_64/libjniMuJoCoLib.dylib
   publish:
     runs-on: ubuntu-latest 
     needs: [macos,windows,linux]
@@ -75,7 +79,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: linux-lib  
-        
+      - name: Download math result for job Mac
+        uses: actions/download-artifact@v3
+        with:
+          name: mac-lib         
       - name: Publish package
         uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
         with:

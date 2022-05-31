@@ -22,7 +22,8 @@ else
 	find /Volumes/MuJoCo/ -name '*.dylib'
 	
 	cp -R /Volumes/MuJoCo/mujoco.framework/Headers/ /tmp/mujoco/include
-    cp -R /Volumes/MuJoCo/mujoco.framework/Resources/ /tmp/mujoco/lib
+    mkdir /tmp/mujoco/lib/
+    cp /Volumes/MuJoCo/mujoco.framework/Versions/A/libmujoco.$VER.dylib /tmp/mujoco/lib/libmujoco.dylib
 	
 	echo /tmp/mujoco/
 	ls -al /tmp/mujoco/
@@ -35,7 +36,6 @@ echo "Include"
 ls -al /tmp/mujoco/include/
 echo "Lib"
 ls -al /tmp/mujoco/lib/
-exit 0
 
 set -e
 JAVACPP_VER=1.5.7

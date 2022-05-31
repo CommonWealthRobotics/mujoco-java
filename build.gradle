@@ -9,7 +9,10 @@
 plugins {
     id 'eclipse'
     id 'java'
-    id 'maven-publish'
+    //id 'maven-publish'
+	id 'signing'
+	id 'maven'
+	
 }
 
 repositories {
@@ -30,33 +33,101 @@ if(JavaVersion.current() != JavaVersion.VERSION_1_8){
 group='com.commonwealthrobotics'
 archivesBaseName='mujoco-java'
 version = System.getenv("VERSION_SEMVER")
-publishing {
+//publishing {
+//	
+//  repositories {
+//		maven {
+//			name = 'GitHubPackages'
+//			url = uri("https://maven.pkg.github.com/CommonWealthRobotics/mujoco-java")
+//			credentials {
+//		        username = System.getenv("GITHUB_ACTOR")
+//		        password = System.getenv("GITHUB_TOKEN")
+//		           
+//			}
+//		}
+////		maven {
+////	      name = "OSSRH"
+////	      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+////	      credentials {
+////	        username = System.getenv("MAVEN_USERNAME")
+////	        password = System.getenv("MAVEN_PASSWORD")
+////	      }
+////	    }
+//	}
+//    publications {
+//        register("jar", MavenPublication) {
+//            from(components["java"])
+//            pom {
+//                url.set("https://github.com/CommonWealthRobotics/mujoco-java.git")
+//            }
+//        }
+//    }
+//}
 
-  repositories {
-		maven {
-			name = 'GitHubPackages'
-			url = uri("https://maven.pkg.github.com/CommonWealthRobotics/mujoco-java")
-			credentials {
-		        username = System.getenv("GITHUB_ACTOR")
-		        password = System.getenv("GITHUB_TOKEN")
-		           
-			}
+
+
+uploadArchives {
+	
+	repositories {
+	  mavenDeployer {
+		beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+  
+		repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+		  authentication(userName: System.getenv("MAVEN_USERNAME"), password: System.getenv("MAVEN_PASSWORD"))
 		}
-		maven {
-	      name = "OSSRH"
-	      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-	      credentials {
-	        username = System.getenv("MAVEN_USERNAME")
-	        password = System.getenv("MAVEN_PASSWORD")
-	      }
-	    }
+  
+		snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+		  authentication(userName: System.getenv("MAVEN_USERNAME"), password: System.getenv("MAVEN_PASSWORD"))
+		}
+  
+		pom.project {
+		  name 'MuJoCo java'
+		  packaging 'jar'
+		  // optionally artifactId can be defined here
+		  description 'Java bindings for MuJoCo'
+		  url 'https://github.com/CommonWealthRobotics/mujoco-java.git'
+  
+		  scm {
+			connection 			'scm:git:https://github.com/CommonWealthRobotics/mujoco-java.git'
+			developerConnection 'scm:git:https://github.com/CommonWealthRobotics/mujoco-java.git
+			url 'https://github.com/CommonWealthRobotics/mujoco-java.git'
+		  }
+  
+		  licenses {
+			license {
+			  name 'The Apache License, Version 2.0'
+			  url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+			}
+		  }
+  
+		  developers {
+			developer {
+			  id 'madhephaestus'
+			  name 'Kevin Harrington'
+			  email 'mad.hephaestus@gmail.com'
+			}
+		  }
+		}
+	  }
 	}
-    publications {
-        register("jar", MavenPublication) {
-            from(components["java"])
-            pom {
-                url.set("https://github.com/CommonWealthRobotics/mujoco-java.git")
-            }
-        }
-    }
 }
+
+
+signing {
+	sign configurations.archives
+}
+
+task javadocJar(type: Jar) {
+	classifier = 'javadoc'
+	from javadoc
+}
+
+task sourcesJar(type: Jar) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+artifacts {
+	archives javadocJar, sourcesJar, jar
+}
+

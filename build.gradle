@@ -7,8 +7,6 @@
  */
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
-    id 'application'
     id 'eclipse'
     id 'java'
     id 'maven-publish'
@@ -27,10 +25,7 @@ dependencies {
 if(JavaVersion.current() != JavaVersion.VERSION_1_8){
     throw new GradleException("This build must be run with java 8")
 }
-application {
-    // Define the main class for the application.
-    mainClass = 'mujoco.java.App'
-}
+
 
 group='com.commonwealthrobotics'
 archivesBaseName='mujoco-java'

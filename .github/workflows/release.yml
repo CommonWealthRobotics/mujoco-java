@@ -99,5 +99,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_SEMVER: ${{ steps.vars.outputs.tag }}
           
-          
+      - name: Make gitHub release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+               draft: false
+               prerelease: false
+               release_name: ${{ steps.version.outputs.version }}
+               tag_name: ${{ github.ref }}
+        env:
+               GITHUB_TOKEN: ${{ github.token }}
+               
+      - name: upload MuJoCo jar artifact
+        uses: actions/upload-release-asset@v1
+        env:
+               GITHUB_TOKEN: ${{ github.token }}
+        with:
+               upload_url: ${{ steps.create_release.outputs.upload_url }}
+               asset_path: ./build/libs/mujoco-java.jar
+               asset_name: mujoco-java.jar
+               asset_content_type: application/jar          
           

@@ -8,8 +8,8 @@ import org.mujoco.MuJoCoLib;
 
 import static org.junit.Assert.*;
 
-public class AppTest {
-    @Test public void appHasAGreeting() {
+public class MuJoColibTest {
+    @Test public void mujocoJNILoadTest() {
         MuJoCoLib lib = new MuJoCoLib();
         
         System.out.println("Starting "+MuJoCoLib.mj_versionString().getString());

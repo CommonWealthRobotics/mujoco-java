@@ -7,7 +7,6 @@ ARCH=x64
 TYPE=macos-universal2
 ARCHIVE=mujoco-$VER-$TYPE.dmg
 URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
-echo "https://github.com/deepmind/mujoco/releases/download/2.2.0/mujoco-2.2.0-windows-x86_64.zip"
 echo "$URL"
 SCRIPT_DIR=$( pwd )
 mkdir -p /tmp/
@@ -20,7 +19,7 @@ else
 	mkdir mujoco
 	cd mujoco
 	hdiutil attach  ../$ARCHIVE
-	ls -al /Volumes/
+	ls -al /Volumes/MuJoCo/
 	echo /tmp/mujoco/
 	ls -al /tmp/mujoco/
 	cd /tmp

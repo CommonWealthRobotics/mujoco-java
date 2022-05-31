@@ -4,8 +4,8 @@ g++ --version
 echo "Windows Build"
 VER=$(cat mujocoRelease.txt)
 ARCH=x64
-TYPE=macos-universal2
-ARCHIVE=mujoco-$VER-$TYPE.dmg
+TYPE=macosx-x86_64
+ARCHIVE=mujoco-$VER-macos-universal2.dmg
 URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
 echo "$URL"
 SCRIPT_DIR=$( pwd )

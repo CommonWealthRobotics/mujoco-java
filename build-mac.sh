@@ -19,6 +19,7 @@ else
 	mkdir mujoco
 	cd mujoco
 	7z x ../$ARCHIVE
+	mv x64/* .
 	echo /tmp/mujoco/
 	ls -al /tmp/mujoco/
 	cd /tmp

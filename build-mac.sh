@@ -19,7 +19,7 @@ else
 	mkdir mujoco
 	cd mujoco
 	hdiutil attach  ../$ARCHIVE
-	ls -al /Volumes/MuJoCo/
+	ls -al /Volumes/MuJoCo/mujoco.framework
 	echo /tmp/mujoco/
 	ls -al /tmp/mujoco/
 	cd /tmp
@@ -27,6 +27,7 @@ else
 	ls -al
 	cd $SCRIPT_DIR/
 fi
+exit 0
 echo "Include"
 ls /tmp/mujoco/include/
 echo "Lib"
@@ -45,7 +46,7 @@ else
 	cd $SCRIPT_DIR/
 	
 fi
-exit 0
+
 cd $SCRIPT_DIR/src/main/java/
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java

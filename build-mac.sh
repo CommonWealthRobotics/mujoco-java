@@ -20,8 +20,8 @@ else
 	cd mujoco
 	hdiutil attach  ../$ARCHIVE
 	ls -al /Volumes/MuJoCo/mujoco.framework
-	mv /Volumes/MuJoCo/mujoco.framework/Headers/ /tmp/mujoco/include
-    mv /Volumes/MuJoCo/mujoco.framework/Modules/ /tmp/mujoco/lib
+	cp -R /Volumes/MuJoCo/mujoco.framework/Headers/ /tmp/mujoco/include
+    cp -R /Volumes/MuJoCo/mujoco.framework/Modules/ /tmp/mujoco/lib
 	
 	echo /tmp/mujoco/
 	ls -al /tmp/mujoco/
@@ -30,11 +30,12 @@ else
 	ls -al
 	cd $SCRIPT_DIR/
 fi
-exit 0
 echo "Include"
 ls /tmp/mujoco/include/
 echo "Lib"
 ls /tmp/mujoco/lib/
+exit 0
+
 set -e
 JAVACPP_VER=1.5.7
 JAVACPPDIR=javacpp-platform-$JAVACPP_VER-bin

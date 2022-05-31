@@ -101,7 +101,8 @@ jobs:
       - name: Print Output Dir
         run: |
              ls -al build
-             ls -al build/libs/     
+             ls -al build/libs/
+             mv  build/libs/mujoco-java-*.jar  mujoco-java.jar
       - name: Make gitHub release
         uses: actions/create-release@v1
         id: create_release
@@ -119,7 +120,7 @@ jobs:
                GITHUB_TOKEN: ${{ github.token }}
         with:
                upload_url: ${{ steps.create_release.outputs.upload_url }}
-               asset_path: build/libs/mujoco-java-*.jar
+               asset_path: mujoco-java.jar
                asset_name: mujoco-java.jar
                asset_content_type: application/jar          
           

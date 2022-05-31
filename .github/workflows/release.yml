@@ -85,7 +85,7 @@ jobs:
           name: mac-lib
       - name: Print Working Dir
         run: |
-             ls -al ./build/libs/
+             ls -al .
              mkdir -p src/main/resources/macosx-x86_64/
              mkdir -p src/main/resources/linux-x86_64/
              mv libjniMuJoCoLib.dylib src/main/resources/macosx-x86_64/
@@ -98,7 +98,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_SEMVER: ${{ steps.vars.outputs.tag }}
-          
+      - name: Print Output Dir
+        run: |
+             ls -al build
+             ls -al build/libs/     
       - name: Make gitHub release
         uses: actions/create-release@v1
         id: create_release
@@ -116,7 +119,7 @@ jobs:
                GITHUB_TOKEN: ${{ github.token }}
         with:
                upload_url: ${{ steps.create_release.outputs.upload_url }}
-               asset_path: build/libs/mujoco-java.jar
+               asset_path: build/libs/mujoco-java-$VERSION_SEMVER.jar
                asset_name: mujoco-java.jar
                asset_content_type: application/jar          
           

@@ -82,7 +82,9 @@ jobs:
       - name: Download math result for job Mac
         uses: actions/download-artifact@v3
         with:
-          name: mac-lib         
+          name: mac-lib
+      - name: Print Working Dir
+        run: ls -al .         
       - name: Publish package
         uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
         with:

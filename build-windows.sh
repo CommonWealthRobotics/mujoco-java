@@ -2,10 +2,10 @@
 bash --version
 g++ --version
 echo "Windows Build"
-VER=$(cat mujocoRelease.txt)
-TYPE=windows-x86_64
-ARCHIVE=mujoco-$VER-$TYPE.zip
-URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
+export VER=$(cat mujocoRelease.txt)
+export TYPE=windows-x86_64
+export ARCHIVE=mujoco-$VER-$TYPE.zip
+export URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
 echo "https://github.com/deepmind/mujoco/releases/download/2.2.0/mujoco-2.2.0-windows-x86_64.zip"
 echo "$URL"
 SCRIPT_DIR=$( pwd )
@@ -15,12 +15,12 @@ if [ -f "/tmp/$ARCHIVE" ]; then
 else
 	rm -rf /tmp/mujoco*
 	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o /tmp/$ARCHIVE
-	cd /tmp/
+	cd /tmp
 	mkdir mujoco
 	cd mujoco
 	7z x ../$ARCHIVE
-	echo /tmp/mujoco/
-	ls -al /tmp/mujoco/
+	echo /tmp/mujoco
+	ls -al /tmp/mujoco
 	cd /tmp
 	echo /tmp
 	ls -al
@@ -45,7 +45,6 @@ else
 	cd $SCRIPT_DIR/
 	
 fi
-exit 0
 JAVADIR=$SCRIPT_DIR/src/main/java/
 cd $SCRIPT_DIR/src/main/java/
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java

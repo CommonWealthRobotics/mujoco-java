@@ -11,7 +11,7 @@ plugins {
 	id 'java'
 	id 'maven-publish'
 	id 'signing'
-	//id 'maven'
+	id 'io.codearte.nexus-staging' version '0.30.0'
 
 }
 
@@ -34,6 +34,12 @@ group='com.neuronrobotics'
 archivesBaseName='mujoco-java'
 version = System.getenv("VERSION_SEMVER")
 
+nexusStaging {
+	packageGroup = 'com.neuronrobotics' 
+	serverUrl='https://oss.sonatype.org/service/local/'
+	username = System.getenv("MAVEN_USERNAME")
+	password = System.getenv("MAVEN_PASSWORD")
+}
 
 publishing {
 

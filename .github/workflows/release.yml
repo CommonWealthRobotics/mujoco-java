@@ -90,6 +90,7 @@ jobs:
              mkdir -p src/main/resources/linux-x86_64/
              mv libjniMuJoCoLib.dylib src/main/resources/macosx-x86_64/
              mv libjniMuJoCoLib.so src/main/resources/linux-x86_64/
+             apt install gnupg1
                  
       - name: Publish package
         run: bash publish.sh

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-cat <(echo -e $OSSRH_GPG_SECRET_KEY) | gpg --batch --import
-gpg --list-secret-keys --keyid-format LONG
+cat <(echo -e $OSSRH_GPG_SECRET_KEY) | gpg1 --batch --import
+gpg1 --list-secret-keys --keyid-format LONG
 
 ls -al $HOME/.gnupg/
 

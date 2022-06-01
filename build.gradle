@@ -7,127 +7,102 @@
  */
 
 plugins {
-    id 'eclipse'
-    id 'java'
-    //id 'maven-publish'
+	id 'eclipse'
+	id 'java'
+	id 'maven-publish'
 	id 'signing'
-	id 'maven'
-	
+	//id 'maven'
+
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
+	// Use Maven Central for resolving dependencies.
+	mavenCentral()
 }
 
 dependencies {
-    // Use JUnit test framework.
-    testImplementation 'junit:junit:4.13.2'
+	// Use JUnit test framework.
+	testImplementation 'junit:junit:4.13.2'
 	implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
 }
 if(JavaVersion.current() != JavaVersion.VERSION_1_8){
-    throw new GradleException("This build must be run with java 8")
+	throw new GradleException("This build must be run with java 8")
 }
 
 
-group='com.commonwealthrobotics'
+group='com.neuronrobotics'
 archivesBaseName='mujoco-java'
 version = System.getenv("VERSION_SEMVER")
-//publishing {
-//	
-//  repositories {
-//		maven {
-//			name = 'GitHubPackages'
-//			url = uri("https://maven.pkg.github.com/CommonWealthRobotics/mujoco-java")
-//			credentials {
-//		        username = System.getenv("GITHUB_ACTOR")
-//		        password = System.getenv("GITHUB_TOKEN")
-//		           
-//			}
-//		}
-////		maven {
-////	      name = "OSSRH"
-////	      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-////	      credentials {
-////	        username = System.getenv("MAVEN_USERNAME")
-////	        password = System.getenv("MAVEN_PASSWORD")
-////	      }
-////	    }
-//	}
-//    publications {
-//        register("jar", MavenPublication) {
-//            from(components["java"])
-//            pom {
-//                url.set("https://github.com/CommonWealthRobotics/mujoco-java.git")
-//            }
-//        }
-//    }
-//}
 
 
+publishing {
 
-uploadArchives {
-	
 	repositories {
-	  mavenDeployer {
-		beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-  
-		repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-		  authentication(userName: System.getenv("MAVEN_USERNAME"), password: System.getenv("MAVEN_PASSWORD"))
-		}
-  
-		snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-		  authentication(userName: System.getenv("MAVEN_USERNAME"), password: System.getenv("MAVEN_PASSWORD"))
-		}
-  
-		pom.project {
-		  name 'MuJoCo java'
-		  packaging 'jar'
-		  // optionally artifactId can be defined here
-		  description 'Java bindings for MuJoCo'
-		  url 'https://github.com/CommonWealthRobotics/mujoco-java.git'
-  
-		  scm {
-			connection 			'scm:git:https://github.com/CommonWealthRobotics/mujoco-java.git'
-			developerConnection 'scm:git:https://github.com/CommonWealthRobotics/mujoco-java.git
-			url 'https://github.com/CommonWealthRobotics/mujoco-java.git'
-		  }
-  
-		  licenses {
-			license {
-			  name 'The Apache License, Version 2.0'
-			  url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+		//		maven {
+		//			name = 'GitHubPackages'
+		//			url = uri("https://maven.pkg.github.com/CommonWealthRobotics/mujoco-java")
+		//			credentials {
+		//		        username = System.getenv("GITHUB_ACTOR")
+		//		        password = System.getenv("GITHUB_TOKEN")
+		//
+		//			}
+		//		}
+		maven {
+			name = "OSSRH"
+			url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+			credentials {
+				username = System.getenv("MAVEN_USERNAME")
+				password = System.getenv("MAVEN_PASSWORD")
 			}
-		  }
-  
-		  developers {
-			developer {
-			  id 'madhephaestus'
-			  name 'Kevin Harrington'
-			  email 'mad.hephaestus@gmail.com'
-			}
-		  }
 		}
-	  }
+	}
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+			pom {
+				name= 'mujoco java'
+				packaging ='jar'
+				// optionally artifactId can be defined here
+				description ='Java bindings for MuJoCo Physics library'
+				url= 'http://github.com:CommonWealthRobotics/mujoco-java'
+
+				scm {
+					connection 			='scm:git:https://github.com/CommonWealthRobotics/mujoco-java'
+					developerConnection ='scm:git:git@github.com:CommonWealthRobotics/mujoco-java.git'
+					url ='https://github.com/CommonWealthRobotics/mujoco-java'
+				}
+
+				licenses {
+					license {
+						name= 'The Apache License, Version 2.0'
+						url ='http://www.apache.org/licenses/LICENSE-2.0.txt'
+					}
+				}
+
+				developers {
+					developer {
+						id ='madhephaestus'
+						name= 'Kevin Harrington'
+						email= 'kharrington@neuronrobotics.com'
+					}
+				}
+			}
+		}
 	}
 }
 
+java {
+	withJavadocJar()
+	withSourcesJar()
+}
 
 signing {
-	sign configurations.archives
+	sign publishing.publications.mavenJava
 }
 
-task javadocJar(type: Jar) {
-	classifier = 'javadoc'
-	from javadoc
-}
 
-task sourcesJar(type: Jar) {
-	classifier = 'sources'
-	from sourceSets.main.allSource
+javadoc {
+	if(JavaVersion.current().isJava9Compatible()) {
+		options.addBooleanOption('html5', true)
+	}
 }
-
-artifacts {
-	archives javadocJar, sourcesJar, jar
-}
-

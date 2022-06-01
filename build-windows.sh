@@ -25,6 +25,9 @@ else
 	echo /tmp
 	ls -al
 	cd $SCRIPT_DIR/
+	mv /tmp/mujoco/include/mujoco /usr/include/
+	mkdir /lib/mujoco/
+	mv /tmp/mujoco/lib/* /lib/mujoco/
 fi
 echo "Include"
 ls /tmp/mujoco/include/

@@ -107,7 +107,7 @@ jobs:
         run: |
              ls -al build
              ls -al build/libs/
-             mv  build/libs/mujoco-java-$VERSION_SEMVER.jar  mujoco-java.jar
+             mv  "build/libs/mujoco-java-${{ steps.version.outputs.version }}.jar"  mujoco-java.jar
       - name: Make gitHub release
         uses: actions/create-release@v1
         id: create_release

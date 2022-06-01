@@ -6,26 +6,28 @@ import org.bytedeco.javacpp.tools.*;
 
 
 @Properties(
-    value = @Platform(
-        includepath = {"/tmp/mujoco/include/"},
-        linkpath = {"/tmp/mujoco/lib/"},
-        include = {
-        		"mujoco/mjexport.h",
-        		"mujoco/mjdata.h",
-        		"mujoco/mjmodel.h",
-        		"mujoco/mjrender.h",
-        		"mujoco/mjtnum.h",
-        		"mujoco/mjui.h",
-        		"mujoco/mjvisualize.h",
-        		"mujoco/mujoco.h"      		
-        		},  
-        link = {"mujoco"}
-    ),
-    @Platform(
+    value = {
+    	@Platform(
+	        includepath = {"/tmp/mujoco/include/"},
+	        linkpath = {"/tmp/mujoco/lib/"},
+	        include = {
+	        		"mujoco/mjexport.h",
+	        		"mujoco/mjdata.h",
+	        		"mujoco/mjmodel.h",
+	        		"mujoco/mjrender.h",
+	        		"mujoco/mjtnum.h",
+	        		"mujoco/mjui.h",
+	        		"mujoco/mjvisualize.h",
+	        		"mujoco/mujoco.h"      		
+	        		},  
+	        link = {"mujoco"}
+	    ),
+	    @Platform(
             value = "windows-x86_64",
             includepath = {"C:/tools/cygwin/tmp/mujoco/include/"},
             linkpath = {"C:/tools/cygwin/tmp/mujoco/lib/"}
-    ),
+	    )
+    },
     target = "org.mujoco.MuJoCoLib"
 )
 

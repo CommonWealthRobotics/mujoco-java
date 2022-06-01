@@ -92,14 +92,16 @@ jobs:
              mv libjniMuJoCoLib.so src/main/resources/linux-x86_64/
                  
       - name: Publish package
-        uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
-        with:
-          arguments: jar publish
+        run: bash publish.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_SEMVER: ${{ steps.vars.outputs.tag }}
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          OSSRH_GPG_SECRET_KEY:  ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+          OSSRH_GPG_SECRET_KEY_PASSWORD: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+          OSSRH_GPG_SECRET_KEY_ID: ${{ secrets.OSSRH_GPG_SECRET_KEY_ID }}
+          
       - name: Print Output Dir
         run: |
              ls -al build

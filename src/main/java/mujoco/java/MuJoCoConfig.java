@@ -7,8 +7,8 @@ import org.bytedeco.javacpp.tools.*;
 
 @Properties(
     value = @Platform(
-        includepath = {"C:/cygwin64/tmp/mujoco/include/"},
-        linkpath = {"C:/cygwin64/tmp/mujoco/lib/"},
+        includepath = {"/tmp/mujoco/include/"},
+        linkpath = {"/tmp/mujoco/lib/"},
         include = {
         		"mujoco/mjexport.h",
         		"mujoco/mjdata.h",
@@ -20,6 +20,11 @@ import org.bytedeco.javacpp.tools.*;
         		"mujoco/mujoco.h"      		
         		},  
         link = {"mujoco"}
+    ),
+    @Platform(
+            value = "windows-x86_64",
+            includepath = {"C:/tools/cygwin/tmp/mujoco/include/"},
+            linkpath = {"C:/tools/cygwin/tmp/mujoco/lib/"}
     ),
     target = "org.mujoco.MuJoCoLib"
 )

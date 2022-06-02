@@ -7,13 +7,14 @@ public class Search {
 	public static void main(String[] args) {
 		System.out.println("Hello");
 		search(new File("D:/"),0);
+		search(new File("C:/Users"),0);
 		search(new File("C:/"),0);
 	}
 	
 	private static void search(File f,int depth) {
 		
 		if(f.isDirectory()) {
-			if(depth<4) {
+			if(depth<5) {
 				if(depth<2)
 					System.out.println("\tSearching "+f.getAbsolutePath());
 			}else {

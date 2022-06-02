@@ -7,8 +7,7 @@ public class Search {
 	public static void main(String[] args) {
 		System.out.println("Hello");
 		search(new File("D:/"),0);
-		search(new File("C:/Users"),0);
-		search(new File("C:/"),0);
+		search(new File("C:\\Users\\runneradmin\\AppData\\Local\\Temp\\"),0);
 	}
 	
 	private static void search(File f,int depth) {

@@ -7,6 +7,12 @@ MuJoCo-Java is published on Maven Central via Sonatype.
 
 ![](https://img.shields.io/nexus/r/https/oss.sonatype.org/com.neuronrobotics/mujoco-java.svg?style=flat)
 
+Hosting is in:
+
+```
+https://oss.sonatype.org/content/repositories/staging/com/neuronrobotics/mujoco-java/
+```
+
 Maven:
 
 ```

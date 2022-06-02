@@ -12,6 +12,7 @@ export URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
 echo "https://github.com/deepmind/mujoco/releases/download/2.2.0/mujoco-2.2.0-windows-x86_64.zip"
 echo "$URL"
 SCRIPT_DIR=$( pwd )
+JAVADIR=$SCRIPT_DIR/src/main/java/
 mkdir -p /tmp/
 if [ -f "/tmp/$ARCHIVE" ]; then
     echo "/tmp/$ARCHIVE exists."
@@ -34,7 +35,9 @@ else
 	#mkdir /lib/mujoco/
 	#mv /tmp/mujoco/lib/* /lib/mujoco/
 fi
+cd $JAVADIR
 javac mujoco/java/Search.java;java mujoco.java.Search
+cd $SCRIPT_DIR/
 echo "Include"
 ls /tmp/mujoco/include/
 ls /tmp/mujoco/include/mujoco/
@@ -54,7 +57,7 @@ else
 	cd $SCRIPT_DIR/
 	
 fi
-JAVADIR=$SCRIPT_DIR/src/main/java/
+
 cd $SCRIPT_DIR/src/main/java/
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
 java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java

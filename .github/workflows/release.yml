@@ -30,12 +30,19 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
     - uses: ilammy/msvc-dev-cmd@v1
+      with:
+          arch: amd64_x86
     - uses: actions/setup-java@v3
       with:
           java-version: '8'
           distribution: 'zulu'
     - name: Build
       run: bash build-windows.sh
+    - name: Upload math result for job Windows
+      uses: actions/upload-artifact@v3
+      with:
+          name: win-lib
+          path: src/main/resources/windows-x86_64/*
 
   macos:
     runs-on: macos-latest
@@ -76,6 +83,12 @@ jobs:
         run: |
           echo $VERSION_SEMVER
           echo ${{ steps.vars.outputs.tag }}
+      - name: Download math result for job Windows
+        uses: actions/download-artifact@v3
+        with:
+          name: win-lib 
+          path: src/main/resources/windows-x86_64/
+          
       - name: Download math result for job Linux
         uses: actions/download-artifact@v3
         with:
@@ -87,6 +100,8 @@ jobs:
       - name: Print Working Dir
         run: |
              ls -al .
+             ls -al src/main/resources/
+             ls -al src/main/resources/windows-x86_64/
              mkdir -p src/main/resources/macosx-x86_64/
              mkdir -p src/main/resources/linux-x86_64/
              mv libjniMuJoCoLib.dylib src/main/resources/macosx-x86_64/

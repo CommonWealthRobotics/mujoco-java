@@ -64,6 +64,9 @@ java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJo
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
 
+echo "ls -al $JAVADIR"
+ls -al $JAVADIR
+
 rm -rf $JAVADIR../resources/$TYPE
 mv $JAVADIR/$TYPE/ $JAVADIR../resources/
 echo "ls -al $JAVADIR../resources/"
@@ -72,7 +75,7 @@ ls -al $JAVADIR../resources/
 cd $SCRIPT_DIR/
 echo "Resource File: "
 ls -al $JAVADIR../resources/$TYPE
-./gradlew jar  --stacktrace test
+#./gradlew jar  --stacktrace test
 
 
 

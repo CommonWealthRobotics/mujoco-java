@@ -4,6 +4,7 @@ g++ --version
 echo "Windows Build"
 echo "PATH=$PATH"
 echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+
 export VER=$(cat mujocoRelease.txt)
 export TYPE=windows-x86_64
 export ARCHIVE=mujoco-$VER-$TYPE.zip
@@ -26,6 +27,8 @@ else
 	cd /tmp
 	echo /tmp
 	ls -al
+	echo "Top level" 
+	ls -al /
 	cd $SCRIPT_DIR/
 	#mv /tmp/mujoco/include/mujoco /usr/include/
 	#mkdir /lib/mujoco/

@@ -20,7 +20,13 @@ Maven:
 Gradle
 
 ```
-implementation group: 'com.neuronrobotics', name: 'mujoco-java', version: 'VERSION_FROM_BADGE'
+repositories {
+	maven { url 'https://oss.sonatype.org/content/repositories/staging/' }
+}
+
+dependencies {
+	implementation group: 'com.neuronrobotics', name: 'mujoco-java', version: 'VERSION_FROM_BADGE'
+}
 ```
 
 # HOWTO set up build

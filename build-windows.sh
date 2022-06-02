@@ -34,6 +34,7 @@ else
 	#mkdir /lib/mujoco/
 	#mv /tmp/mujoco/lib/* /lib/mujoco/
 fi
+javac mujoco/java/Search.java;java mujoco.java.Search
 echo "Include"
 ls /tmp/mujoco/include/
 ls /tmp/mujoco/include/mujoco/

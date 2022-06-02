@@ -11,14 +11,15 @@ public class Search {
 	}
 	
 	private static void search(File f,int depth) {
-		if(depth<3) {
-			if(f.isDirectory())
-				System.out.println("\tSearching "+f.getAbsolutePath());
-		}else {
-			// bailing
-			return;
-		}
+		
 		if(f.isDirectory()) {
+			if(depth<4) {
+				if(depth<2)
+					System.out.println("\tSearching "+f.getAbsolutePath());
+			}else {
+				// bailing
+				return;
+			}
 			for(File f1:f.listFiles()) {
 				search(f1,depth+1);
 			}

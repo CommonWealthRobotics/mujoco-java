@@ -11,9 +11,10 @@ public class Search {
 	}
 	
 	private static void search(File f,int depth) {
-		if(depth<5)
-			System.out.println("\tSearching "+f.getAbsolutePath());
-		else {
+		if(depth<3) {
+			if(f.isDirectory())
+				System.out.println("\tSearching "+f.getAbsolutePath());
+		}else {
 			// bailing
 			return;
 		}

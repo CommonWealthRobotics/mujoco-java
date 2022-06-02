@@ -24,8 +24,8 @@ import org.bytedeco.javacpp.tools.*;
 	    ),
 	    @Platform(
             value = "windows-x86_64",
-            includepath = {"mujoco/include/","C:/msys64/tmp/mujoco/include/"},
-            linkpath = {"mujoco/lib/","C:/msys64/tmp/mujoco/lib/"}
+            includepath = {"mujoco/include/","C:/Users/runneradmin/AppData/Local/Temp/mujoco/include/"},
+            linkpath = {"mujoco/lib/","C:/Users/runneradmin/AppData/Local/Temp/mujoco/lib/"}
 	    )
     },
     target = "org.mujoco.MuJoCoLib"

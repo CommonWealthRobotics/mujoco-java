@@ -14,20 +14,20 @@ mkdir -p $BUILDDIR
 if [ -f "$BUILDDIR$ARCHIVE" ]; then
     echo "$BUILDDIR$ARCHIVE exists."
 else
-	rm -rf $BUILDDIRmujoco*
-	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o $BUILDDIR$ARCHIVE
+	rm -rf $BUILDDIR/mujoco*
+	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o $BUILDDIR/$ARCHIVE
 	cd $BUILDDIR
 	mkdir mujoco
 	cd mujoco
 	hdiutil attach  ../$ARCHIVE
 	find /Volumes/MuJoCo/ -name '*.dylib'
-	mkdir $BUILDDIRmujoco/include
-	cp -R /Volumes/MuJoCo/mujoco.framework/Headers/ $BUILDDIRmujoco/include/mujoco
-    mkdir $BUILDDIRmujoco/lib/
-    cp /Volumes/MuJoCo/mujoco.framework/Versions/A/libmujoco.$VER.dylib $BUILDDIRmujoco/lib/libmujoco.dylib
+	mkdir $BUILDDIR/mujoco/include
+	cp -R /Volumes/MuJoCo/mujoco.framework/Headers/ $BUILDDIR/mujoco/include/mujoco
+    mkdir $BUILDDIR/mujoco/lib/
+    cp /Volumes/MuJoCo/mujoco.framework/Versions/A/libmujoco.$VER.dylib $BUILDDIR/mujoco/lib/libmujoco.dylib
 	
-	echo $BUILDDIRmujoco/
-	ls -al $BUILDDIRmujoco/
+	echo $BUILDDIR/mujoco/
+	ls -al $BUILDDIR/mujoco/
 	cd /tmp
 	echo /tmp
 	ls -al

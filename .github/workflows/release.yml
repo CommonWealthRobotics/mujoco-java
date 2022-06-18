@@ -5,7 +5,7 @@ on:
        tags:       
          - '*'
 env:
-  VERSION_SEMVER: ${GITHUB_REF##*/}
+  VERSION_SEMVER: ${{ steps.version.outputs.version }}
 jobs:
   linux:
     runs-on: ubuntu-latest
@@ -102,7 +102,7 @@ jobs:
         run: |
              ls -al .
              sudo apt install gnupg1
-                 
+
       - name: Publish package
         run: bash publish.sh
         env:

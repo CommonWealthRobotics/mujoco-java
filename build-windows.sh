@@ -9,22 +9,22 @@ export VER=$(cat mujocoRelease.txt)
 export TYPE=windows-x86_64
 export ARCHIVE=mujoco-$VER-$TYPE.zip
 export URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
-echo "https://github.com/deepmind/mujoco/releases/download/2.2.0/mujoco-2.2.0-windows-x86_64.zip"
 echo "$URL"
 SCRIPT_DIR=$( pwd )
 JAVADIR=$SCRIPT_DIR/src/main/java/
-mkdir -p /tmp/
-if [ -f "/tmp/$ARCHIVE" ]; then
-    echo "/tmp/$ARCHIVE exists."
+BUILDDIR=/tmp/
+mkdir -p $BUILDDIR
+if [ -f "$BUILDDIR$ARCHIVE" ]; then
+    echo "$BUILDDIR$ARCHIVE exists."
 else
-	rm -rf /tmp/mujoco*
-	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o /tmp/$ARCHIVE
+	rm -rf $BUILDDIRmujoco*
+	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o $BUILDDIR$ARCHIVE
 	cd /tmp
 	mkdir mujoco
 	cd mujoco
 	7z x ../$ARCHIVE
-	echo /tmp/mujoco
-	ls -al /tmp/mujoco
+	echo $BUILDDIRmujoco
+	ls -al $BUILDDIRmujoco
 	cd /tmp
 	echo /tmp
 	ls -al
@@ -32,14 +32,13 @@ else
 	ls -al /
 	cd $SCRIPT_DIR/
 fi
-cd $JAVADIR
-javac mujoco/java/Search.java;java mujoco.java.Search
+
 cd $SCRIPT_DIR/
 echo "Include"
-ls /tmp/mujoco/include/
-ls /tmp/mujoco/include/mujoco/
+ls $BUILDDIRmujoco/include/
+ls $BUILDDIRmujoco/include/mujoco/
 echo "Lib"
-ls /tmp/mujoco/lib/
+ls $BUILDDIRmujoco/lib/
 set -e
 JAVACPP_VER=1.5.7
 JAVACPPDIR=javacpp-platform-$JAVACPP_VER-bin
@@ -54,10 +53,12 @@ else
 	cd $SCRIPT_DIR/
 	
 fi
-
+mv $BUILDDIR/mujoco/lib/* $JAVADIR/
+mv $BUILDDIR/mujoco/include/mujoco $JAVADIR/
 cd $SCRIPT_DIR/src/main/java/
-java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
-java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java
+java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
+java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
+
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
 
@@ -66,6 +67,8 @@ ls -al $JAVADIR
 
 rm -rf $JAVADIR../resources/$TYPE
 mv $JAVADIR/$TYPE/ $JAVADIR../resources/
+cp $BUILDDIRmujoco/lib/* $JAVADIR../resources/$TYPE/
+
 echo "ls -al $JAVADIR../resources/"
 ls -al $JAVADIR../resources/
 

@@ -9,34 +9,35 @@ ARCHIVE=mujoco-$VER-macos-universal2.dmg
 URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
 echo "$URL"
 SCRIPT_DIR=$( pwd )
-mkdir -p /tmp/
-if [ -f "/tmp/$ARCHIVE" ]; then
-    echo "/tmp/$ARCHIVE exists."
+BUILDDIR=/tmp/
+mkdir -p $BUILDDIR
+if [ -f "$BUILDDIR$ARCHIVE" ]; then
+    echo "$BUILDDIR$ARCHIVE exists."
 else
-	rm -rf /tmp/mujoco*
-	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o /tmp/$ARCHIVE
-	cd /tmp/
+	rm -rf $BUILDDIRmujoco*
+	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o $BUILDDIR$ARCHIVE
+	cd $BUILDDIR
 	mkdir mujoco
 	cd mujoco
 	hdiutil attach  ../$ARCHIVE
 	find /Volumes/MuJoCo/ -name '*.dylib'
-	mkdir /tmp/mujoco/include
-	cp -R /Volumes/MuJoCo/mujoco.framework/Headers/ /tmp/mujoco/include/mujoco
-    mkdir /tmp/mujoco/lib/
-    cp /Volumes/MuJoCo/mujoco.framework/Versions/A/libmujoco.$VER.dylib /tmp/mujoco/lib/libmujoco.dylib
+	mkdir $BUILDDIRmujoco/include
+	cp -R /Volumes/MuJoCo/mujoco.framework/Headers/ $BUILDDIRmujoco/include/mujoco
+    mkdir $BUILDDIRmujoco/lib/
+    cp /Volumes/MuJoCo/mujoco.framework/Versions/A/libmujoco.$VER.dylib $BUILDDIRmujoco/lib/libmujoco.dylib
 	
-	echo /tmp/mujoco/
-	ls -al /tmp/mujoco/
+	echo $BUILDDIRmujoco/
+	ls -al $BUILDDIRmujoco/
 	cd /tmp
 	echo /tmp
 	ls -al
 	cd $SCRIPT_DIR/
 fi
 echo "Include"
-ls /tmp/mujoco/include/
-ls /tmp/mujoco/include/mujoco/
+ls $BUILDDIRmujoco/include/
+ls $BUILDDIRmujoco/include/mujoco/
 echo "Lib"
-ls /tmp/mujoco/lib/
+ls $BUILDDIRmujoco/lib/
 
 set -e
 JAVACPP_VER=1.5.7
@@ -54,13 +55,17 @@ else
 fi
 JAVADIR=$SCRIPT_DIR/src/main/java/
 cd $SCRIPT_DIR/src/main/java/
-java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
-java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java
+mv $BUILDDIR/mujoco/lib/* $JAVADIR/
+mv $BUILDDIR/mujoco/include/mujoco $JAVADIR/
+java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
+java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
+
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
-
 rm -rf $JAVADIR../resources/$TYPE
 mv $JAVADIR/$TYPE/ $JAVADIR../resources/
+cp $BUILDDIRmujoco/lib/* $JAVADIR../resources/$TYPE/
+
 echo "ls -al $JAVADIR../resources/"
 ls -al $JAVADIR../resources/
 

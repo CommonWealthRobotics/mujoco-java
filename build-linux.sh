@@ -51,7 +51,7 @@ mkdir -p $SCRIPT_DIR/src/main/resources/
 
 rm -rf $JAVADIR../resources/$TYPE
 mv $JAVADIR/org/mujoco/$TYPE/ $JAVADIR../resources/
-rm $JAVADIR/libmujoco.so 
+mv $JAVADIR/libmujoco.so  $JAVADIR../resources/$TYPE/
 rm -rf $JAVADIR/mujoco
 echo "ls -al $JAVADIR../resources/"
 ls -al $JAVADIR../resources/

@@ -65,7 +65,7 @@ echo "ls -al JAVADIR $JAVADIR"
 ls -al $JAVADIR
 
 rm -rf $JAVADIR../resources/$TYPE
-find .|grep $TYPE
+find $SCRIPT_DIR|grep $TYPE
 mv $JAVADIR/$TYPE/ $JAVADIR../resources/
 cp $BUILDDIR/mujoco/lib/* $JAVADIR../resources/$TYPE/
 

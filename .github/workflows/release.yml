@@ -4,8 +4,7 @@ on:
    push:
        tags:       
          - '*'
-env:
-  VERSION_SEMVER: ${{ steps.version.outputs.version }}
+
 jobs:
   linux:
     runs-on: ubuntu-latest

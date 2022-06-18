@@ -33,13 +33,14 @@ else
 	ls -al
 	cd $SCRIPT_DIR/
 fi
-echo "Include"
-ls $BUILDDIRmujoco/include/
-ls $BUILDDIRmujoco/include/mujoco/
-echo "Lib"
-ls $BUILDDIRmujoco/lib/
-
 set -e
+echo "Include"
+ls $BUILDDIR/mujoco/include/
+ls $BUILDDIR/mujoco/include/mujoco/
+echo "Lib"
+ls $BUILDDIR/mujoco/lib/
+
+
 JAVACPP_VER=1.5.7
 JAVACPPDIR=javacpp-platform-$JAVACPP_VER-bin
 JAVACPP=$JAVACPPDIR.zip
@@ -55,7 +56,7 @@ else
 fi
 JAVADIR=$SCRIPT_DIR/src/main/java/
 cd $SCRIPT_DIR/src/main/java/
-mv $BUILDDIR/mujoco/lib/* $JAVADIR/
+cp $BUILDDIR/mujoco/lib/* $JAVADIR/
 mv $BUILDDIR/mujoco/include/mujoco $JAVADIR/
 java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
 java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
@@ -64,7 +65,7 @@ LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
 rm -rf $JAVADIR../resources/$TYPE
 mv $JAVADIR/$TYPE/ $JAVADIR../resources/
-cp $BUILDDIRmujoco/lib/* $JAVADIR../resources/$TYPE/
+cp $BUILDDIR/mujoco/lib/* $JAVADIR../resources/$TYPE/
 
 echo "ls -al $JAVADIR../resources/"
 ls -al $JAVADIR../resources/

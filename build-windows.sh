@@ -17,16 +17,15 @@ mkdir -p $BUILDDIR
 if [ -f "$BUILDDIR$ARCHIVE" ]; then
     echo "$BUILDDIR$ARCHIVE exists."
 else
-	rm -rf $BUILDDIRmujoco*
 	curl -L  --location-trusted https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -o $BUILDDIR$ARCHIVE
-	cd /tmp
+	cd $BUILDDIR
 	mkdir mujoco
 	cd mujoco
 	7z x ../$ARCHIVE
 	echo $BUILDDIRmujoco
 	ls -al $BUILDDIRmujoco
-	cd /tmp
-	echo /tmp
+	cd $BUILDDIR
+	echo $BUILDDIR
 	ls -al
 	echo "Top level" 
 	ls -al /
@@ -35,10 +34,10 @@ fi
 
 cd $SCRIPT_DIR/
 echo "Include"
-ls $BUILDDIRmujoco/include/
-ls $BUILDDIRmujoco/include/mujoco/
+ls $BUILDDIR/mujoco/include/
+ls $BUILDDIR/mujoco/include/mujoco/
 echo "Lib"
-ls $BUILDDIRmujoco/lib/
+ls $BUILDDIR/mujoco/lib/
 set -e
 JAVACPP_VER=1.5.7
 JAVACPPDIR=javacpp-platform-$JAVACPP_VER-bin
@@ -53,9 +52,9 @@ else
 	cd $SCRIPT_DIR/
 	
 fi
-mv $BUILDDIR/mujoco/lib/* $JAVADIR/
+cp $BUILDDIR/mujoco/lib/* $JAVADIR/
 mv $BUILDDIR/mujoco/include/mujoco $JAVADIR/
-cd $SCRIPT_DIR/src/main/java/
+cd $JAVADIR
 java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
 java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
 
@@ -67,7 +66,7 @@ ls -al $JAVADIR
 
 rm -rf $JAVADIR../resources/$TYPE
 mv $JAVADIR/$TYPE/ $JAVADIR../resources/
-cp $BUILDDIRmujoco/lib/* $JAVADIR../resources/$TYPE/
+cp $BUILDDIR/mujoco/lib/* $JAVADIR../resources/$TYPE/
 
 echo "ls -al $JAVADIR../resources/"
 ls -al $JAVADIR../resources/
@@ -75,7 +74,7 @@ ls -al $JAVADIR../resources/
 cd $SCRIPT_DIR/
 echo "Resource File: "
 ls -al $JAVADIR../resources/$TYPE
-#./gradlew jar  --stacktrace test
+./gradlew jar  --stacktrace test
 
 
 

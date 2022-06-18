@@ -35,6 +35,14 @@ dependencies {
 }
 ```
 
+# Windows System Dep
+
+installing VC++ redist from:
+
+``` 
+https://www.microsoft.com/en-gb/download/details.aspx?id=48145
+```
+
 # HOWTO set up build
 
 1. Export your gpg private key from the system that you have created it.

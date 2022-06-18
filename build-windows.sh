@@ -68,14 +68,14 @@ rm -rf $JAVADIR../resources/$TYPE
 find $SCRIPT_DIR|grep $TYPE
 mv $JAVADIR/org/mujoco/$TYPE/ $JAVADIR../resources/
 cp $BUILDDIR/mujoco/lib/* $JAVADIR../resources/$TYPE/
-
+cp $BUILDDIR/mujoco/bin/mujoco.dll $JAVADIR../resources/$TYPE/
 echo "ls -al $JAVADIR../resources/"
 ls -al $JAVADIR../resources/
 
 cd $SCRIPT_DIR/
 echo "Resource File: "
 ls -al $JAVADIR../resources/$TYPE
-#./gradlew jar  --stacktrace test
+./gradlew jar  --stacktrace test
 
 
 

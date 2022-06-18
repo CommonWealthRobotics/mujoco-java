@@ -5,17 +5,27 @@ VER=$(cat mujocoRelease.txt)
 TYPE=linux-x86_64
 ARCHIVE=mujoco-$VER-$TYPE.tar.gz
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+JAVADIR=$SCRIPT_DIR/src/main/resources/
 
-if [ -f "/tmp/$ARCHIVE" ]; then
-    echo "/tmp/$ARCHIVE exists."
+BUILDDIR=$SCRIPT_DIR/cppbuild
+if [ -f "$SCRIPT_DIR/$ARCHIVE" ]; then
+    echo "$ARCHIVE exists."
 else
-	rm -rf /tmp/mujoco*
-	wget https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -O /tmp/$ARCHIVE
-	cd /tmp/
-	tar -xf $ARCHIVE
-	mv /tmp/mujoco-$VER /tmp/mujoco/
-	cd $SCRIPT_DIR/
+	wget https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -O $SCRIPT_DIR/$ARCHIVE
 fi
+
+mkdir -p $BUILDDIR
+cd $BUILDDIR
+tar -xf $SCRIPT_DIR/$ARCHIVE
+mv $BUILDDIR/mujoco-$VER $BUILDDIR/mujoco/
+rm $BUILDDIR/mujoco/lib/libmujoco.so
+mv $BUILDDIR/mujoco/lib/libmujoco.so.$VER $BUILDDIR/mujoco/lib/libmujoco.so
+mv $BUILDDIR/mujoco/lib/* $JAVADIR/
+mv $BUILDDIR/mujoco/include/mujoco $JAVADIR/
+
+cd $SCRIPT_DIR/
+
+
 set -e
 JAVACPP_VER=1.5.7
 JAVACPP=javacpp-platform-$JAVACPP_VER-bin.zip
@@ -26,14 +36,17 @@ else
 	unzip $JAVACPP
 fi
 echo "Include"
-ls /tmp/mujoco/include/
-ls /tmp/mujoco/include/mujoco/
+ls $JAVADIR/include/
+ls $JAVADIR/include/mujoco/
 echo "Lib"
-ls /tmp/mujoco/lib/
-JAVADIR=$SCRIPT_DIR/src/main/java/
+ls $BUILDDIR/lib/
 cd $JAVADIR
-java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar mujoco/java/MuJoCoConfig.java
-java -jar ../../../javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java
+
+echo "JavaCPP configs:"
+java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -Dcompiler.includepath=$BUILDDIR/include/ -print properties.includepath
+
+java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -Dcompiler.includepath=$BUILDDIR/include/ mujoco/java/MuJoCoConfig.java
+java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
 
@@ -45,7 +58,8 @@ ls -al $JAVADIR../resources/
 cd $SCRIPT_DIR/
 echo "Resources: "
 ls -al $JAVADIR../resources/$TYPE
+#mv $BUILDDIR/mujoco/ $BUILDDIR/mujoco-back/
 ./gradlew jar  --stacktrace test
-
+#mv $BUILDDIR/mujoco-back/ $BUILDDIR/mujoco/
 
 

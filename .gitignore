@@ -14,3 +14,4 @@ build
 *jni*.cpp
 bin
 src/main/resources/*
+cppbuild

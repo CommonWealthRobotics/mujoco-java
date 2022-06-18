@@ -65,7 +65,7 @@ LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
 rm -rf $JAVADIR../resources/$TYPE
 find $SCRIPT_DIR|grep $TYPE
-mv $JAVADIR/$TYPE/ $JAVADIR../resources/
+mv $JAVADIR/org/mujoco/$TYPE/ $JAVADIR../resources/
 cp $BUILDDIR/mujoco/lib/* $JAVADIR../resources/$TYPE/
 
 echo "ls -al $JAVADIR../resources/"

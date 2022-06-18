@@ -1,4 +1,5 @@
-package mujoco.java;
+package org.mujoco;
+
 
 import org.bytedeco.javacpp.*;
 import org.bytedeco.javacpp.annotation.*;

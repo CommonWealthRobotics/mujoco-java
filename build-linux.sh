@@ -5,7 +5,7 @@ VER=$(cat mujocoRelease.txt)
 TYPE=linux-x86_64
 ARCHIVE=mujoco-$VER-$TYPE.tar.gz
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-JAVADIR=$SCRIPT_DIR/src/main/resources/
+JAVADIR=$SCRIPT_DIR/src/main/java/
 
 BUILDDIR=$SCRIPT_DIR/cppbuild
 if [ -f "$SCRIPT_DIR/$ARCHIVE" ]; then
@@ -13,7 +13,7 @@ if [ -f "$SCRIPT_DIR/$ARCHIVE" ]; then
 else
 	wget https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE -O $SCRIPT_DIR/$ARCHIVE
 fi
-
+rm -rf $SCRIPT_DIR/cppbuild
 mkdir -p $BUILDDIR
 cd $BUILDDIR
 tar -xf $SCRIPT_DIR/$ARCHIVE
@@ -36,22 +36,23 @@ else
 	unzip $JAVACPP
 fi
 echo "Include"
-ls $JAVADIR/include/
-ls $JAVADIR/include/mujoco/
+ls $JAVADIR/mujoco/
 echo "Lib"
-ls $BUILDDIR/lib/
+ls $BUILDDIR/
 cd $JAVADIR
 
 echo "JavaCPP configs:"
 java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -Dcompiler.includepath=$BUILDDIR/include/ -print properties.includepath
 
-java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -Dcompiler.includepath=$BUILDDIR/include/ mujoco/java/MuJoCoConfig.java
-java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar org/mujoco/MuJoCoLib.java
+java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
+java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
 
 rm -rf $JAVADIR../resources/$TYPE
-mv $JAVADIR/$TYPE/ $JAVADIR../resources/
+mv $JAVADIR/org/mujoco/$TYPE/ $JAVADIR../resources/
+rm $JAVADIR/libmujoco.so 
+rm -rf $JAVADIR/mujoco
 echo "ls -al $JAVADIR../resources/"
 ls -al $JAVADIR../resources/
 

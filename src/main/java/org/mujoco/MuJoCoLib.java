@@ -6,7 +6,7 @@ import java.nio.*;
 import org.bytedeco.javacpp.*;
 import org.bytedeco.javacpp.annotation.*;
 
-public class MuJoCoLib extends mujoco.java.MuJoCoConfig {
+public class MuJoCoLib extends org.mujoco.MuJoCoConfig {
     static { Loader.load(); }
 
 // Parsed from mujoco/mjexport.h

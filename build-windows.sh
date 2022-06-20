@@ -76,6 +76,7 @@ cd $SCRIPT_DIR/
 echo "Resource File: "
 ls -al $JAVADIR../resources/$TYPE
 ./gradlew jar  --stacktrace test
+ls -al $HOME/.javacpp/cache/mujoco-java-*/$TYPE/
 
 
 

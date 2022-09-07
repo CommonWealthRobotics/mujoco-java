@@ -8,9 +8,16 @@ import org.mujoco.MuJoCoLib;
 
 import static org.junit.Assert.*;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.bytedeco.javacpp.Loader;
+
 public class MuJoColibTest {
     @Test public void mujocoJNILoadTest() {
-        MuJoCoLib lib = new MuJoCoLib();
+    	System.out.println(System.getProperty("org.bytedeco.javacpp.logger.debug"));
+    	System.setProperty("org.bytedeco.javacpp.logger.debug", "true");
+    	MuJoCoLib lib = new MuJoCoLib();
         
         System.out.println("Starting "+MuJoCoLib.mj_versionString().getString());
     }

@@ -10,9 +10,11 @@ import org.mujoco.MuJoCoLib.mjData_;
 import org.mujoco.MuJoCoLib.mjModel;
 import org.mujoco.MuJoCoLib.mjModel_;
 import org.mujoco.MuJoCoLib.mjVFS;
+import org.mujoco.MuJoCoModelManager;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,34 +27,28 @@ public class MuJoColibTest {
 	public void mujocoJNILoadTest() {
 		System.out.println(System.getProperty("org.bytedeco.javacpp.logger.debug"));
 		System.setProperty("org.bytedeco.javacpp.logger.debug", "true");
-		MuJoCoLib lib = new MuJoCoLib();
 
 		System.out.println("Starting " + MuJoCoLib.mj_versionString().getString());
-		byte[] error = new byte[100];
-		int error_sz = 0;
-		mjModel m = MuJoCoLib.mj_loadXML(
-				"/home/hephaestus/git/mujoco-java/src/main/resources/mujoco/java/humanoid/humanoid.xml", null, error,
-				error_sz);
-		System.out.println("Humanoid model loaded " + m);
-		mjData d = MuJoCoLib.mj_makeData(m);
+
+		MuJoCoModelManager manager = new MuJoCoModelManager(
+				new File("/home/hephaestus/git/mujoco-java/src/main/resources/mujoco/java/humanoid/humanoid.xml"));
+
 		try {
-			mjModel_ Maccessable = new mjModel_(m);
-			try (mjData_ accessable = new mjData_(d)) {
-				System.out.println("Run model for 10 seconds");
-				while (accessable.time() < 10) {
-					MuJoCoLib.mj_step(m, d);
-					Thread.sleep(1);
-					
-				}
+			mjModel_ Maccessable = manager.getModel();
+			mjData_ accessable = manager.getData();
+			System.out.println("Run model for 10 seconds");
+			while (accessable.time() < 10) {
+				manager.stepOne();
+				manager.stepTwo();
+				Thread.sleep(1);
 
 			}
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Clean up data objects");
-
-		MuJoCoLib.mj_deleteData(d);
-		MuJoCoLib.mj_deleteModel(m);
+		manager.close();
 	}
 }

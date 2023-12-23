@@ -31,8 +31,8 @@ public class MuJoColibTest {
 
 		System.out.println("Starting " + MuJoCoLib.mj_versionString().getString());
 
-		//MuJoCoModelManager manager = new MuJoCoModelManager("humanoid/humanoid.xml");
-		MuJoCoModelManager manager = new MuJoCoModelManager(new File("/home/hephaestus/git/mujoco-java/model/humanoid/humanoid.xml"));
+		MuJoCoModelManager manager = new MuJoCoModelManager("humanoid/humanoid.xml");
+		//MuJoCoModelManager manager = new MuJoCoModelManager(new File("/home/hephaestus/git/mujoco-java/model/humanoid/humanoid.xml"));
 
 		try {
 			mjModel_ Maccessable = manager.getModel();

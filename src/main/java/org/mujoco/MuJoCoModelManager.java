@@ -31,13 +31,14 @@ public class MuJoCoModelManager {
 
 	}
 	private void loadFromFile(File config) {
+		if(!config.exists())
+			throw new RuntimeException("Config File does not exist "+config);
 		byte[] error = new byte[1000];
 		int error_sz = 0;
-		m = MuJoCoLib.mj_loadXML(
-				config.getAbsolutePath(),(mjVFS) null, error,
-				error_sz);
+		System.out.println("MuJoCo loading configureation file "+config.getAbsolutePath());
+		m = MuJoCoLib.mj_loadXML(config.getAbsolutePath(), null, error,error_sz);
 		if(m==null)
-			throw new RuntimeException("Model File Failed to load "+new String(error));
+			throw new RuntimeException("Model File Failed to load "+new String(error)+" code "+error_sz);
 		System.out.println("Humanoid model loaded " + m);
 		d = MuJoCoLib.mj_makeData(m);
 		setModel(new mjModel_(m));

@@ -40,7 +40,7 @@ public class MuJoCoModelManager {
 		m = MuJoCoLib.mj_loadXML(config.getAbsolutePath(), null, error,error_sz);
 		if(m==null)
 			throw new RuntimeException("Model File Failed to load "+error.getString()+" code "+error_sz);
-		System.out.println("Humanoid model loaded " + m);
+		System.out.println("MuJoCo model loaded " + config.getAbsolutePath());
 		d = MuJoCoLib.mj_makeData(m);
 		setModel(new mjModel_(m));
 		setData(new mjData_(d));
@@ -78,7 +78,10 @@ public class MuJoCoModelManager {
 	public void setData(mjData_ daccessable) {
 		this.daccessable = daccessable;
 	}
-	
+	public void step() {
+		stepOne();
+		stepTwo();
+	}
 	public void stepOne() {
 		MuJoCoLib.mj_step1(m, d);
 	}

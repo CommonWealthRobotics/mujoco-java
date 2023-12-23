@@ -15,8 +15,29 @@ import org.mujoco.MuJoCoLib.mjData_;
 import org.mujoco.MuJoCoLib.mjModel;
 import org.mujoco.MuJoCoLib.mjModel_;
 import org.mujoco.MuJoCoLib.mjVFS;
+import org.mujoco.MuJoCoModelManager;
 
 public class MuJoColibTest {
+	@Test
+	public void managerTest() throws InterruptedException {
+		String filename = "model/humanoid/humanoid.xml";
+		File file = new File(filename);
+		if(!file.exists()) {
+			fail("File is missing from the disk");
+		}
+		MuJoCoModelManager m = new MuJoCoModelManager(file);
+		mjModel_ model = m.getModel();
+		mjData_ data = m.getData();
+		System.out.println("Run model for 10 seconds");
+		while (data.time() < 10) {
+			m.stepOne();
+			//apply controls
+			m.stepTwo();
+			// sleep
+			Thread.sleep(1);
+		}
+		m.close();
+	}
 	@Test
 	public void mujocoJNILoadTest() {
 		System.out.println(System.getProperty("org.bytedeco.javacpp.logger.debug"));

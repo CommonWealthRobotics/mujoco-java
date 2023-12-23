@@ -15,6 +15,7 @@ import org.mujoco.MuJoCoModelManager;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,14 +25,14 @@ import org.bytedeco.javacpp.annotation.Const;
 
 public class MuJoColibTest {
 	@Test
-	public void mujocoJNILoadTest() {
+	public void mujocoJNILoadTest() throws IOException {
 		System.out.println(System.getProperty("org.bytedeco.javacpp.logger.debug"));
 		System.setProperty("org.bytedeco.javacpp.logger.debug", "true");
 
 		System.out.println("Starting " + MuJoCoLib.mj_versionString().getString());
 
-		MuJoCoModelManager manager = new MuJoCoModelManager(
-				new File("/home/hephaestus/git/mujoco-java/src/main/resources/mujoco/java/humanoid/humanoid.xml"));
+		//MuJoCoModelManager manager = new MuJoCoModelManager("humanoid/humanoid.xml");
+		MuJoCoModelManager manager = new MuJoCoModelManager(new File("/home/hephaestus/git/mujoco-java/model/humanoid/humanoid.xml"));
 
 		try {
 			mjModel_ Maccessable = manager.getModel();
@@ -41,9 +42,7 @@ public class MuJoColibTest {
 				manager.stepOne();
 				manager.stepTwo();
 				Thread.sleep(1);
-
 			}
-
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

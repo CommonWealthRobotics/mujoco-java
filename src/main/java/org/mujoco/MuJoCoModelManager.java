@@ -1,6 +1,10 @@
 package org.mujoco;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import org.mujoco.MuJoCoLib.mjData;
 import org.mujoco.MuJoCoLib.mjData_;
@@ -17,6 +21,16 @@ public class MuJoCoModelManager {
 	private mjData_ daccessable;
 
 	public MuJoCoModelManager(File config){
+		loadFromFile(config);
+	}
+	public MuJoCoModelManager(String jarpath) throws IOException{
+		File config = new File("model/"+jarpath);
+
+		System.out.println("Searching for models in "+config.getAbsolutePath());
+		loadFromFile(config);
+
+	}
+	private void loadFromFile(File config) {
 		byte[] error = new byte[1000];
 		int error_sz = 0;
 		m = MuJoCoLib.mj_loadXML(

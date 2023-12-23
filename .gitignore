@@ -15,3 +15,4 @@ build
 bin
 src/main/resources/*
 cppbuild
+*hs_err_*.log

@@ -3,6 +3,11 @@
  */
 package mujoco.java;
 
+import static org.junit.Assert.fail;
+
+import java.io.File;
+
+import org.bytedeco.javacpp.BytePointer;
 import org.junit.Test;
 import org.mujoco.MuJoCoLib;
 import org.mujoco.MuJoCoLib.mjData;
@@ -10,15 +15,6 @@ import org.mujoco.MuJoCoLib.mjData_;
 import org.mujoco.MuJoCoLib.mjModel;
 import org.mujoco.MuJoCoLib.mjModel_;
 import org.mujoco.MuJoCoLib.mjVFS;
-
-import static org.junit.Assert.*;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.bytedeco.javacpp.Loader;
-import org.bytedeco.javacpp.annotation.Cast;
-import org.bytedeco.javacpp.annotation.Const;
 
 public class MuJoColibTest {
 	@Test
@@ -28,12 +24,24 @@ public class MuJoColibTest {
 		MuJoCoLib lib = new MuJoCoLib();
 
 		System.out.println("Starting " + MuJoCoLib.mj_versionString().getString());
-		byte[] error = new byte[100];
-		int error_sz = 0;
+		int error_sz = 1000;
+		BytePointer error = new BytePointer(error_sz);
+		String filename = "model/humanoid/humanoid.xml";
+		File file = new File(filename);
+		if(!file.exists()) {
+			fail("File is missing from the disk");
+		}
+		filename = file.getAbsolutePath();
 		mjModel m = MuJoCoLib.mj_loadXML(
-				"/home/hephaestus/git/mujoco-java/src/main/resources/mujoco/java/humanoid/humanoid.xml", null, error,
+				filename, null, error,
 				error_sz);
-		System.out.println("Humanoid model loaded " + m);
+		
+		if(m==null) {
+			String message = "Model failed to load from "+filename+"\n"+error.getString();
+			System.err.println(message);
+			fail(message);
+		}
+		System.out.println("Humanoid model loaded " + filename);
 		mjData d = MuJoCoLib.mj_makeData(m);
 		try {
 			mjModel_ Maccessable = new mjModel_(m);

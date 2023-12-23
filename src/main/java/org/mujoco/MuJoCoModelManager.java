@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.bytedeco.javacpp.BytePointer;
 import org.mujoco.MuJoCoLib.mjData;
 import org.mujoco.MuJoCoLib.mjData_;
 import org.mujoco.MuJoCoLib.mjModel;
@@ -33,12 +34,12 @@ public class MuJoCoModelManager {
 	private void loadFromFile(File config) {
 		if(!config.exists())
 			throw new RuntimeException("Config File does not exist "+config);
-		byte[] error = new byte[1000];
-		int error_sz = 0;
+		int error_sz = 1000;
+		BytePointer error = new BytePointer(error_sz);
 		System.out.println("MuJoCo loading configureation file "+config.getAbsolutePath());
 		m = MuJoCoLib.mj_loadXML(config.getAbsolutePath(), null, error,error_sz);
 		if(m==null)
-			throw new RuntimeException("Model File Failed to load "+new String(error)+" code "+error_sz);
+			throw new RuntimeException("Model File Failed to load "+error.getString()+" code "+error_sz);
 		System.out.println("Humanoid model loaded " + m);
 		d = MuJoCoLib.mj_makeData(m);
 		setModel(new mjModel_(m));

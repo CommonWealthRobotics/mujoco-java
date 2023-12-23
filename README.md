@@ -1,5 +1,6 @@
 # mujoco-java
-Java JNI binding for mujoco physics system
+
+Java JNI binding for [mujoco physics system](https://github.com/google-deepmind/mujoco)
 
 # Maven
 

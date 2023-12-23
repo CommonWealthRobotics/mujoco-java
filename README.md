@@ -43,7 +43,7 @@ installing VC++ redist from:
 https://www.microsoft.com/en-gb/download/details.aspx?id=48145
 ```
 
-# HOWTO set up build
+# HOWTO set up Publish
 
 1. Export your gpg private key from the system that you have created it.
     1. Find your key-id (using `gpg --list-secret-keys --keyid-format=long`)

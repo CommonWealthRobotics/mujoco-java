@@ -8,6 +8,8 @@ import static org.junit.Assert.fail;
 import java.io.File;
 
 import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacpp.IntPointer;
+import org.bytedeco.javacpp.Pointer;
 import org.junit.Test;
 import org.mujoco.IMujocoController;
 import org.mujoco.MuJoCoLib;
@@ -21,31 +23,54 @@ import org.mujoco.MuJoCoModelManager;
 
 public class MuJoColibTest {
 	IMujocoController controller = (d, m) -> {
-		// apply controls https://mujoco.readthedocs.io/en/stable/programming/simulation.html#simulation-loop
-		if( m.nu()==m.nv() )
+		/**
+		 * This illustrates two concepts. First, we are checking 
+		 * if the number of controls mjModel.nu equals the number 
+		 * of DoFs mjModel.nv. In general, the same callback may 
+		 * be used with multiple models depending on how the user
+		 *  code is structured, and so it is a good idea to check 
+		 *  the model dimensions in the callback. Second, MuJoCo 
+		 *  has a library of BLAS-like functions that are very 
+		 *  useful; indeed a large part of the code base consists 
+		 *  of calling such functions internally. The mju_scl 
+		 *  function above scales the velocity vector mjData.qvel 
+		 *  by a constant feedback gain and copies the result into 
+		 *  the control vector mjData.ctrl.
+		 */
+		// apply controls
+		// https://mujoco.readthedocs.io/en/stable/programming/simulation.html#simulation-loop
+		if (m.nu() == m.nv())
 			MuJoCoLib.mju_scl(d.ctrl(), d.qvel(), -0.1, m.nv());
 	};
+
 	@Test
 	public void managerTest() throws InterruptedException {
 		System.out.println("managerTest");
 		String filename = "model/humanoid/humanoid.xml";
 		File file = new File(filename);
-		if(!file.exists()) {
+		if (!file.exists()) {
 			fail("File is missing from the disk");
 		}
 		MuJoCoModelManager m = new MuJoCoModelManager(file);
-		mjModel_ model = m.getModel();
-		mjData_ data = m.getData();
 		System.out.println("Run ModelManager for 10 seconds");
 
+
+		for (int i = 0; i < m.getNumberOfJoints(); i++) {
+			System.out.println(i + " link = " + m.getJointName(i));
+		}
+		for (int i = 0; i < m.getNumberOfBodys(); i++) {
+			System.out.println(i + " Body = " + m.getBodyName(i));
+		}
+		
 		m.setController(controller);
-		while (data.time() < 10) {
+		while (m.getCurrentSimulationTimeSeconds() < 10) {
 			m.step();
 			// sleep
 			Thread.sleep(m.getTimestepMilliSeconds());
 		}
 		m.close();
 	}
+
 	@Test
 	public void mujocoJNILoadTest() {
 		System.out.println("mujocoJNILoadTest");
@@ -54,47 +79,6 @@ public class MuJoColibTest {
 		MuJoCoLib lib = new MuJoCoLib();
 
 		System.out.println("Starting " + MuJoCoLib.mj_versionString().getString());
-		int error_sz = 1000;
-		BytePointer error = new BytePointer(error_sz);
-		String filename = "model/humanoid/humanoid.xml";
-		File file = new File(filename);
-		if(!file.exists()) {
-			fail("File is missing from the disk");
-		}
-		filename = file.getAbsolutePath();
-		mjModel m = MuJoCoLib.mj_loadXML(
-				filename, null, error,
-				error_sz);
-		
-		if(m==null) {
-			String message = "Model failed to load from "+filename+"\n"+error.getString();
-			System.err.println(message);
-			fail(message);
-		}
-		System.out.println("Humanoid model loaded " + filename);
-		mjData d = MuJoCoLib.mj_makeData(m);
-		try {
-			mjModel_ Maccessable = new mjModel_(m);
-			try (mjData_ accessable = new mjData_(d)) {
-				System.out.println("Run model for 10 seconds");
-				while (accessable.time() < 10) {
-					MuJoCoLib.mj_step1(m, d);
-					// apply controls https://mujoco.readthedocs.io/en/stable/programming/simulation.html
-					controller.controlStep(accessable, Maccessable);
-					MuJoCoLib.mj_step2(m, d);
-					double timestep = new mjOption_(Maccessable.opt()).timestep()*1000;
-					Thread.sleep((long) timestep);
-					
-				}
 
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Clean up data objects");
-
-		MuJoCoLib.mj_deleteData(d);
-		MuJoCoLib.mj_deleteModel(m);
 	}
 }

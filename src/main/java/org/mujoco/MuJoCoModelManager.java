@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacpp.IntPointer;
 import org.mujoco.MuJoCoLib.mjData;
 import org.mujoco.MuJoCoLib.mjData_;
 import org.mujoco.MuJoCoLib.mjModel;
@@ -19,10 +20,16 @@ public class MuJoCoModelManager {
 
 	private mjModel m;
 	private mjData d;
-	private mjModel_ maccessable;
-	private mjData_ daccessable;
+	private mjModel_ model;
+	private mjData_ data;
 	private mjOption_ opt;
 	private IMujocoController controller = null;
+
+	private BytePointer modelNames;
+
+	private IntPointer jointNameIndexes;
+
+	private IntPointer bodyNameIndex;
 	public MuJoCoModelManager(File config){
 		loadFromFile(config);
 	}
@@ -47,9 +54,37 @@ public class MuJoCoModelManager {
 		setModel(new mjModel_(m));
 		setData(new mjData_(d));
 		setOpt(new mjOption_(getModel().opt()));
-		
+		setModelNames(model.names());
+		jointNameIndexes = model.name_jntadr();
+		bodyNameIndex = model.name_bodyadr();
 	}
-	
+	public double getCurrentSimulationTimeSeconds() {
+		return data.time();
+	}
+	public int getNumberOfJoints() {
+		return model.nu();
+	}
+	public String getJointName(int i) {
+		if(i<0)
+			throw new IndexOutOfBoundsException("Joint index must be positive or zero");
+		if(i>=getNumberOfJoints()) {
+			throw new IndexOutOfBoundsException("Joint index must be less than "+i);
+		}
+		BytePointer byp = modelNames.getPointer(jointNameIndexes.getPointer(i).get());
+		return byp.getString();
+	}
+	public int getNumberOfBodys() {
+		return model.nbody();
+	}
+	public String getBodyName(int i) {
+		if(i<0)
+			throw new IndexOutOfBoundsException("Body index must be positive or zero");
+		if(i>=getNumberOfJoints()) {
+			throw new IndexOutOfBoundsException("Body index must be less than "+i);
+		}
+		BytePointer byp = modelNames.getPointer(bodyNameIndex.getPointer(i).get());
+		return byp.getString();
+	}
 	public double getTimestepSeconds() {
 		return getOpt().timestep();
 	}
@@ -65,33 +100,33 @@ public class MuJoCoModelManager {
 	 * @return the maccessable
 	 */
 	public mjModel_ getModel() {
-		return maccessable;
+		return model;
 	}
 
 	/**
 	 * @param maccessable the maccessable to set
 	 */
 	private void setModel(mjModel_ maccessable) {
-		this.maccessable = maccessable;
+		this.model = maccessable;
 	}
 
 	/**
 	 * @return the daccessable
 	 */
 	public mjData_ getData() {
-		return daccessable;
+		return data;
 	}
 
 	/**
 	 * @param daccessable the daccessable to set
 	 */
 	public void setData(mjData_ daccessable) {
-		this.daccessable = daccessable;
+		this.data = daccessable;
 	}
 	public void step() {
 		stepOne();
 		if(controller!=null)
-			controller.controlStep(daccessable, maccessable);
+			controller.controlStep(data, model);
 		stepTwo();
 	}
 	public void stepOne() {
@@ -123,5 +158,17 @@ public class MuJoCoModelManager {
 	 */
 	public void setController(IMujocoController controller) {
 		this.controller = controller;
+	}
+	/**
+	 * @return the modelNames
+	 */
+	public BytePointer getModelNames() {
+		return modelNames;
+	}
+	/**
+	 * @param modelNames the modelNames to set
+	 */
+	public void setModelNames(BytePointer modelNames) {
+		this.modelNames = modelNames;
 	}
 }

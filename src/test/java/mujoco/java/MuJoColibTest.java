@@ -9,6 +9,7 @@ import java.io.File;
 
 import org.bytedeco.javacpp.BytePointer;
 import org.junit.Test;
+import org.mujoco.IMujocoController;
 import org.mujoco.MuJoCoLib;
 import org.mujoco.MuJoCoLib.mjData;
 import org.mujoco.MuJoCoLib.mjData_;
@@ -19,6 +20,11 @@ import org.mujoco.MuJoCoLib.mjVFS;
 import org.mujoco.MuJoCoModelManager;
 
 public class MuJoColibTest {
+	IMujocoController controller = (d, m) -> {
+		// apply controls https://mujoco.readthedocs.io/en/stable/programming/simulation.html#simulation-loop
+		if( m.nu()==m.nv() )
+			MuJoCoLib.mju_scl(d.ctrl(), d.qvel(), -0.1, m.nv());
+	};
 	@Test
 	public void managerTest() throws InterruptedException {
 		System.out.println("managerTest");
@@ -31,10 +37,8 @@ public class MuJoColibTest {
 		mjModel_ model = m.getModel();
 		mjData_ data = m.getData();
 		System.out.println("Run ModelManager for 10 seconds");
-		m.setController((data1, model1) -> {
-			// apply controls https://mujoco.readthedocs.io/en/stable/programming/simulation.html
-			
-		});
+
+		m.setController(controller);
 		while (data.time() < 10) {
 			m.step();
 			// sleep
@@ -76,6 +80,7 @@ public class MuJoColibTest {
 				while (accessable.time() < 10) {
 					MuJoCoLib.mj_step1(m, d);
 					// apply controls https://mujoco.readthedocs.io/en/stable/programming/simulation.html
+					controller.controlStep(accessable, Maccessable);
 					MuJoCoLib.mj_step2(m, d);
 					double timestep = new mjOption_(Maccessable.opt()).timestep()*1000;
 					Thread.sleep((long) timestep);

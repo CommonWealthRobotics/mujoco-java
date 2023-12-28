@@ -31,10 +31,12 @@ public class MuJoColibTest {
 		mjModel_ model = m.getModel();
 		mjData_ data = m.getData();
 		System.out.println("Run ModelManager for 10 seconds");
+		m.setController((data1, model1) -> {
+			// apply controls https://mujoco.readthedocs.io/en/stable/programming/simulation.html
+			
+		});
 		while (data.time() < 10) {
-			m.stepOne();
-			//apply controls
-			m.stepTwo();
+			m.step();
 			// sleep
 			Thread.sleep(m.getTimestepMilliSeconds());
 		}
@@ -72,7 +74,9 @@ public class MuJoColibTest {
 			try (mjData_ accessable = new mjData_(d)) {
 				System.out.println("Run model for 10 seconds");
 				while (accessable.time() < 10) {
-					MuJoCoLib.mj_step(m, d);
+					MuJoCoLib.mj_step1(m, d);
+					// apply controls https://mujoco.readthedocs.io/en/stable/programming/simulation.html
+					MuJoCoLib.mj_step2(m, d);
 					double timestep = new mjOption_(Maccessable.opt()).timestep()*1000;
 					Thread.sleep((long) timestep);
 					

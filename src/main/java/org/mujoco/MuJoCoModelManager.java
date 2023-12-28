@@ -22,6 +22,7 @@ public class MuJoCoModelManager {
 	private mjModel_ maccessable;
 	private mjData_ daccessable;
 	private mjOption_ opt;
+	private IMujocoController controller = null;
 	public MuJoCoModelManager(File config){
 		loadFromFile(config);
 	}
@@ -89,6 +90,8 @@ public class MuJoCoModelManager {
 	}
 	public void step() {
 		stepOne();
+		if(controller!=null)
+			controller.controlStep(daccessable, maccessable);
 		stepTwo();
 	}
 	public void stepOne() {
@@ -108,5 +111,17 @@ public class MuJoCoModelManager {
 	 */
 	public void setOpt(mjOption_ opt) {
 		this.opt = opt;
+	}
+	/**
+	 * @return the controller
+	 */
+	public IMujocoController getController() {
+		return controller;
+	}
+	/**
+	 * @param controller the controller to set
+	 */
+	public void setController(IMujocoController controller) {
+		this.controller = controller;
 	}
 }

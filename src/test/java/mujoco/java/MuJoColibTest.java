@@ -14,12 +14,14 @@ import org.mujoco.MuJoCoLib.mjData;
 import org.mujoco.MuJoCoLib.mjData_;
 import org.mujoco.MuJoCoLib.mjModel;
 import org.mujoco.MuJoCoLib.mjModel_;
+import org.mujoco.MuJoCoLib.mjOption_;
 import org.mujoco.MuJoCoLib.mjVFS;
 import org.mujoco.MuJoCoModelManager;
 
 public class MuJoColibTest {
 	@Test
 	public void managerTest() throws InterruptedException {
+		System.out.println("managerTest");
 		String filename = "model/humanoid/humanoid.xml";
 		File file = new File(filename);
 		if(!file.exists()) {
@@ -28,18 +30,19 @@ public class MuJoColibTest {
 		MuJoCoModelManager m = new MuJoCoModelManager(file);
 		mjModel_ model = m.getModel();
 		mjData_ data = m.getData();
-		System.out.println("Run model for 10 seconds");
+		System.out.println("Run ModelManager for 10 seconds");
 		while (data.time() < 10) {
 			m.stepOne();
 			//apply controls
 			m.stepTwo();
 			// sleep
-			Thread.sleep(1);
+			Thread.sleep(m.getTimestepMilliSeconds());
 		}
 		m.close();
 	}
 	@Test
 	public void mujocoJNILoadTest() {
+		System.out.println("mujocoJNILoadTest");
 		System.out.println(System.getProperty("org.bytedeco.javacpp.logger.debug"));
 		System.setProperty("org.bytedeco.javacpp.logger.debug", "true");
 		MuJoCoLib lib = new MuJoCoLib();
@@ -70,7 +73,8 @@ public class MuJoColibTest {
 				System.out.println("Run model for 10 seconds");
 				while (accessable.time() < 10) {
 					MuJoCoLib.mj_step(m, d);
-					Thread.sleep(1);
+					double timestep = new mjOption_(Maccessable.opt()).timestep()*1000;
+					Thread.sleep((long) timestep);
 					
 				}
 

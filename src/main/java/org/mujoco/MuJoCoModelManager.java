@@ -11,6 +11,7 @@ import org.mujoco.MuJoCoLib.mjData;
 import org.mujoco.MuJoCoLib.mjData_;
 import org.mujoco.MuJoCoLib.mjModel;
 import org.mujoco.MuJoCoLib.mjModel_;
+import org.mujoco.MuJoCoLib.mjOption_;
 import org.mujoco.MuJoCoLib.mjVFS;
 
 public class MuJoCoModelManager {
@@ -20,7 +21,7 @@ public class MuJoCoModelManager {
 	private mjData d;
 	private mjModel_ maccessable;
 	private mjData_ daccessable;
-
+	private mjOption_ opt;
 	public MuJoCoModelManager(File config){
 		loadFromFile(config);
 	}
@@ -44,8 +45,16 @@ public class MuJoCoModelManager {
 		d = MuJoCoLib.mj_makeData(m);
 		setModel(new mjModel_(m));
 		setData(new mjData_(d));
+		setOpt(new mjOption_(getModel().opt()));
+		
 	}
 	
+	public double getTimestepSeconds() {
+		return getOpt().timestep();
+	}
+	public long getTimestepMilliSeconds() {
+		return (long)(getTimestepSeconds()*1000);
+	}
 	public void close() {
 		MuJoCoLib.mj_deleteData(d);
 		MuJoCoLib.mj_deleteModel(m);
@@ -87,5 +96,17 @@ public class MuJoCoModelManager {
 	}
 	public void stepTwo() {
 		MuJoCoLib.mj_step2(m, d);
+	}
+	/**
+	 * @return the opt
+	 */
+	public mjOption_ getOpt() {
+		return opt;
+	}
+	/**
+	 * @param opt the opt to set
+	 */
+	public void setOpt(mjOption_ opt) {
+		this.opt = opt;
 	}
 }

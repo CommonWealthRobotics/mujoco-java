@@ -62,7 +62,7 @@ public class MuJoCoModelManager {
 		return data.time();
 	}
 	public int getNumberOfJoints() {
-		return model.nu();
+		return model.njnt();
 	}
 	public String getJointName(int i) {
 		if(i<0)
@@ -79,12 +79,14 @@ public class MuJoCoModelManager {
 	public String getBodyName(int i) {
 		if(i<0)
 			throw new IndexOutOfBoundsException("Body index must be positive or zero");
-		if(i>=getNumberOfJoints()) {
+		if(i>=getNumberOfBodys()) {
 			throw new IndexOutOfBoundsException("Body index must be less than "+i);
 		}
 		BytePointer byp = modelNames.getPointer(bodyNameIndex.getPointer(i).get());
 		return byp.getString();
 	}
+	
+	
 	public double getTimestepSeconds() {
 		return getOpt().timestep();
 	}

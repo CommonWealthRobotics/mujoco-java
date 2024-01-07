@@ -44,3 +44,14 @@ jobs:
           distribution: 'zulu' 
     - name: Build
       run:  bash build-mac.sh
+  macM1:
+    runs-on: macos-13-xlarge
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - uses: actions/setup-java@v3
+      with:
+          java-version: '8'
+          distribution: 'zulu' 
+    - name: Build
+      run:  bash build-mac.sh

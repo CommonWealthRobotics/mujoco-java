@@ -4,7 +4,7 @@ g++ --version
 echo "Mac M1 Build"
 VER=$(cat mujocoRelease.txt)
 
-TYPE=macosx-x86_64
+TYPE=macosx-arm64
 ARCHIVE=mujoco-$VER-macos-universal2.dmg
 URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
 echo "$URL"
@@ -72,8 +72,8 @@ echo "ls -al $JAVADIR../resources/"
 ls -al $JAVADIR../resources/
 
 cd $SCRIPT_DIR/
-echo "Resource File: "
-
+echo "Resource Files: "
+ls -al $JAVADIR../resources/
 ls -al $JAVADIR../resources/$TYPE
 ./gradlew jar  --stacktrace test
 

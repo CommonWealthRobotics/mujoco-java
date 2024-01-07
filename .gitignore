@@ -13,6 +13,6 @@ build
 *.class*
 *jni*.cpp
 bin
-src/main/resources/*
+src/main/resources/linux*
 cppbuild
 *hs_err_*.log

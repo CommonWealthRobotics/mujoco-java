@@ -13,6 +13,11 @@ build
 *.class*
 *jni*.cpp
 bin
-src/main/resources/*
+src/main/resources/linux*
+src/main/resources/windows*
+src/main/resources/macosx-x*
+src/main/java/mujoco/*.h
+
+*.DS_Store*
 cppbuild
 *hs_err_*.log

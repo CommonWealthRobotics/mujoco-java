@@ -2,11 +2,26 @@
 
 Java JNI binding for [mujoco physics system](https://github.com/google-deepmind/mujoco)
 
+# Platforms
+
+This library supports
+
+* Windows x86_64
+* Linux x86_64
+* MacOS x86_64
+* MacOS arm64 (M1, M2, M3)
+
+# Examples
+
+An example of loading a MuJoCo model and display in JavaFX 3d:
+
+https://github.com/madhephaestus/MuJoCoTest/releases 
+
+Examples are designed to run in [Bowler Studio](http://commonwealthrobotics.com)
+
 # Maven
 
 MuJoCo-Java is published on Maven Central via Sonatype. 
-
-![](https://img.shields.io/nexus/r/https/oss.sonatype.org/com.neuronrobotics/mujoco-java.svg?style=flat)
 
 Hosting is in:
 
@@ -20,7 +35,7 @@ Maven:
 <dependency>
   <groupId>com.neuronrobotics</groupId>
   <artifactId>mujoco-java</artifactId>
-  <version>VERSION_FROM_BADGE</version>
+  <version>2.2.0-pre.11</version>
   <type>module</type>
 </dependency>
 ```
@@ -32,7 +47,7 @@ repositories {
 }
 
 dependencies {
-	implementation group: 'com.neuronrobotics', name: 'mujoco-java', version: 'VERSION_FROM_BADGE'
+	implementation group: 'com.neuronrobotics', name: 'mujoco-java', version: '2.2.0-pre.11'
 }
 ```
 

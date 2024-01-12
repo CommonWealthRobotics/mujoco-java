@@ -18,14 +18,14 @@ import org.bytedeco.javacpp.tools.*;
 	        		"mujoco/mujoco.h"   ,   		
 	        		"mujoco/mjmacro.h",
 	        		"mujoco/mjthread.h",
-
-	        		"mujoco/mjxmacro.h",
 	        		"mujoco/mjdata.h",
 	        		"mujoco/mjmodel.h",
 	        		"mujoco/mjrender.h",
 	        		"mujoco/mjui.h",
 	        		"mujoco/mjvisualize.h",
 
+
+	        		//"mujoco/mjxmacro.h",
 	        		"mujoco/mjplugin.h"
 	        		},  
 	        link = {"mujoco"}
@@ -71,5 +71,20 @@ public class MuJoCoConfig implements InfoMapper {
 		infoMap.put(new Info("mjEXTERNC").skip());
 		infoMap.put(new Info("mjDLLMAIN").skip());
 		infoMap.put(new Info("XMJV").skip());
+		//infoMap.put(new Info("X").skip());
+		//infoMap.put(new Info("MJOPTION_FLOATS").skip());
+		//infoMap.put(new Info("MJOPTION_INTS").skip());
+		//infoMap.put(new Info("MJOPTION_SCALARS").skip());
+		infoMap.put(new Info("mjPLUGIN_LIB_INIT").skip());
+		infoMap.put(new Info("mjfPluginLibraryLoadCallback").skip());
+		infoMap.put(new Info("mjfGeneric").skip());
+		infoMap.put(new Info("mjfConFilt").skip());
+		infoMap.put(new Info("mjfSensor").skip());
+		infoMap.put(new Info("mjfTime").skip());
+		infoMap.put(new Info("mjfAct").skip());
+		infoMap.put(new Info("mjfCollision").skip());
+//		infoMap.put(new Info("").skip());
+//		infoMap.put(new Info("").skip());
+		
     }
 }

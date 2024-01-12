@@ -29,13 +29,17 @@ Hosting is in:
 https://oss.sonatype.org/content/repositories/staging/com/neuronrobotics/mujoco-java/
 ```
 
+![](https://img.shields.io/nexus/r/https/oss.sonatype.org/com.neuronrobotics/mujoco-java.svg?style=flat)
+
+
+
 Maven:
 
 ```
 <dependency>
   <groupId>com.neuronrobotics</groupId>
   <artifactId>mujoco-java</artifactId>
-  <version>2.2.0-pre.11</version>
+  <version>3.1.1-pre.1</version>
   <type>module</type>
 </dependency>
 ```
@@ -47,7 +51,7 @@ repositories {
 }
 
 dependencies {
-	implementation group: 'com.neuronrobotics', name: 'mujoco-java', version: '2.2.0-pre.11'
+	implementation group: 'com.neuronrobotics', name: 'mujoco-java', version: '3.1.1-pre.1'
 }
 ```
 

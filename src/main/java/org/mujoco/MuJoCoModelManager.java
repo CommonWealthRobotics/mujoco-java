@@ -1,19 +1,16 @@
 package org.mujoco;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import java.util.HashMap;
 
 import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacpp.IntPointer;
 import org.mujoco.MuJoCoLib.mjData;
 import org.mujoco.MuJoCoLib.mjData_;
 import org.mujoco.MuJoCoLib.mjModel;
 import org.mujoco.MuJoCoLib.mjModel_;
 import org.mujoco.MuJoCoLib.mjOption_;
-import org.mujoco.MuJoCoLib.mjVFS;
 
 public class MuJoCoModelManager {
 	MuJoCoLib lib = new MuJoCoLib();
@@ -30,16 +27,11 @@ public class MuJoCoModelManager {
 	private IntPointer jointNameIndexes;
 
 	private IntPointer bodyNameIndex;
+	private boolean connected=false;
 	public MuJoCoModelManager(File config){
 		loadFromFile(config);
 	}
-	public MuJoCoModelManager(String jarpath) throws IOException{
-		File config = new File("model/"+jarpath);
 
-		System.out.println("Searching for models in "+config.getAbsolutePath());
-		loadFromFile(config);
-
-	}
 	private void loadFromFile(File config) {
 		if(!config.exists())
 			throw new RuntimeException("Config File does not exist "+config);
@@ -57,14 +49,22 @@ public class MuJoCoModelManager {
 		setModelNames(model.names());
 		jointNameIndexes = model.name_jntadr();
 		bodyNameIndex = model.name_bodyadr();
+		connected=true;
+	}
+	private void check() {
+		if(!connected)
+			throw new RuntimeException("MuJoCo Model may not be accessed when disconnected");
 	}
 	public double getCurrentSimulationTimeSeconds() {
+		check();
 		return data.time();
 	}
 	public int getNumberOfJoints() {
+		check();
 		return model.njnt();
 	}
 	public String getJointName(int i) {
+		check();
 		if(i<0)
 			throw new IndexOutOfBoundsException("Joint index must be positive or zero");
 		if(i>=getNumberOfJoints()) {
@@ -74,9 +74,15 @@ public class MuJoCoModelManager {
 		return byp.getString();
 	}
 	public int getNumberOfBodys() {
+		check();
 		return model.nbody();
 	}
+	public int getNumberOfGeometrys() {
+		check();
+		return model.ngeom();
+	}
 	public String getBodyName(int i) {
+		check();
 		if(i<0)
 			throw new IndexOutOfBoundsException("Body index must be positive or zero");
 		if(i>=getNumberOfBodys()) {
@@ -86,14 +92,106 @@ public class MuJoCoModelManager {
 		return byp.getString();
 	}
 	
+	public String getGeometryName(int i) {
+		check();
+		if(i<0)
+			throw new IndexOutOfBoundsException("Body index must be positive or zero");
+		if(i>=getNumberOfBodys()) {
+			throw new IndexOutOfBoundsException("Body index must be less than "+i);
+		}
+		IntPointer GeomIndex = model.name_geomadr();
+		BytePointer byp = modelNames.getPointer(GeomIndex.getPointer(i).get());
+		return byp.getString();
+	}
+	
+	/**
+	 * 
+	 * @param cartesianPositions pointer to positions
+	 * @param cartesianQuaturnions pointer to quaturnions
+	 * @param i index within the pointer space
+	 * @return cartesian pose, Xm, Ym, Zm, QuatW, QuatX, QuatY, QuatZ
+	 */
+	double [] convert(DoublePointer cartesianPositions,DoublePointer cartesianQuaturnions, int i) {
+		check();
+		DoublePointer coords =cartesianPositions.getPointer(i*3);
+		double x = coords.getPointer(0).get();
+		double y = coords.getPointer(1).get();
+		double z = coords.getPointer(2).get();
+
+		DoublePointer quat =cartesianQuaturnions.getPointer(i*4);
+		double qw = quat.getPointer(0).get();
+		double qx = quat.getPointer(1).get();
+		double qy = quat.getPointer(2).get();
+		double qz = quat.getPointer(3).get();
+
+		return new double [] {x,y,z,qw, qx, qy, qz};
+	}
+	private HashMap<String, Integer> bodyNameIndexMap= null;
+	private HashMap<String, Integer> geometryNameIndexMap= null;
+
+	public int getBodyIndex(String name) {
+		check();
+		if(bodyNameIndexMap==null) {
+			bodyNameIndexMap=new HashMap<>();
+			for(int i=0;i<getNumberOfBodys();i++) {
+				bodyNameIndexMap.put(getBodyName(i), i);
+			}
+		}
+		Integer i = bodyNameIndexMap.get(name);
+		if(i!=null)
+			return i;
+		throw new RuntimeException("Body named "+name+" not found");
+	}
+	
+	
+	public int getGeometryIndex(String name) {
+		check();
+		if(geometryNameIndexMap==null) {
+			geometryNameIndexMap=new HashMap<>();
+			for(int i=0;i<getNumberOfGeometrys();i++) {
+				geometryNameIndexMap.put(getGeometryName(i), i);
+			}
+		}
+		Integer i = geometryNameIndexMap.get(name);
+		if(i!=null)
+			return i;
+		throw new RuntimeException("Geometry named "+name+" not found");
+	}
+	
+	/**
+	 * 
+	 * @param name of a body
+	 * @return cartesian pose, Xm, Ym, Zm, QuatW, QuatX, QuatY, QuatZ
+	 */
+	public double [] getBodyPose(String name) {
+		DoublePointer cartesianQuaturnions = data.xquat();
+		DoublePointer cartesianPositions = data.xpos();
+		return convert(cartesianPositions,cartesianQuaturnions,getBodyIndex(name));
+	}
+	/**
+	 * 
+	 * @param name of a geometry
+	 * @return cartesian pose, Xm, Ym, Zm, QuatW, QuatX, QuatY, QuatZ
+	 */
+	public double [] getGeometryPose(String name) {
+		DoublePointer geomPos = model.geom_pos();
+		DoublePointer geomQuat = model.geom_quat();
+		return convert(geomPos,geomQuat,getGeometryIndex(name));
+	}
+	
+	public String getBodyNameOfAGeometry(String geomName) {
+		
+	}
 	
 	public double getTimestepSeconds() {
+		
 		return getOpt().timestep();
 	}
 	public long getTimestepMilliSeconds() {
 		return (long)(getTimestepSeconds()*1000);
 	}
 	public void close() {
+		connected=false;
 		MuJoCoLib.mj_deleteData(d);
 		MuJoCoLib.mj_deleteModel(m);
 	}
@@ -116,6 +214,7 @@ public class MuJoCoModelManager {
 	 * @return the daccessable
 	 */
 	public mjData_ getData() {
+		check();
 		return data;
 	}
 
@@ -141,6 +240,7 @@ public class MuJoCoModelManager {
 	 * @return the opt
 	 */
 	public mjOption_ getOpt() {
+		check();
 		return opt;
 	}
 	/**
@@ -165,12 +265,13 @@ public class MuJoCoModelManager {
 	 * @return the modelNames
 	 */
 	public BytePointer getModelNames() {
+		check();
 		return modelNames;
 	}
 	/**
 	 * @param modelNames the modelNames to set
 	 */
-	public void setModelNames(BytePointer modelNames) {
+	private void setModelNames(BytePointer modelNames) {
 		this.modelNames = modelNames;
 	}
 }

@@ -13,17 +13,17 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
 public class MuJoCoXML {
-	public static mujoco unmarshal(File xml) throws JAXBException {
-		JAXBContext jaxbContext = JAXBContext.newInstance(mujoco.class);
+	public static Mujoco unmarshal(File xml) throws JAXBException {
+		JAXBContext jaxbContext = JAXBContext.newInstance(Mujoco.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
 		// We had written this file in marshalling example
-		return (mujoco) jaxbUnmarshaller.unmarshal(xml);
+		return (Mujoco) jaxbUnmarshaller.unmarshal(xml);
 
 	}
 
-	public static String marshal(mujoco source) throws JAXBException {
-		JAXBContext jaxbContext = JAXBContext.newInstance(mujoco.class);
+	public static String marshal(Mujoco source) throws JAXBException {
+		JAXBContext jaxbContext = JAXBContext.newInstance(Mujoco.class);
 		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
 		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -34,7 +34,7 @@ public class MuJoCoXML {
 
 	}
 
-	public static void marshal(mujoco source, File dest) throws JAXBException, IOException {
+	public static void marshal(Mujoco source, File dest) throws JAXBException, IOException {
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(dest.getAbsolutePath(), true));
 

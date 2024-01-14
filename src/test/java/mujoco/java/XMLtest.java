@@ -8,9 +8,20 @@ import javax.xml.bind.JAXBException;
 
 import org.junit.Test;
 import org.mujoco.xml.MuJoCoXML;
-import org.mujoco.xml.mujoco;
+import org.mujoco.xml.Mujoco;
 
 public class XMLtest {
+	
+	@Test
+	public void marshal() throws JAXBException {
+		Mujoco m =new Mujoco();
+	
+	
+		
+		String marshaled = MuJoCoXML.marshal(m);
+		
+		System.out.println(marshaled);
+	}
 
 	@Test
 	public void unmarshal() throws JAXBException {
@@ -19,11 +30,11 @@ public class XMLtest {
 		if (!file.exists()) {
 			fail("File is missing from the disk");
 		}
-		mujoco m = MuJoCoXML.unmarshal(file);
+		Mujoco m = MuJoCoXML.unmarshal(file);
 		
 		String marshaled = MuJoCoXML.marshal(m);
 		
-		System.out.println(marshaled);
+		//System.out.println(marshaled);
 		
 	}
 

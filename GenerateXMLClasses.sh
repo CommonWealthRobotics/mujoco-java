@@ -4,6 +4,6 @@
 
 cd ../mujoco-xml-schema-mjcf
 
-xjc -nv -extension -d ../mujoco-java/src/main/java/  -b customization.xjb mujoco.xsd
+xjc -nv -Xfluent-builder -extension -d ../mujoco-java/src/main/java/  -b customization.xjb mujoco.xsd
 
 cd ../mujoco-java

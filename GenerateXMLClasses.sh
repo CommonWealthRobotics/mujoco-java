@@ -2,8 +2,8 @@
 
 #git clone https://github.com/CommonWealthRobotics/mujoco-xml-schema-mjcf.git ../mujoco-xml-schema-mjcf
 
-cd ../mujoco-xml-schema-mjcf
+cd schema
 
-xjc -nv -Xfluent-builder -extension -d ../mujoco-java/src/main/java/  -b customization.xjb mujoco.xsd
+xjc -nv -extension -d ../src/main/java/  -b customization.xjb mujoco.xsd
 
-cd ../mujoco-java
+cd ../

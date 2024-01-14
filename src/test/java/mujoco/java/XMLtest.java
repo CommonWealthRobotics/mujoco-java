@@ -15,8 +15,7 @@ public class XMLtest {
 	@Test
 	public void marshal() throws JAXBException {
 		Mujoco m =new Mujoco();
-	
-	
+		
 		
 		String marshaled = MuJoCoXML.marshal(m);
 		

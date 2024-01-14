@@ -26,6 +26,10 @@ dependencies {
 	implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
 	// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+	
+	// https://mvnrepository.com/artifact/net.codesup.util/jaxb2-rich-contract-plugin
+	implementation group: 'net.codesup.util', name: 'jaxb2-rich-contract-plugin', version: '2.1.0'
+	
 }
 if(JavaVersion.current() != JavaVersion.VERSION_1_8){
 	throw new GradleException("This build must be run with java 8")

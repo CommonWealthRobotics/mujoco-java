@@ -5,14 +5,11 @@
  * For more details take a look at the 'Building Java & JVM projects' chapter in the Gradle
  * User Manual available at https://docs.gradle.org/7.2/userguide/building_java_projects.html
  */
-
 plugins {
 	id 'eclipse'
 	id 'java'
 	id 'maven-publish'
 	id 'signing'
-	id 'io.codearte.nexus-staging' version '0.30.0'
-
 }
 
 repositories {
@@ -26,11 +23,26 @@ dependencies {
 	implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
 	// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-	
 	// https://mvnrepository.com/artifact/net.codesup.util/jaxb2-rich-contract-plugin
 	implementation group: 'net.codesup.util', name: 'jaxb2-rich-contract-plugin', version: '2.1.0'
-	
 }
+
+xjc {
+	xsdDir.set(layout.projectDirectory.dir("src/main/java/"))
+	xsdFiles = files(layout.projectDirectory.file("mujoco.xsd"))
+	defaultPackage.set("org.mujoco.xml")
+	options.addAll("-Xfluent-builder",
+							 "-Xmeta",
+								"-extended=y",
+								"-nv",
+								"-extension",
+								"-b customization.xjb"
+								)
+
+}
+
+
+
 if(JavaVersion.current() != JavaVersion.VERSION_1_8){
 	throw new GradleException("This build must be run with java 8")
 }
@@ -41,7 +53,7 @@ archivesBaseName='mujoco-java'
 version = System.getenv("VERSION_SEMVER")
 
 nexusStaging {
-	packageGroup = 'com.neuronrobotics' 
+	packageGroup = 'com.neuronrobotics'
 	serverUrl='https://oss.sonatype.org/service/local/'
 	username = System.getenv("MAVEN_USERNAME")
 	password = System.getenv("MAVEN_PASSWORD")
@@ -50,14 +62,14 @@ nexusStaging {
 publishing {
 
 	repositories {
-//		maven {
-//			name = 'GitHubPackages'
-//			url = uri("https://maven.pkg.github.com/CommonWealthRobotics/mujoco-java")
-//			credentials {
-//				username = System.getenv("GITHUB_ACTOR")
-//				password = System.getenv("GITHUB_TOKEN")
-//			}
-//		}
+		//		maven {
+		//			name = 'GitHubPackages'
+		//			url = uri("https://maven.pkg.github.com/CommonWealthRobotics/mujoco-java")
+		//			credentials {
+		//				username = System.getenv("GITHUB_ACTOR")
+		//				password = System.getenv("GITHUB_TOKEN")
+		//			}
+		//		}
 		maven {
 			name = "OSSRH"
 			url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"

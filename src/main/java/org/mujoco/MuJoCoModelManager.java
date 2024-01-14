@@ -29,6 +29,8 @@ public class MuJoCoModelManager {
 
 	private IntPointer bodyNameIndex;
 	private boolean connected = false;
+	private HashMap<String, Double> setEfforts = new HashMap<String, Double>();
+	private HashMap<String, Double> positions  = new HashMap<String, Double>();
 
 	public MuJoCoModelManager(File config) {
 		loadFromFile(config);
@@ -158,8 +160,6 @@ public class MuJoCoModelManager {
 
 	public HashMap<String, Double> getAllJointPositions() {
 		check();
-
-		HashMap<String, Double> positions = new HashMap<String, Double>();
 		for (int i = 0; i < getNumberOfJoints(); i++) {
 			double position = data.qpos().get(model.jnt_qposadr().get(i));
 			String name = getJointName(i);
@@ -167,7 +167,9 @@ public class MuJoCoModelManager {
 		}
 		return positions;
 	}
-
+	public HashMap<String, Double> getControlInstance() {
+		return setEfforts;
+	}
 	public void setActualtorCtrl(HashMap<String, Double> control) {
 		check();
 		for (int i = 0; i < getNumberOfActuators(); i++) {

@@ -45,7 +45,7 @@ public class MuJoColibTest {
 		
 //		if (m.nu() == m.nv())
 //			MuJoCoLib.mju_scl(d.ctrl(), d.qvel(), -0.1, m.nv());
-		HashMap<String, Double> setEfforts = new HashMap<String, Double>();
+		HashMap<String, Double> setEfforts = manager.getControlInstance();
 		HashMap<String, Double> positions = manager.getAllJointPositions();
 		// this is a simple P controller
 		double target =0;

@@ -24,6 +24,8 @@ dependencies {
 	// Use JUnit test framework.
 	testImplementation 'junit:junit:4.13.2'
 	implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
+	// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 }
 if(JavaVersion.current() != JavaVersion.VERSION_1_8){
 	throw new GradleException("This build must be run with java 8")

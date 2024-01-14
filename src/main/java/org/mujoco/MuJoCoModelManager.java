@@ -149,7 +149,7 @@ public class MuJoCoModelManager {
 	 */
 	public double[] getGeometrySize(String name) {
 		DoublePointer geomSize = model.geom_size();
-		DoublePointer coords = geomSize.getPointer(getGeometryIndex(null) * 3);
+		DoublePointer coords = geomSize.getPointer(getGeometryIndex(name) * 3);
 		double x = coords.getPointer(0).get();
 		double y = coords.getPointer(1).get();
 		double z = coords.getPointer(2).get();
@@ -183,20 +183,14 @@ public class MuJoCoModelManager {
 	private HashMap<String, Integer> ActuatorNameIndexMap = null;
 
 	public Set<String> getActuatorNames() {
-		getActuatorIndex("");
-		return ActuatorNameIndexMap.keySet();
+		return getActuatorNameIndexMap().keySet();
 	}
 
 	public int getActuatorIndex(String name) {
 		check();
 
-		if (ActuatorNameIndexMap == null) {
-			ActuatorNameIndexMap = new HashMap<>();
-			for (int i = 0; i < getNumberOfActuators(); i++) {
-				ActuatorNameIndexMap.put(getActuatorName(i), i);
-			}
-		}
-		Integer i = ActuatorNameIndexMap.get(name);
+
+		Integer i = getActuatorNameIndexMap().get(name);
 		if (i != null)
 			return i;
 		throw new RuntimeException("Actuator named " + name + " not found");
@@ -219,20 +213,14 @@ public class MuJoCoModelManager {
 	}
 
 	public Set<String> getJointNames() {
-		getJointIndex("");
-		return jointNameIndexMap.keySet();
+		return getJointNameIndexMap().keySet();
 	}
 
 	public int getJointIndex(String name) {
 		check();
 
-		if (jointNameIndexMap == null) {
-			jointNameIndexMap = new HashMap<>();
-			for (int i = 0; i < getNumberOfJoints(); i++) {
-				jointNameIndexMap.put(getJointName(i), i);
-			}
-		}
-		Integer i = jointNameIndexMap.get(name);
+
+		Integer i = getJointNameIndexMap().get(name);
 		if (i != null)
 			return i;
 		throw new RuntimeException("Joint named " + name + " not found");
@@ -255,39 +243,28 @@ public class MuJoCoModelManager {
 	}
 
 	public Set<String> getBodyNames() {
-		getBodyIndex("");
-		return bodyNameIndexMap.keySet();
+		return getBodyNameIndexMap().keySet();
 	}
 
 	public int getBodyIndex(String name) {
 		check();
 
-		if (bodyNameIndexMap == null) {
-			bodyNameIndexMap = new HashMap<>();
-			for (int i = 0; i < getNumberOfBodys(); i++) {
-				bodyNameIndexMap.put(getBodyName(i), i);
-			}
-		}
-		Integer i = bodyNameIndexMap.get(name);
+
+		Integer i = getBodyNameIndexMap().get(name);
 		if (i != null)
 			return i;
 		throw new RuntimeException("Body named " + name + " not found");
 	}
 
 	public Set<String> getGeometryNames() {
-		getGeometryIndex("");
-		return geometryNameIndexMap.keySet();
+
+		return getGeometryNameIndexMap().keySet();
 	}
 
 	public int getGeometryIndex(String name) {
 		check();
-		if (geometryNameIndexMap == null) {
-			geometryNameIndexMap = new HashMap<>();
-			for (int i = 0; i < getNumberOfGeometrys(); i++) {
-				geometryNameIndexMap.put(getGeometryName(i), i);
-			}
-		}
-		Integer i = geometryNameIndexMap.get(name);
+
+		Integer i = getGeometryNameIndexMap().get(name);
 		if (i != null)
 			return i;
 		throw new RuntimeException("Geometry named " + name + " not found");
@@ -298,13 +275,13 @@ public class MuJoCoModelManager {
 		return MuJoCoGeomType.get(type);
 	}
 
-	public int getBodyIndexOfGeometry(String geomName) {
+	public int getBodyIndexForGeometry(String geomName) {
 		int i = getGeometryIndex(geomName);
 		return model.geom_bodyid().getPointer(i).get();
 	}
 
-	public String getBodyNameOfGeometry(String geomName) {
-		return getBodyName(getBodyIndexOfGeometry(geomName));
+	public String getBodyNameForGeometry(String geomName) {
+		return getBodyName(getBodyIndexForGeometry(geomName));
 	}
 
 	public double getTimestepSeconds() {
@@ -347,14 +324,14 @@ public class MuJoCoModelManager {
 	/**
 	 * @param daccessable the daccessable to set
 	 */
-	public void setData(mjData_ daccessable) {
+	private void setData(mjData_ daccessable) {
 		this.data = daccessable;
 	}
 
 	public void step() {
 		stepOne();
 		if (controller != null)
-			controller.controlStep(data, model);
+			controller.controlStep(this);
 		stepTwo();
 	}
 
@@ -408,5 +385,85 @@ public class MuJoCoModelManager {
 	 */
 	private void setModelNames(BytePointer modelNames) {
 		this.modelNames = modelNames;
+	}
+
+	/**
+	 * @return the bodyNameIndexMap
+	 */
+	public HashMap<String, Integer> getBodyNameIndexMap() {
+		if (bodyNameIndexMap == null) {
+			setBodyNameIndexMap(new HashMap<>());
+			for (int i = 0; i < getNumberOfBodys(); i++) {
+				bodyNameIndexMap.put(getBodyName(i), i);
+			}
+		}
+		return bodyNameIndexMap;
+	}
+
+	/**
+	 * @param bodyNameIndexMap the bodyNameIndexMap to set
+	 */
+	public void setBodyNameIndexMap(HashMap<String, Integer> bodyNameIndexMap) {
+		this.bodyNameIndexMap = bodyNameIndexMap;
+	}
+
+	/**
+	 * @return the geometryNameIndexMap
+	 */
+	public HashMap<String, Integer> getGeometryNameIndexMap() {
+		if (geometryNameIndexMap == null) {
+			setGeometryNameIndexMap(new HashMap<>());
+			for (int i = 0; i < getNumberOfGeometrys(); i++) {
+				geometryNameIndexMap.put(getGeometryName(i), i);
+			}
+		}
+		return geometryNameIndexMap;
+	}
+
+	/**
+	 * @param geometryNameIndexMap the geometryNameIndexMap to set
+	 */
+	public void setGeometryNameIndexMap(HashMap<String, Integer> geometryNameIndexMap) {
+		this.geometryNameIndexMap = geometryNameIndexMap;
+	}
+
+	/**
+	 * @return the jointNameIndexMap
+	 */
+	public HashMap<String, Integer> getJointNameIndexMap() {
+		if (jointNameIndexMap == null) {
+			setJointNameIndexMap(new HashMap<>());
+			for (int i = 0; i < getNumberOfJoints(); i++) {
+				jointNameIndexMap.put(getJointName(i), i);
+			}
+		}
+		return jointNameIndexMap;
+	}
+
+	/**
+	 * @param jointNameIndexMap the jointNameIndexMap to set
+	 */
+	public void setJointNameIndexMap(HashMap<String, Integer> jointNameIndexMap) {
+		this.jointNameIndexMap = jointNameIndexMap;
+	}
+
+	/**
+	 * @return the actuatorNameIndexMap
+	 */
+	public HashMap<String, Integer> getActuatorNameIndexMap() {
+		if (ActuatorNameIndexMap == null) {
+			setActuatorNameIndexMap(new HashMap<>());
+			for (int i = 0; i < getNumberOfActuators(); i++) {
+				ActuatorNameIndexMap.put(getActuatorName(i), i);
+			}
+		}
+		return ActuatorNameIndexMap;
+	}
+
+	/**
+	 * @param actuatorNameIndexMap the actuatorNameIndexMap to set
+	 */
+	public void setActuatorNameIndexMap(HashMap<String, Integer> actuatorNameIndexMap) {
+		ActuatorNameIndexMap = actuatorNameIndexMap;
 	}
 }

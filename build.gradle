@@ -10,37 +10,24 @@ plugins {
 	id 'java'
 	id 'maven-publish'
 	id 'signing'
+	id 'io.codearte.nexus-staging' version '0.30.0'
 }
 
 repositories {
 	// Use Maven Central for resolving dependencies.
 	mavenCentral()
 }
-
+configurations {
+	jaxb
+}
 dependencies {
 	// Use JUnit test framework.
 	testImplementation 'junit:junit:4.13.2'
 	implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
 	// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-	// https://mvnrepository.com/artifact/net.codesup.util/jaxb2-rich-contract-plugin
-	implementation group: 'net.codesup.util', name: 'jaxb2-rich-contract-plugin', version: '2.1.0'
-}
-
-xjc {
-	xsdDir.set(layout.projectDirectory.dir("src/main/java/"))
-	xsdFiles = files(layout.projectDirectory.file("mujoco.xsd"))
-	defaultPackage.set("org.mujoco.xml")
-	options.addAll("-Xfluent-builder",
-							 "-Xmeta",
-								"-extended=y",
-								"-nv",
-								"-extension",
-								"-b customization.xjb"
-								)
 
 }
-
 
 
 if(JavaVersion.current() != JavaVersion.VERSION_1_8){

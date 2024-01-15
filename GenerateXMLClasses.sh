@@ -1,7 +1,9 @@
 #!/bin/bash
 
-cd schema
+#cd schema
 
-xjc -nv -extension -d ../src/main/java/  -b customization.xjb mujoco.xsd
+#xjc -nv -extension -d ../src/main/java/  -b customization.xjb mujoco.xsd
 
-cd ../
+#cd ../
+
+mvn generate-sources

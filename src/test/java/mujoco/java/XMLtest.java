@@ -9,13 +9,20 @@ import javax.xml.bind.JAXBException;
 import org.junit.Test;
 import org.mujoco.xml.MuJoCoXML;
 import org.mujoco.xml.Mujoco;
+import org.mujoco.xml.Mujoco.Builder;
 
 public class XMLtest {
 	
 	@Test
 	public void marshal() throws JAXBException {
-		Mujoco m =new Mujoco();
-		m.setModel(null);
+		
+		
+		Builder<Void> builder = Mujoco.builder();
+		builder.addActuator();
+		builder.addActuator();
+		
+		
+		Mujoco m =builder.build();
 		String marshaled = MuJoCoXML.marshal(m);
 		
 		System.out.println(marshaled);

@@ -24,7 +24,8 @@ dependencies {
 	implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
 	// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-
+    implementation 'net.codesup.util:jaxb2-rich-contract-plugin:2.1.0'
+	
 }
 
 

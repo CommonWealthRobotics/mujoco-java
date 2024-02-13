@@ -73,7 +73,7 @@
 						<arg>-selectorClassName=Selector</arg>
 						<arg>-builderClassName=Builder</arg>
 						<arg>-builderInterfaceName=BuildSupport</arg>
-						<arg>-copyAlways=n</arg>
+						<arg>-copyAlways=y</arg>
 						<arg>-buildMethodName=build</arg>
 						<arg>-endMethodName=end</arg>
 						<arg>-Xmeta</arg>

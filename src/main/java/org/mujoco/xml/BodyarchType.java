@@ -320,15 +320,19 @@ public class BodyarchType
         return this;
     }
 
-    public static class Builder<_B >
-        extends BodyType.Builder<_B>
+    public static class Builder<__B >
+        extends BodyType.Builder<__B>
         implements Buildable
     {
 
         private List<Buildable> inertialOrJointOrFreejoint;
+        
 
-        public Builder(final _B _parentBuilder, final BodyarchType _other, final boolean _copy) {
-            super(_parentBuilder, _other, _copy);
+        public Builder() {
+        	 super(null, null, false);
+		}
+        public Builder(final __B _parentBuilder, final BodyarchType _other, final boolean _copy) {
+            super((__B)_parentBuilder, _other, _copy);
             if (_other!= null) {
                 if (_other.inertialOrJointOrFreejoint == null) {
                     this.inertialOrJointOrFreejoint = null;
@@ -341,7 +345,24 @@ public class BodyarchType
             }
         }
 
-        public Builder(final _B _parentBuilder, final BodyarchType _other, final boolean _copy, final PropertyTree _propertyTree, final PropertyTreeUse _propertyTreeUse) {
+        /**
+         * Returns a new builder to build an additional value of the "body" property.
+         * Use {@link org.mujoco.xml.BodyarchType.Builder#end()} to return to the current builder.
+         * 
+         * @return
+         *     a new builder to build an additional value of the "body" property.
+         *     Use {@link org.mujoco.xml.BodyarchType.Builder#end()} to return to the current builder.
+         */
+        public BodyarchType.Builder<? extends Mujoco.Worldbody.Builder<__B>> addBody() {
+            if (this.inertialOrJointOrFreejoint == null) {
+                this.inertialOrJointOrFreejoint = new ArrayList<Buildable>();
+            }
+            final BodyarchType.Builder<Mujoco.Worldbody.Builder<__B>> body_Builder = new BodyarchType.Builder<Mujoco.Worldbody.Builder<__B>>(this, null, false);
+            this.inertialOrJointOrFreejoint.add(body_Builder);
+            return body_Builder;
+        }
+
+        public Builder(final __B _parentBuilder, final BodyarchType _other, final boolean _copy, final PropertyTree _propertyTree, final PropertyTreeUse _propertyTreeUse) {
             super(_parentBuilder, _other, _copy, _propertyTree, _propertyTreeUse);
             if (_other!= null) {
                 final PropertyTree inertialOrJointOrFreejointPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("inertialOrJointOrFreejoint"));
@@ -358,7 +379,8 @@ public class BodyarchType
             }
         }
 
-        protected<_P extends BodyarchType >_P init(final _P _product) {
+
+		protected<_P extends BodyarchType >_P init(final _P _product) {
             if (this.inertialOrJointOrFreejoint!= null) {
                 final List<JAXBElement<?>> inertialOrJointOrFreejoint = new ArrayList<JAXBElement<?>>(this.inertialOrJointOrFreejoint.size());
                 for (Buildable _item: this.inertialOrJointOrFreejoint) {
@@ -375,7 +397,7 @@ public class BodyarchType
          * @param inertialOrJointOrFreejoint
          *     Items to add to the value of the "inertialOrJointOrFreejoint" property
          */
-        public BodyarchType.Builder<_B> addInertialOrJointOrFreejoint(final Iterable<? extends JAXBElement<?>> inertialOrJointOrFreejoint) {
+        public BodyarchType.Builder<__B> addInertialOrJointOrFreejoint(final Iterable<? extends JAXBElement<?>> inertialOrJointOrFreejoint) {
             if (inertialOrJointOrFreejoint!= null) {
                 if (this.inertialOrJointOrFreejoint == null) {
                     this.inertialOrJointOrFreejoint = new ArrayList<Buildable>();
@@ -393,7 +415,7 @@ public class BodyarchType
          * @param inertialOrJointOrFreejoint
          *     New value of the "inertialOrJointOrFreejoint" property.
          */
-        public BodyarchType.Builder<_B> withInertialOrJointOrFreejoint(final Iterable<? extends JAXBElement<?>> inertialOrJointOrFreejoint) {
+        public BodyarchType.Builder<__B> withInertialOrJointOrFreejoint(final Iterable<? extends JAXBElement<?>> inertialOrJointOrFreejoint) {
             if (this.inertialOrJointOrFreejoint!= null) {
                 this.inertialOrJointOrFreejoint.clear();
             }
@@ -406,7 +428,7 @@ public class BodyarchType
          * @param inertialOrJointOrFreejoint
          *     Items to add to the value of the "inertialOrJointOrFreejoint" property
          */
-        public BodyarchType.Builder<_B> addInertialOrJointOrFreejoint(JAXBElement<?> ... inertialOrJointOrFreejoint) {
+        public BodyarchType.Builder<__B> addInertialOrJointOrFreejoint(JAXBElement<?> ... inertialOrJointOrFreejoint) {
             addInertialOrJointOrFreejoint(Arrays.asList(inertialOrJointOrFreejoint));
             return this;
         }
@@ -417,7 +439,7 @@ public class BodyarchType
          * @param inertialOrJointOrFreejoint
          *     New value of the "inertialOrJointOrFreejoint" property.
          */
-        public BodyarchType.Builder<_B> withInertialOrJointOrFreejoint(JAXBElement<?> ... inertialOrJointOrFreejoint) {
+        public BodyarchType.Builder<__B> withInertialOrJointOrFreejoint(JAXBElement<?> ... inertialOrJointOrFreejoint) {
             withInertialOrJointOrFreejoint(Arrays.asList(inertialOrJointOrFreejoint));
             return this;
         }
@@ -428,7 +450,7 @@ public class BodyarchType
          * @param inertial_
          *     Items to add to the value of the "inertial_" property
          */
-        public BodyarchType.Builder<_B> addInertial(final Iterable<? extends JAXBElement<InertialType>> inertial_) {
+        public BodyarchType.Builder<__B> addInertial(final Iterable<? extends JAXBElement<InertialType>> inertial_) {
             return addInertialOrJointOrFreejoint(inertial_);
         }
 
@@ -438,7 +460,7 @@ public class BodyarchType
          * @param inertial_
          *     Items to add to the value of the "inertial_" property
          */
-        public BodyarchType.Builder<_B> addInertial(JAXBElement<InertialType> ... inertial_) {
+        public BodyarchType.Builder<__B> addInertial(JAXBElement<InertialType> ... inertial_) {
             return addInertial(Arrays.asList(inertial_));
         }
 
@@ -448,7 +470,7 @@ public class BodyarchType
          * @param joint_
          *     Items to add to the value of the "joint_" property
          */
-        public BodyarchType.Builder<_B> addJoint(final Iterable<? extends JAXBElement<JointType>> joint_) {
+        public BodyarchType.Builder<__B> addJoint(final Iterable<? extends JAXBElement<JointType>> joint_) {
             return addInertialOrJointOrFreejoint(joint_);
         }
 
@@ -458,7 +480,7 @@ public class BodyarchType
          * @param joint_
          *     Items to add to the value of the "joint_" property
          */
-        public BodyarchType.Builder<_B> addJoint(JAXBElement<JointType> ... joint_) {
+        public BodyarchType.Builder<__B> addJoint(JAXBElement<JointType> ... joint_) {
             return addJoint(Arrays.asList(joint_));
         }
 
@@ -468,7 +490,7 @@ public class BodyarchType
          * @param freejoint_
          *     Items to add to the value of the "freejoint_" property
          */
-        public BodyarchType.Builder<_B> addFreejoint(final Iterable<? extends JAXBElement<JointType>> freejoint_) {
+        public BodyarchType.Builder<__B> addFreejoint(final Iterable<? extends JAXBElement<JointType>> freejoint_) {
             return addInertialOrJointOrFreejoint(freejoint_);
         }
 
@@ -478,7 +500,7 @@ public class BodyarchType
          * @param freejoint_
          *     Items to add to the value of the "freejoint_" property
          */
-        public BodyarchType.Builder<_B> addFreejoint(JAXBElement<JointType> ... freejoint_) {
+        public BodyarchType.Builder<__B> addFreejoint(JAXBElement<JointType> ... freejoint_) {
             return addFreejoint(Arrays.asList(freejoint_));
         }
 
@@ -488,7 +510,7 @@ public class BodyarchType
          * @param geom_
          *     Items to add to the value of the "geom_" property
          */
-        public BodyarchType.Builder<_B> addGeom(final Iterable<? extends JAXBElement<GeomType>> geom_) {
+        public BodyarchType.Builder<__B> addGeom(final Iterable<? extends JAXBElement<GeomType>> geom_) {
             return addInertialOrJointOrFreejoint(geom_);
         }
 
@@ -498,7 +520,7 @@ public class BodyarchType
          * @param geom_
          *     Items to add to the value of the "geom_" property
          */
-        public BodyarchType.Builder<_B> addGeom(JAXBElement<GeomType> ... geom_) {
+        public BodyarchType.Builder<__B> addGeom(JAXBElement<GeomType> ... geom_) {
             return addGeom(Arrays.asList(geom_));
         }
 
@@ -508,7 +530,7 @@ public class BodyarchType
          * @param site_
          *     Items to add to the value of the "site_" property
          */
-        public BodyarchType.Builder<_B> addSite(final Iterable<? extends JAXBElement<SiteType>> site_) {
+        public BodyarchType.Builder<__B> addSite(final Iterable<? extends JAXBElement<SiteType>> site_) {
             return addInertialOrJointOrFreejoint(site_);
         }
 
@@ -518,7 +540,7 @@ public class BodyarchType
          * @param site_
          *     Items to add to the value of the "site_" property
          */
-        public BodyarchType.Builder<_B> addSite(JAXBElement<SiteType> ... site_) {
+        public BodyarchType.Builder<__B> addSite(JAXBElement<SiteType> ... site_) {
             return addSite(Arrays.asList(site_));
         }
 
@@ -528,7 +550,7 @@ public class BodyarchType
          * @param camera_
          *     Items to add to the value of the "camera_" property
          */
-        public BodyarchType.Builder<_B> addCamera(final Iterable<? extends JAXBElement<CameraType>> camera_) {
+        public BodyarchType.Builder<__B> addCamera(final Iterable<? extends JAXBElement<CameraType>> camera_) {
             return addInertialOrJointOrFreejoint(camera_);
         }
 
@@ -538,7 +560,7 @@ public class BodyarchType
          * @param camera_
          *     Items to add to the value of the "camera_" property
          */
-        public BodyarchType.Builder<_B> addCamera(JAXBElement<CameraType> ... camera_) {
+        public BodyarchType.Builder<__B> addCamera(JAXBElement<CameraType> ... camera_) {
             return addCamera(Arrays.asList(camera_));
         }
 
@@ -548,7 +570,7 @@ public class BodyarchType
          * @param light_
          *     Items to add to the value of the "light_" property
          */
-        public BodyarchType.Builder<_B> addLight(final Iterable<? extends JAXBElement<LightType>> light_) {
+        public BodyarchType.Builder<__B> addLight(final Iterable<? extends JAXBElement<LightType>> light_) {
             return addInertialOrJointOrFreejoint(light_);
         }
 
@@ -558,7 +580,7 @@ public class BodyarchType
          * @param light_
          *     Items to add to the value of the "light_" property
          */
-        public BodyarchType.Builder<_B> addLight(JAXBElement<LightType> ... light_) {
+        public BodyarchType.Builder<__B> addLight(JAXBElement<LightType> ... light_) {
             return addLight(Arrays.asList(light_));
         }
 
@@ -568,7 +590,7 @@ public class BodyarchType
          * @param composite_
          *     Items to add to the value of the "composite_" property
          */
-        public BodyarchType.Builder<_B> addComposite(final Iterable<? extends JAXBElement<BodyarchType.Composite>> composite_) {
+        public BodyarchType.Builder<__B> addComposite(final Iterable<? extends JAXBElement<BodyarchType.Composite>> composite_) {
             return addInertialOrJointOrFreejoint(composite_);
         }
 
@@ -578,7 +600,7 @@ public class BodyarchType
          * @param composite_
          *     Items to add to the value of the "composite_" property
          */
-        public BodyarchType.Builder<_B> addComposite(JAXBElement<BodyarchType.Composite> ... composite_) {
+        public BodyarchType.Builder<__B> addComposite(JAXBElement<BodyarchType.Composite> ... composite_) {
             return addComposite(Arrays.asList(composite_));
         }
 
@@ -588,7 +610,7 @@ public class BodyarchType
          * @param body_
          *     Items to add to the value of the "body_" property
          */
-        public BodyarchType.Builder<_B> addBody(final Iterable<? extends JAXBElement<BodyarchType>> body_) {
+        public BodyarchType.Builder<__B> addBody(final Iterable<? extends JAXBElement<BodyarchType>> body_) {
             return addInertialOrJointOrFreejoint(body_);
         }
 
@@ -598,7 +620,7 @@ public class BodyarchType
          * @param body_
          *     Items to add to the value of the "body_" property
          */
-        public BodyarchType.Builder<_B> addBody(JAXBElement<BodyarchType> ... body_) {
+        public BodyarchType.Builder<__B> addBody(JAXBElement<BodyarchType> ... body_) {
             return addBody(Arrays.asList(body_));
         }
 
@@ -608,7 +630,7 @@ public class BodyarchType
          * @param include_
          *     Items to add to the value of the "include_" property
          */
-        public BodyarchType.Builder<_B> addInclude(final Iterable<? extends JAXBElement<IncludeType>> include_) {
+        public BodyarchType.Builder<__B> addInclude(final Iterable<? extends JAXBElement<IncludeType>> include_) {
             return addInertialOrJointOrFreejoint(include_);
         }
 
@@ -618,7 +640,7 @@ public class BodyarchType
          * @param include_
          *     Items to add to the value of the "include_" property
          */
-        public BodyarchType.Builder<_B> addInclude(JAXBElement<IncludeType> ... include_) {
+        public BodyarchType.Builder<__B> addInclude(JAXBElement<IncludeType> ... include_) {
             return addInclude(Arrays.asList(include_));
         }
 
@@ -629,7 +651,7 @@ public class BodyarchType
          *     New value of the "name" property.
          */
         @Override
-        public BodyarchType.Builder<_B> withName(final String name) {
+        public BodyarchType.Builder<__B> withName(final String name) {
             super.withName(name);
             return this;
         }
@@ -641,7 +663,7 @@ public class BodyarchType
          *     New value of the "childclass" property.
          */
         @Override
-        public BodyarchType.Builder<_B> withChildclass(final String childclass) {
+        public BodyarchType.Builder<__B> withChildclass(final String childclass) {
             super.withChildclass(childclass);
             return this;
         }
@@ -653,7 +675,7 @@ public class BodyarchType
          *     New value of the "mocap" property.
          */
         @Override
-        public BodyarchType.Builder<_B> withMocap(final Boolean mocap) {
+        public BodyarchType.Builder<__B> withMocap(final Boolean mocap) {
             super.withMocap(mocap);
             return this;
         }
@@ -665,7 +687,7 @@ public class BodyarchType
          *     New value of the "pos" property.
          */
         @Override
-        public BodyarchType.Builder<_B> withPos(final String pos) {
+        public BodyarchType.Builder<__B> withPos(final String pos) {
             super.withPos(pos);
             return this;
         }
@@ -677,7 +699,7 @@ public class BodyarchType
          *     New value of the "quat" property.
          */
         @Override
-        public BodyarchType.Builder<_B> withQuat(final String quat) {
+        public BodyarchType.Builder<__B> withQuat(final String quat) {
             super.withQuat(quat);
             return this;
         }
@@ -689,7 +711,7 @@ public class BodyarchType
          *     New value of the "axisangle" property.
          */
         @Override
-        public BodyarchType.Builder<_B> withAxisangle(final String axisangle) {
+        public BodyarchType.Builder<__B> withAxisangle(final String axisangle) {
             super.withAxisangle(axisangle);
             return this;
         }
@@ -701,7 +723,7 @@ public class BodyarchType
          *     New value of the "euler" property.
          */
         @Override
-        public BodyarchType.Builder<_B> withEuler(final String euler) {
+        public BodyarchType.Builder<__B> withEuler(final String euler) {
             super.withEuler(euler);
             return this;
         }
@@ -713,7 +735,7 @@ public class BodyarchType
          *     New value of the "xyaxes" property.
          */
         @Override
-        public BodyarchType.Builder<_B> withXyaxes(final String xyaxes) {
+        public BodyarchType.Builder<__B> withXyaxes(final String xyaxes) {
             super.withXyaxes(xyaxes);
             return this;
         }
@@ -725,7 +747,7 @@ public class BodyarchType
          *     New value of the "zaxis" property.
          */
         @Override
-        public BodyarchType.Builder<_B> withZaxis(final String zaxis) {
+        public BodyarchType.Builder<__B> withZaxis(final String zaxis) {
             super.withZaxis(zaxis);
             return this;
         }
@@ -737,7 +759,7 @@ public class BodyarchType
          *     New value of the "user" property.
          */
         @Override
-        public BodyarchType.Builder<_B> withUser(final String user) {
+        public BodyarchType.Builder<__B> withUser(final String user) {
             super.withUser(user);
             return this;
         }
@@ -751,12 +773,12 @@ public class BodyarchType
             }
         }
 
-        public BodyarchType.Builder<_B> copyOf(final BodyarchType _other) {
+        public BodyarchType.Builder<__B> copyOf(final BodyarchType _other) {
             _other.copyTo(this);
             return this;
         }
 
-        public BodyarchType.Builder<_B> copyOf(final BodyarchType.Builder _other) {
+        public BodyarchType.Builder<__B> copyOf(final BodyarchType.Builder _other) {
             return copyOf(_other.build());
         }
 

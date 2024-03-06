@@ -117,11 +117,11 @@ public class MuJoCoLib extends org.mujoco.MuJoCoConfig {
 
 
 // this is a C-API
-// #if defined(__cplusplus)
+// #ifdef __cplusplus
 // #endif
 
 // header version; should match the library version as returned by mj_version()
-public static final int mjVERSION_HEADER = 311;
+public static final int mjVERSION_HEADER = 313;
 
 // needed to define size_t, fabs and log10
 // #include <stdlib.h>
@@ -211,9 +211,9 @@ public static native void mj_defaultVFS(mjVFS vfs);
 public static native int mj_addFileVFS(mjVFS vfs, @Cast("const char*") BytePointer directory, @Cast("const char*") BytePointer filename);
 public static native int mj_addFileVFS(mjVFS vfs, String directory, String filename);
 
-// Make empty file in VFS, return 0: success, 1: full, 2: repeated name.
-public static native int mj_makeEmptyFileVFS(mjVFS vfs, @Cast("const char*") BytePointer filename, int filesize);
-public static native int mj_makeEmptyFileVFS(mjVFS vfs, String filename, int filesize);
+// Add file to VFS from buffer, return 0: success, 1: full, 2: repeated name, -1: failed to load.
+public static native int mj_addBufferVFS(mjVFS vfs, @Cast("const char*") BytePointer name, @Const Pointer buffer, int nbuffer);
+public static native int mj_addBufferVFS(mjVFS vfs, String name, @Const Pointer buffer, int nbuffer);
 
 // Return file index in VFS, or -1 if not found in VFS.
 public static native int mj_findFileVFS(@Const mjVFS vfs, @Cast("const char*") BytePointer filename);
@@ -226,6 +226,9 @@ public static native int mj_deleteFileVFS(mjVFS vfs, String filename);
 // Delete all files from VFS.
 public static native void mj_deleteVFS(mjVFS vfs);
 
+// deprecated: use mj_copyBufferVFS.
+public static native int mj_makeEmptyFileVFS(mjVFS vfs, @Cast("const char*") BytePointer filename, int filesize);
+public static native int mj_makeEmptyFileVFS(mjVFS vfs, String filename, int filesize);
 
 //---------------------------------- Parse and compile ---------------------------------------------
 
@@ -336,8 +339,10 @@ public static native void mj_resetData(@Const mjModel m, mjData d);
 // Reset data to defaults, fill everything else with debug_value.
 public static native void mj_resetDataDebug(@Const mjModel m, mjData d, @Cast("unsigned char") byte debug_value);
 
-// Reset data, set fields from specified keyframe.
+// Reset data. If 0 <= key < nkey, set fields from specified keyframe.
 public static native void mj_resetDataKeyframe(@Const mjModel m, mjData d, int key);
+
+// #ifndef ADDRESS_SANITIZER
 
 // Mark a new frame on the mjData stack.
 public static native void mj_markStack(mjData d);
@@ -345,6 +350,8 @@ public static native void mj_markStack(mjData d);
 // Free the current mjData stack frame. All pointers returned by mj_stackAlloc since the last call
 // to mj_markStack must no longer be used afterwards.
 public static native void mj_freeStack(mjData d);
+
+// #endif  // ADDRESS_SANITIZER
 
 // Allocate a number of bytes on mjData stack at a specific alignment.
 // Call mju_error on stack overflow.
@@ -590,6 +597,9 @@ public static native void mj_jacSite(@Const mjModel m, @Const mjData d, @Cast("m
 // Compute translation end-effector Jacobian of point, and rotation Jacobian of axis.
 public static native void mj_jacPointAxis(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer jacPoint, @Cast("mjtNum*") DoublePointer jacAxis,
                            @Cast("const mjtNum*") DoublePointer point, @Cast("const mjtNum*") DoublePointer axis, int body);
+
+// Compute subtree angular momentum matrix.
+public static native void mj_angmomMat(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer mat, int body);
 
 // Get id of object with the specified mjtObj type and name, returns -1 if id not found.
 public static native int mj_name2id(@Const mjModel m, int type, @Cast("const char*") BytePointer name);
@@ -1345,7 +1355,7 @@ public static native void mju_bandMulMatVec(@Cast("mjtNum*") DoublePointer res, 
 // Address of diagonal element i in band-dense matrix representation.
 public static native int mju_bandDiag(int i, int ntotal, int nband, int ndense);
 
-// Eigenvalue decomposition of symmetric 3x3 matrix.
+// Eigenvalue decomposition of symmetric 3x3 matrix, mat = eigvec * diag(eigval) * eigvec'.
 public static native int mju_eig3(@Cast("mjtNum*") DoublePointer eigval, @Cast("mjtNum*") DoublePointer eigvec, @Cast("mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer mat);
 
 // minimize 0.5*x'*H*x + x'*g  s.t. lower <= x <= upper, return rank or -1 if failed
@@ -1597,8 +1607,26 @@ public static native void mju_defaultTask(mjTask task);
 // Wait for a task to complete.
 public static native void mju_taskJoin(mjTask task);
 
+//---------------------- Sanitizer instrumentation helpers -----------------------------------------
+//
+// Most MuJoCo users can ignore these functions, the following comments are aimed primarily at
+// MuJoCo developers.
+//
+// When built and run under address sanitizer (asan), mj_markStack and mj_freeStack are instrumented
+// to detect leakage of mjData stack frames. When the compiler inlines several callees that call
+// into mark/free into the same function, this instrumentation requires that the compiler retains
+// separate mark/free calls for each original callee. The memory-clobbered asm blocks act as a
+// barrier to prevent mark/free calls from being combined under optimization.
 
-// #if defined(__cplusplus)
+// #ifdef ADDRESS_SANITIZER
+
+
+
+
+
+// #endif  // ADDRESS_SANITIZER
+
+// #ifdef __cplusplus
 // #endif
 
 // #endif  // MUJOCO_MUJOCO_H_
@@ -1676,7 +1704,7 @@ public static native void mju_taskJoin(mjTask task);
 // #ifndef MUJOCO_INCLUDE_MJTHREAD_H_
 // #define MUJOCO_INCLUDE_MJTHREAD_H_
 
-public static final int mjMAXTHREADS = 128;       // maximum number of threads in a thread pool
+public static final int mjMAXTHREAD = 128;        // maximum number of threads in a thread pool
 
 /** enum mjtTaskStatus */
 public static final int  // status values for mjTask
@@ -1844,10 +1872,9 @@ public static final int     // internal timers
 
   // breakdown of mj_collision
   mjTIMER_COL_BROAD = 13,         // broadphase
-  mjTIMER_COL_MID = 14,           // midphase
-  mjTIMER_COL_NARROW = 15,        // narrowphase
+  mjTIMER_COL_NARROW = 14,        // narrowphase
 
-  mjNTIMER = 16;                   // number of timers
+  mjNTIMER = 15;                   // number of timers
 
 
 //---------------------------------- mjContact -----------------------------------------------------
@@ -2044,7 +2071,7 @@ public static class mjData_ extends Pointer {
   // memory utilization stats
   public native @Cast("size_t") long maxuse_stack(); public native mjData_ maxuse_stack(long setter);                      // maximum stack allocation in bytes
   public native @Cast("size_t") long maxuse_threadstack(int i); public native mjData_ maxuse_threadstack(int i, long setter);
-  @MemberGetter public native @Cast("size_t*") SizeTPointer maxuse_threadstack();  // maximum stack allocation per thread in bytes
+  @MemberGetter public native @Cast("size_t*") SizeTPointer maxuse_threadstack();   // maximum stack allocation per thread in bytes
   public native @Cast("size_t") long maxuse_arena(); public native mjData_ maxuse_arena(long setter);                      // maximum arena allocation in bytes
   public native int maxuse_con(); public native mjData_ maxuse_con(int setter);                        // maximum number of contacts
   public native int maxuse_efc(); public native mjData_ maxuse_efc(int setter);                        // maximum number of scalar constraints
@@ -2350,6 +2377,7 @@ public static class mjData_ extends Pointer {
 // #define MUJOCO_MJMODEL_H_
 
 // #include <stddef.h>
+// #include <stdint.h>
 
 
 // #include <mujoco/mjtnum.h>
@@ -2761,7 +2789,7 @@ public static class mjVFS_ extends Pointer {
     @Override public mjVFS_ getPointer(long i) {
         return new mjVFS_((Pointer)this).offsetAddress(i);
     }
-                             // virtual file system for loading from memory
+                               // virtual file system for loading from memory
   public native int nfile(); public native mjVFS_ nfile(int setter);                             // number of files present
   public native @Cast("char") byte filename(int i, int j); public native mjVFS_ filename(int i, int j, byte setter);
   @MemberGetter public native @Cast("char*") BytePointer filename();  // file name without path
@@ -2769,6 +2797,8 @@ public static class mjVFS_ extends Pointer {
   @MemberGetter public native @Cast("size_t*") SizeTPointer filesize();                // file size in bytes
   public native Pointer filedata(int i); public native mjVFS_ filedata(int i, Pointer setter);
   @MemberGetter public native @Cast("void**") PointerPointer filedata();                // buffer with file data
+  public native @Cast("uint64_t") long filestamp(int i); public native mjVFS_ filestamp(int i, long setter);
+  @MemberGetter public native @Cast("uint64_t*") LongPointer filestamp();               // checksum of the file data
 }
 @Opaque public static class mjVFS extends Pointer {
     /** Empty constructor. Calls {@code super((Pointer)null)}. */
@@ -2880,6 +2910,7 @@ public static class mjVisual_ extends Pointer {
     @Name("global.offwidth") public native int global_offwidth(); public native mjVisual_ global_offwidth(int setter);               // width of offscreen buffer
     @Name("global.offheight") public native int global_offheight(); public native mjVisual_ global_offheight(int setter);              // height of offscreen buffer
     @Name("global.ellipsoidinertia") public native int global_ellipsoidinertia(); public native mjVisual_ global_ellipsoidinertia(int setter);       // geom for inertia visualization (0: box, 1: ellipsoid)
+    @Name("global.bvactive") public native int global_bvactive(); public native mjVisual_ global_bvactive(int setter);               // visualize active bounding volumes (0: no, 1: yes)
                         // rendering quality
     @Name("quality.shadowsize") public native int quality_shadowsize(); public native mjVisual_ quality_shadowsize(int setter);             // size of shadowmap texture
     @Name("quality.offsamples") public native int quality_offsamples(); public native mjVisual_ quality_offsamples(int setter);             // number of multisamples for offscreen rendering
@@ -2973,6 +3004,10 @@ public static class mjVisual_ extends Pointer {
     @Name("rgba.crankbroken") @MemberGetter public native FloatPointer rgba_crankbroken();         // used when crank must be stretched/broken
     @Name("rgba.frustum") public native float rgba_frustum(int i); public native mjVisual_ rgba_frustum(int i, float setter);
     @Name("rgba.frustum") @MemberGetter public native FloatPointer rgba_frustum();             // camera frustum
+    @Name("rgba.bv") public native float rgba_bv(int i); public native mjVisual_ rgba_bv(int i, float setter);
+    @Name("rgba.bv") @MemberGetter public native FloatPointer rgba_bv();                  // bounding volume
+    @Name("rgba.bvactive") public native float rgba_bvactive(int i); public native mjVisual_ rgba_bvactive(int i, float setter);
+    @Name("rgba.bvactive") @MemberGetter public native FloatPointer rgba_bvactive();            // active bounding volume
 }
 @Opaque public static class mjVisual extends Pointer {
     /** Empty constructor. Calls {@code super((Pointer)null)}. */
@@ -3344,8 +3379,6 @@ public static class mjModel_ extends Pointer {
   public native IntPointer mesh_texcoordadr(); public native mjModel_ mesh_texcoordadr(IntPointer setter);     // texcoord data address; -1: no texcoord   (nmesh x 1)
   public native IntPointer mesh_texcoordnum(); public native mjModel_ mesh_texcoordnum(IntPointer setter);     // number of texcoord                       (nmesh x 1)
   public native IntPointer mesh_graphadr(); public native mjModel_ mesh_graphadr(IntPointer setter);        // graph data address; -1: no graph         (nmesh x 1)
-  public native @Cast("mjtNum*") DoublePointer mesh_pos(); public native mjModel_ mesh_pos(DoublePointer setter);             // translation applied to asset vertices    (nmesh x 3)
-  public native @Cast("mjtNum*") DoublePointer mesh_quat(); public native mjModel_ mesh_quat(DoublePointer setter);            // rotation applied to asset vertices       (nmesh x 4)
   public native FloatPointer mesh_vert(); public native mjModel_ mesh_vert(FloatPointer setter);            // vertex positions for all meshes          (nmeshvert x 3)
   public native FloatPointer mesh_normal(); public native mjModel_ mesh_normal(FloatPointer setter);          // normals for all meshes                   (nmeshnormal x 3)
   public native FloatPointer mesh_texcoord(); public native mjModel_ mesh_texcoord(FloatPointer setter);        // vertex texcoords for all meshes          (nmeshtexcoord x 2)
@@ -3353,6 +3386,8 @@ public static class mjModel_ extends Pointer {
   public native IntPointer mesh_facenormal(); public native mjModel_ mesh_facenormal(IntPointer setter);      // normal face data                         (nmeshface x 3)
   public native IntPointer mesh_facetexcoord(); public native mjModel_ mesh_facetexcoord(IntPointer setter);    // texture face data                        (nmeshface x 3)
   public native IntPointer mesh_graph(); public native mjModel_ mesh_graph(IntPointer setter);           // convex graph data                        (nmeshgraph x 1)
+  public native @Cast("mjtNum*") DoublePointer mesh_pos(); public native mjModel_ mesh_pos(DoublePointer setter);             // translation applied to asset vertices    (nmesh x 3)
+  public native @Cast("mjtNum*") DoublePointer mesh_quat(); public native mjModel_ mesh_quat(DoublePointer setter);            // rotation applied to asset vertices       (nmesh x 4)
   public native IntPointer mesh_pathadr(); public native mjModel_ mesh_pathadr(IntPointer setter);         // address of asset path for mesh; -1: none (nmesh x 1)
 
   // skins
@@ -5334,6 +5369,8 @@ public static class mjResource_ extends Pointer {
 
   public native @Cast("char*") BytePointer name(); public native mjResource_ name(BytePointer setter);                                   // name of resource (filename, etc)
   public native Pointer data(); public native mjResource_ data(Pointer setter);                                   // opaque data pointer
+  public native @Cast("char") byte timestamp(int i); public native mjResource_ timestamp(int i, byte setter);
+  @MemberGetter public native @Cast("char*") BytePointer timestamp();                          // timestamp of the resource
   public native @Const mjpResourceProvider provider(); public native mjResource_ provider(mjpResourceProvider setter);   // pointer to the provider
 }
 @Opaque public static class mjResource extends Pointer {
@@ -5343,7 +5380,7 @@ public static class mjResource_ extends Pointer {
     public mjResource(Pointer p) { super(p); }
 }
 
-// callback for opeing a resource, returns zero on failure
+// callback for opening a resource, returns zero on failure
 public static class mjfOpenResource extends FunctionPointer {
     static { Loader.load(); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
@@ -5385,16 +5422,18 @@ public static class mjfGetResourceDir extends FunctionPointer {
     public native void call(mjResource resource, @Cast("const char**") PointerPointer dir, IntPointer ndir);
 }
 
-// callback for checking if a resource was modified since last read
-// returns > 0 if resource was modified since last open, 0 if resource was not
-// modified, and < 0 if inconclusive
+// callback for checking if the current resource was modified from the time
+// specified by the timestamp
+// returns 0 if the resource's timestamp matches the provided timestamp
+// returns > 0 if the the resource is younger than the given timestamp
+// returns < 0 if the resource is older than the given timestamp
 public static class mjfResourceModified extends FunctionPointer {
     static { Loader.load(); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public    mjfResourceModified(Pointer p) { super(p); }
     protected mjfResourceModified() { allocate(); }
     private native void allocate();
-    public native int call(@Const mjResource resource);
+    public native int call(@Const mjResource resource, @Cast("const char*") BytePointer timestamp);
 }
 
 // struct describing a single resource provider

@@ -34,7 +34,8 @@ public class XMLtest {
 		topbody.withChildclass("body");
 		topbody.withPos("0 0 1.282");
 		
-		topbody.addBody().withName("Head");
+		//topbody.addBody();
+		//topbody.addBody().withName("Head");
 		
 		
 		//topbody.addBody(topbody.ge);

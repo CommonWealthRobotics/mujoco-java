@@ -29,7 +29,7 @@
 				</executions>
 				<configuration>
 					<schemaDirectory>schema/</schemaDirectory>
-					<generateDirectory>src/main/java/mujoco/xml</generateDirectory>
+					<generateDirectory>src/main/java/org/mujoco/xml</generateDirectory>
 					<schemaIncludes>
 						<schemaInclude>mujoco.xsd</schemaInclude>
 					</schemaIncludes>

@@ -12,6 +12,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
+import org.mujoco.xml.Mujoco;
+
 public class MuJoCoXML {
 	public static Mujoco unmarshal(File xml) throws JAXBException {
 		JAXBContext jaxbContext = JAXBContext.newInstance(Mujoco.class);

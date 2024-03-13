@@ -92,8 +92,7 @@
 						</plugin>
 					</plugins>
 					<dependencies>
-						<!-- Put this in if your default JAXB version is 2.2 or
-						lower,
+						<!-- Put this in if your default JAXB version is 2.2 orlower,
                         or if &quot;tools.jar&quot; isn't in your classpath -->
 						<dependency>
 							<groupId>org.glassfish.jaxb</groupId>

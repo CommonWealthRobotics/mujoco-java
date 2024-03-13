@@ -12,7 +12,7 @@ import javax.xml.namespace.QName;
 
 import org.junit.Test;
 import org.mujoco.xml.BodyarchType;
-import org.mujoco.xml.MuJoCoXML;
+import org.mujoco.MuJoCoXML;
 import org.mujoco.xml.Mujoco;
 import org.mujoco.xml.Mujoco.Builder;
 import org.mujoco.xml.body.LightType;

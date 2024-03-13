@@ -29,14 +29,14 @@
 				</executions>
 				<configuration>
 					<schemaDirectory>schema/</schemaDirectory>
-					<generateDirectory>src/main/java/org/mujoco/xml</generateDirectory>
+					<generateDirectory>src/main/java/</generateDirectory>
 					<schemaIncludes>
 						<schemaInclude>mujoco.xsd</schemaInclude>
 					</schemaIncludes>
 					<strict>false</strict>
 					<verbose>true</verbose>
 					<extension>true</extension>
-					<removeOldOutput>true</removeOldOutput>
+					<removeOldOutput>false</removeOldOutput>
 					<args>
 						<arg>-Xconstrained-properties</arg>
 						<arg>-constrained=y</arg>

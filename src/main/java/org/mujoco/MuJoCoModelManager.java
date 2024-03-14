@@ -35,9 +35,8 @@ public class MuJoCoModelManager {
 	private HashMap<String, Double> setEfforts = new HashMap<String, Double>();
 	private HashMap<String, Double> positions  = new HashMap<String, Double>();
 	public MuJoCoModelManager(String xml) throws IOException {
-		//File tempFile = File.createTempFile("mujoco-", ".xml");
-		//tempFile.deleteOnExit();
-		File tempFile = new File("/tmp/mujocoxmlTEST.XML");
+		File tempFile = File.createTempFile("mujoco-", ".xml");
+		tempFile.deleteOnExit();
 		Files.write( Paths.get(tempFile.getAbsolutePath()), xml.getBytes());
 		loadFromFile(tempFile);
 	}

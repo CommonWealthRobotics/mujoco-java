@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
@@ -23,7 +24,14 @@ public class MuJoCoXML {
 		return (Mujoco) jaxbUnmarshaller.unmarshal(xml);
 
 	}
+	public static Mujoco unmarshal(String xml) throws JAXBException {
+		JAXBContext jaxbContext = JAXBContext.newInstance(Mujoco.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
+		// We had written this file in marshalling example
+		return (Mujoco) jaxbUnmarshaller.unmarshal(new StringReader(xml));
+
+	}
 	public static String marshal(Mujoco source) throws JAXBException {
 		JAXBContext jaxbContext = JAXBContext.newInstance(Mujoco.class);
 		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();

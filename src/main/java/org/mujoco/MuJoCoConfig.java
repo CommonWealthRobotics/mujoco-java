@@ -83,6 +83,11 @@ public class MuJoCoConfig implements InfoMapper {
 		infoMap.put(new Info("mjfTime").skip());
 		infoMap.put(new Info("mjfAct").skip());
 		infoMap.put(new Info("mjfCollision").skip());
+		//mj__freeStack
+		infoMap.put(new Info("mj__freeStack").skip());
+		//mj__markStack
+		infoMap.put(new Info("mj__markStack").skip());
+		
 //		infoMap.put(new Info("").skip());
 //		infoMap.put(new Info("").skip());
 		

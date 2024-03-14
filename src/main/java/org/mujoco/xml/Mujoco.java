@@ -13758,11 +13758,12 @@ public class Mujoco
              *     a new builder to build an additional value of the "body" property.
              *     Use {@link org.mujoco.xml.BodyarchType.Builder#end()} to return to the current builder.
              */
-            public BodyarchType.Builder<? extends Mujoco.Worldbody.Builder<_B>> addBody() {
+            public org.mujoco.xml.BodyarchType.Builder<? extends org.mujoco.xml.Mujoco.Worldbody.Builder<_B>> addBody() {
                 if (this.geomOrSiteOrCamera == null) {
                     this.geomOrSiteOrCamera = new ArrayList<Buildable>();
                 }
-                final BodyarchType.Builder<Mujoco.Worldbody.Builder<_B>> body_Builder = new BodyarchType.Builder<Mujoco.Worldbody.Builder<_B>>(this, null, false);
+                final org.mujoco.xml.BodyarchType.Builder<org.mujoco.xml.Mujoco.Worldbody.Builder<_B>> body_Builder = new org.mujoco.xml.BodyarchType.Builder<org.mujoco.xml.Mujoco.Worldbody.Builder<_B>>(this, null, false);
+                System.out.println("Builder type is "+body_Builder.getClass());
                 this.geomOrSiteOrCamera.add(body_Builder);
                 return body_Builder;
             }

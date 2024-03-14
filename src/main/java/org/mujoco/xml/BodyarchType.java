@@ -10,6 +10,8 @@ package org.mujoco.xml;
 
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeListener;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +26,8 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.namespace.QName;
+
 import com.kscs.util.jaxb.BoundList;
 import com.kscs.util.jaxb.BoundListProxy;
 import com.kscs.util.jaxb.Buildable;
@@ -362,11 +366,51 @@ public class BodyarchType
             if (this.inertialOrJointOrFreejoint!= null) {
                 final List<JAXBElement<?>> inertialOrJointOrFreejoint = new ArrayList<JAXBElement<?>>(this.inertialOrJointOrFreejoint.size());
                 for (Buildable _item: this.inertialOrJointOrFreejoint) {
-                    inertialOrJointOrFreejoint.add(((JAXBElement<?> ) _item.build()));
+                		try {
+							inertialOrJointOrFreejoint.add(buildRecoursive(_item));
+						} catch (NoSuchMethodException | SecurityException | IllegalAccessException
+								| IllegalArgumentException | InvocationTargetException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
                 }
                 _product.inertialOrJointOrFreejoint = inertialOrJointOrFreejoint;
             }
             return super.init(_product);
+        }
+        private JAXBElement<?> buildRecoursive(Object o) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+            Class<? extends Object> class1 = o.getClass();
+            System.out.println("Class "+class1);
+			Method setNameMethod = class1.getMethod("build");
+        	Object product = setNameMethod.invoke(o);
+        	if(JAXBElement.class.isInstance(product))
+        		return (JAXBElement<?>)product;
+        	if (product==null)
+        		throw new NullPointerException();
+        	if(BodyarchType.class.isInstance(product)) {
+        		BodyarchType  bat = (BodyarchType)product;
+                JAXBElement<BodyarchType> element =new JAXBElement<BodyarchType>(new QName("body"),BodyarchType.class,bat);
+        		return element;
+        	}
+        	return buildRecoursive(product);
+        }	
+        
+        /**
+         * Returns a new builder to build an additional value of the "body" property.
+         * Use {@link org.mujoco.xml.BodyarchType.Builder#end()} to return to the current builder.
+         * 
+         * @return
+         *     a new builder to build an additional value of the "body" property.
+         *     Use {@link org.mujoco.xml.BodyarchType.Builder#end()} to return to the current builder.
+         */
+        public BodyarchType.Builder<? extends BodyType.Builder<_B>> addBody() {
+            if (this.inertialOrJointOrFreejoint == null) {
+                this.inertialOrJointOrFreejoint = new ArrayList<Buildable>();
+            }
+            final BodyarchType.Builder<BodyType.Builder<_B>> body_Builder = new BodyarchType.Builder<BodyType.Builder<_B>>(this, null, false);
+            //System.out.println("Builder type is "+body_Builder.getClass());
+            this.inertialOrJointOrFreejoint.add(body_Builder);
+            return body_Builder;
         }
 
         /**

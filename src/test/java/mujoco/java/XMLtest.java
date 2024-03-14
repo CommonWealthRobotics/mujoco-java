@@ -35,7 +35,11 @@ public class XMLtest {
 		topbody.withPos("0 0 1.282");
 		
 		//topbody.addBody();
-		//topbody.addBody().withName("Head");
+		topbody.addBody().withName("Head").withPos("0 0 2.2")
+		.addBody()
+			.withName("mowhawk")
+			.withPos("0 0 1.2")
+		;
 		
 		
 		//topbody.addBody(topbody.ge);

@@ -53,9 +53,7 @@ public class XMLtest {
 		String marshaled = MuJoCoXML.marshal(m);
 		
 		System.out.println(marshaled);
-		
-		Mujoco m2 = new Mujoco();
-		
+	
 	}
 
 	@Test

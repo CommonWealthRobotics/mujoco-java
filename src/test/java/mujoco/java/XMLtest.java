@@ -29,8 +29,49 @@ public class XMLtest {
 		
 		
 		Builder<Void> builder = Mujoco.builder();
-		builder.addActuator().addCylinder();
-		builder.addActuator().addMotor();
+		builder.addOption()
+				.withTimestep(new BigDecimal(0.005));
+		builder.addVisual()
+				.addMap()
+					.withForce(new BigDecimal(0.1))
+					.withZfar(new BigDecimal(30))
+		;
+		builder.addStatistic()
+				.withCenter("0 0 0.7");
+		
+		builder.addKeyframe()
+				.addKey()
+				.withName("squat")
+				.withQpos("0 0 0.596                             0.988015 0 0.154359 0                             0 0.4 0                             -0.25 -0.5 -2.5 -2.65 -0.8 0.56                             -0.25 -0.5 -2.5 -2.65 -0.8 0.56                             0 0 0 0 0 0")
+				
+		;
+		builder.addTendon().addFixed().addJoint();
+		builder.addContact().addExclude()
+				.withBody1("waist_lower")
+				.withBody2("thigh_right")
+		;
+		Mujoco.Default.Builder<?> addDefault = builder.addDefault();
+		addDefault
+				.addMotor()
+					.withCtrllimited(true)
+					.withCtrlrange("-1 1")
+		;
+		addDefault.addDefault()
+					.withClazz("body")
+					.addDefault()
+						.withClazz("thigh")
+						.addGeom()
+						.withSize("0.06")
+					
+		;
+		Mujoco.Actuator.Builder<?> addActuator = builder.addActuator();
+		addActuator.addMuscle();
+		addActuator.addMotor()
+					.withName("torso")
+					.withGear("100")
+					.withJoint("torso")
+		
+		;
 		Mujoco.Worldbody.Builder<?> addWorldbody = builder.addWorldbody();
 		addWorldbody.addGeom()
 				.withName("floor")

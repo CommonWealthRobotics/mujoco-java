@@ -63,6 +63,18 @@ installing VC++ redist from:
 https://www.microsoft.com/en-gb/download/details.aspx?id=48145
 ```
 
+# Build
+
+Windows `bash buiild-windows.sh`
+
+Linux `bash build-linux.sh`
+
+Mac x86 `bash build-mac.sh`
+
+Mac arm64 `bash build-mac-m1.sh`
+
+
+
 # HOWTO set up Publish
 
 1. Export your gpg private key from the system that you have created it.

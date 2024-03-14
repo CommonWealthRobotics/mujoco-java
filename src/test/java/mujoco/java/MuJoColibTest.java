@@ -6,6 +6,7 @@ package mujoco.java;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.HashMap;
 
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.IntPointer;
@@ -22,7 +23,9 @@ import org.mujoco.MuJoCoLib.mjVFS;
 import org.mujoco.MuJoCoModelManager;
 
 public class MuJoColibTest {
-	IMujocoController controller = (d, m) -> {
+	IMujocoController controller = (manager) -> {
+		mjModel_ m=manager.getModel();
+		mjData_ d=manager.getData();
 		/**
 		 * This illustrates two concepts. First, we are checking 
 		 * if the number of controls mjModel.nu equals the number 
@@ -39,8 +42,22 @@ public class MuJoColibTest {
 		 */
 		// apply controls
 		// https://mujoco.readthedocs.io/en/stable/programming/simulation.html#simulation-loop
-		if (m.nu() == m.nv())
-			MuJoCoLib.mju_scl(d.ctrl(), d.qvel(), -0.1, m.nv());
+		
+//		if (m.nu() == m.nv())
+//			MuJoCoLib.mju_scl(d.ctrl(), d.qvel(), -0.1, m.nv());
+		HashMap<String, Double> setEfforts = manager.getControlInstance();
+		HashMap<String, Double> positions = manager.getAllJointPositions();
+		// this is a simple P controller
+		double target =0;
+		double kp = 0.3;
+		for(String s:manager.getActuatorNames()) {
+			double error = target-positions.get(s);
+			double effort = error * kp;
+			System.out.println("Actuator "+s+" position "+positions.get(s)+" effort "+effort);
+			setEfforts.put(s,effort);
+		}
+		manager.setActualtorCtrl(setEfforts);
+
 	};
 
 	@Test
@@ -54,12 +71,18 @@ public class MuJoColibTest {
 		MuJoCoModelManager m = new MuJoCoModelManager(file);
 		System.out.println("Run ModelManager for 10 seconds");
 
-
-		for (int i = 0; i < m.getNumberOfJoints(); i++) {
-			System.out.println(i + " link = " + m.getJointName(i));
+		HashMap<String, Double> positions = m.getAllJointPositions();
+		for(String s:m.getBodyNames()) {
+			System.out.println("Body "+s+" pose "+m.getBodyPose(s));
 		}
-		for (int i = 0; i < m.getNumberOfBodys(); i++) {
-			System.out.println(i + " Body = " + m.getBodyName(i));
+		for(String s:m.getJointNames()) {
+			System.out.println("Joint  "+s+" position "+positions.get(s));
+		}
+		for(String s:m.getActuatorNames()) {
+			System.out.println("Actuator "+s+" position "+positions.get(s));
+		}
+		for(String s:m.getGeometryNames()) {
+			System.out.println("Geom "+s+" pose "+m.getGeometryPose(s)+" size "+m.getGeometrySize(s));
 		}
 		
 		m.setController(controller);
@@ -67,6 +90,9 @@ public class MuJoColibTest {
 			m.step();
 			// sleep
 			Thread.sleep(m.getTimestepMilliSeconds());
+			for(String s:m.getBodyNames()) {
+				System.out.println("Body "+s+" pose "+m.getBodyPose(s));
+			}
 		}
 		m.close();
 	}

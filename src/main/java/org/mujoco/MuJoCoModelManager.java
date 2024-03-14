@@ -1,6 +1,9 @@
 package org.mujoco;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -31,6 +34,13 @@ public class MuJoCoModelManager {
 	private boolean connected = false;
 	private HashMap<String, Double> setEfforts = new HashMap<String, Double>();
 	private HashMap<String, Double> positions  = new HashMap<String, Double>();
+	public MuJoCoModelManager(String xml) throws IOException {
+		//File tempFile = File.createTempFile("mujoco-", ".xml");
+		//tempFile.deleteOnExit();
+		File tempFile = new File("/tmp/mujocoxmlTEST.XML");
+		Files.write( Paths.get(tempFile.getAbsolutePath()), xml.getBytes());
+		loadFromFile(tempFile);
+	}
 
 	public MuJoCoModelManager(File config) {
 		loadFromFile(config);

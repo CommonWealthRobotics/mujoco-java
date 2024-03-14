@@ -145,10 +145,10 @@ public class XMLtest {
 		;
 		topbody.addCamera();
 		topbody.addFreejoint().withName("root");
-		topbody.addInertial()
-		.withMass(BigDecimal.valueOf(0.01))
-		.withPos(".1 .1 .1")
-		;		
+//		topbody.addInertial()
+//		.withMass(BigDecimal.valueOf(0.01))
+//		.withPos(".1 .1 .1")
+//		;		
 		//topbody.addBody();
 		// In the future if this test breaks after generating code, see the solution in
 		// https://github.com/CommonWealthRobotics/mujoco-java/pull/6/commits/e8d65eeec490bb935111a99f5d049991735864c0
@@ -157,10 +157,10 @@ public class XMLtest {
 			.withName("head")
 			.withPos("0 0 2.2")
 		;
-		head.addInertial()
-			.withMass(BigDecimal.valueOf(0.01))
-			.withPos(".1 .1 .1")
-		;
+//		head.addInertial()
+//			.withMass(BigDecimal.valueOf(0.01))
+//			.withPos(".1 .1 .1")
+//		;
 		head.addJoint()
 				.withName("neck")
 				.withAxis("2 1 1")

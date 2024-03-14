@@ -37,12 +37,14 @@ import com.kscs.util.jaxb.PropertyTree;
 import com.kscs.util.jaxb.PropertyTreeUse;
 import com.kscs.util.jaxb.PropertyVisitor;
 import org.mujoco.xml.attributetypes.CompositetypeType;
+import org.mujoco.xml.attributetypes.JointtypeType;
 import org.mujoco.xml.body.BodyType;
 import org.mujoco.xml.body.CameraType;
 import org.mujoco.xml.body.CompositeType;
 import org.mujoco.xml.body.CompositegeomType;
 import org.mujoco.xml.body.CompositejointType;
 import org.mujoco.xml.body.CompositesiteType;
+import org.mujoco.xml.body.FreejointType;
 import org.mujoco.xml.body.GeomType;
 import org.mujoco.xml.body.InertialType;
 import org.mujoco.xml.body.JointType;
@@ -66,7 +68,7 @@ import org.mujoco.xml.root.IncludeType;
  *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
  *         &lt;element name="inertial" type="{body}inertialType"/&gt;
  *         &lt;element name="joint" type="{body}jointType"/&gt;
- *         &lt;element name="freejoint" type="{body}jointType"/&gt;
+ *         &lt;element name="freejoint" type="{body}freejointType"/&gt;
  *         &lt;element name="geom" type="{body}geomType"/&gt;
  *         &lt;element name="site" type="{body}siteType"/&gt;
  *         &lt;element name="camera" type="{body}cameraType"/&gt;
@@ -380,7 +382,7 @@ public class BodyarchType
         }
         private JAXBElement<?> buildRecoursive(Object o) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
             Class<? extends Object> class1 = o.getClass();
-            System.out.println("Class "+class1);
+            //System.out.println("Class "+class1);
 			Method setNameMethod = class1.getMethod("build");
         	Object product = setNameMethod.invoke(o);
         	if(JAXBElement.class.isInstance(product))
@@ -404,15 +406,46 @@ public class BodyarchType
         	//JointType
         	if(JointType.class.isInstance(product)) {
         		JointType  bat = (JointType)product;
-                return new JAXBElement<JointType>(new QName("freejoint"),JointType.class,bat);
+        		if(bat.getType()==JointtypeType.FREE) {
+        			bat.setType(null);
+                    return new JAXBElement<JointType>(new QName("freejoint"),JointType.class,bat);
+        		}
+                return new JAXBElement<JointType>(new QName("joint"),JointType.class,bat);
         	}
+//        	//FreejointType
+//        	if(FreejointType.class.isInstance(product)) {
+//        		FreejointType  bat = (FreejointType)product;
+//                return new JAXBElement<FreejointType>(new QName("freejoint"),FreejointType.class,bat);
+//        	}
+        	
         	//CameraType
         	if(CameraType.class.isInstance(product)) {
         		CameraType  bat = (CameraType)product;
                 return new JAXBElement<CameraType>(new QName("camera"),CameraType.class,bat);
         	}
+        	//InertialType
+        	if(InertialType.class.isInstance(product)) {
+        		InertialType  bat = (InertialType)product;
+                return new JAXBElement<InertialType>(new QName("inertial"),InertialType.class,bat);
+        	}
         	return buildRecoursive(product);
         }	
+        /**
+         * Returns a new builder to build an additional value of the "camera" property.
+         * Use {@link org.mujoco.xml.body.CameraType.Builder#end()} to return to the current builder.
+         * 
+         * @return
+         *     a new builder to build an additional value of the "camera" property.
+         *     Use {@link org.mujoco.xml.body.CameraType.Builder#end()} to return to the current builder.
+         */
+        public org.mujoco.xml.body.InertialType.Builder<? extends BodyType.Builder<_B>> addInertial() {
+            if (this.inertialOrJointOrFreejoint == null) {
+                this.inertialOrJointOrFreejoint = new ArrayList<Buildable>();
+            }
+            final org.mujoco.xml.body.InertialType.Builder<BodyType.Builder<_B>> camera_Builder = new org.mujoco.xml.body.InertialType.Builder<BodyType.Builder<_B>>(this, null, false);
+            this.inertialOrJointOrFreejoint.add(camera_Builder);
+            return camera_Builder;
+        }
         /**
          * Returns a new builder to build an additional value of the "camera" property.
          * Use {@link org.mujoco.xml.body.CameraType.Builder#end()} to return to the current builder.
@@ -482,20 +515,35 @@ public class BodyarchType
         //JointType
         /**
          * Returns a new builder to build an additional value of the "joint" property.
+         * Use {@link org.mujoco.xml.body.FreejointType.Builder#end()} to return to the current builder.
+         * 
+         * @return
+         *     a new builder to build an additional value of the "joint" property.
+         *     Use {@link org.mujoco.xml.body.FreejointType.Builder#end()} to return to the current builder.
+         */
+        public org.mujoco.xml.body.JointType.Builder<? extends BodyType.Builder<_B>> addFreejoint() {
+            return addJoint(JointtypeType.FREE);
+        }
+        
+        //JointType
+        /**
+         * Returns a new builder to build an additional value of the "joint" property.
          * Use {@link org.mujoco.xml.body.JointType.Builder#end()} to return to the current builder.
          * 
          * @return
          *     a new builder to build an additional value of the "joint" property.
          *     Use {@link org.mujoco.xml.body.JointType.Builder#end()} to return to the current builder.
          */
-        public org.mujoco.xml.body.JointType.Builder<? extends BodyType.Builder<_B>> addFreejoint() {
+        public org.mujoco.xml.body.JointType.Builder<? extends BodyType.Builder<_B>> addJoint(JointtypeType type) {
             if (this.inertialOrJointOrFreejoint == null) {
                 this.inertialOrJointOrFreejoint = new ArrayList<Buildable>();
             }
-            final org.mujoco.xml.body.JointType.Builder<BodyType.Builder<_B>> light_Builder = new org.mujoco.xml.body.JointType.Builder<BodyType.Builder<_B>>(this, null, false);
-            this.inertialOrJointOrFreejoint.add(light_Builder);
-            return light_Builder;
+            final org.mujoco.xml.body.JointType.Builder<BodyType.Builder<_B>> joint_builder = new org.mujoco.xml.body.JointType.Builder<BodyType.Builder<_B>>(this, null, false);
+            this.inertialOrJointOrFreejoint.add(joint_builder);
+            joint_builder.withType(type);
+            return joint_builder;
         }
+        
         /**
          * Adds the given items to the value of "inertialOrJointOrFreejoint"
          * 
@@ -595,7 +643,7 @@ public class BodyarchType
          * @param freejoint_
          *     Items to add to the value of the "freejoint_" property
          */
-        public BodyarchType.Builder<_B> addFreejoint(final Iterable<? extends JAXBElement<JointType>> freejoint_) {
+        public BodyarchType.Builder<_B> addFreejoint(final Iterable<? extends JAXBElement<FreejointType>> freejoint_) {
             return addInertialOrJointOrFreejoint(freejoint_);
         }
 
@@ -605,7 +653,7 @@ public class BodyarchType
          * @param freejoint_
          *     Items to add to the value of the "freejoint_" property
          */
-        public BodyarchType.Builder<_B> addFreejoint(JAXBElement<JointType> ... freejoint_) {
+        public BodyarchType.Builder<_B> addFreejoint(JAXBElement<FreejointType> ... freejoint_) {
             return addFreejoint(Arrays.asList(freejoint_));
         }
 

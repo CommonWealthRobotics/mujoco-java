@@ -35,6 +35,8 @@ public class XMLtest {
 		topbody.withPos("0 0 1.282");
 		
 		//topbody.addBody();
+		// In the future if this test breaks after generating code, see the solution in
+		// https://github.com/CommonWealthRobotics/mujoco-java/pull/6/commits/e8d65eeec490bb935111a99f5d049991735864c0
 		topbody.addBody().withName("Head").withPos("0 0 2.2")
 		.addBody()
 			.withName("mowhawk")

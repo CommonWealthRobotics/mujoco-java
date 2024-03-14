@@ -66,6 +66,7 @@ public class XMLtest {
 			fail("File is missing from the disk");
 		}
 		Mujoco m = MuJoCoXML.unmarshal(file);
+	
 		
 		String marshaled = MuJoCoXML.marshal(m);
 		

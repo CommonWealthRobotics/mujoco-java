@@ -92,9 +92,9 @@ public class BoneType implements Cloneable, Copyable, PartialCopyable
      * Instantiates a BoneType copying the state of another BoneType
      * 
      * @param _propertyTreeUse
-     *     Meaning of the {@link PropertyPath}: Exclude or include members contained in property path.
+     *     Meaning of the : Exclude or include members contained in property path.
      * @param _propertyTree
-     *     A restricting {@link PropertyPath} that defines which nodes of the source object tree should actually be copied.
+     *     A restricting  that defines which nodes of the source object tree should actually be copied.
      * @param _other
      *     The original BoneType from which to copy state.
      */

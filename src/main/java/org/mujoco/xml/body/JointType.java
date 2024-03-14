@@ -158,9 +158,9 @@ public class JointType implements Cloneable, Copyable, PartialCopyable
      * Instantiates a JointType copying the state of another JointType
      * 
      * @param _propertyTreeUse
-     *     Meaning of the {@link PropertyPath}: Exclude or include members contained in property path.
+     *     Meaning of the : Exclude or include members contained in property path.
      * @param _propertyTree
-     *     A restricting {@link PropertyPath} that defines which nodes of the source object tree should actually be copied.
+     *     A restricting  that defines which nodes of the source object tree should actually be copied.
      * @param _other
      *     The original JointType from which to copy state.
      */

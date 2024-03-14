@@ -193,7 +193,7 @@ public class XMLtest {
 	}
 
 	@Test
-	public void unmarshal() throws JAXBException {
+	public void unmarshal() throws JAXBException, IOException, InterruptedException {
 		String filename = "model/humanoid/humanoid.xml";
 		File file = new File(filename);
 		if (!file.exists()) {
@@ -205,7 +205,16 @@ public class XMLtest {
 		String marshaled = MuJoCoXML.marshal(m);
 		
 		System.out.println(marshaled);
-		
+		MuJoCoModelManager mRuntime = new MuJoCoModelManager(marshaled);
+		while (mRuntime.getCurrentSimulationTimeSeconds() < 1) {
+			mRuntime.step();
+			// sleep
+			Thread.sleep(mRuntime.getTimestepMilliSeconds());
+			for(String s:mRuntime.getBodyNames()) {
+				//System.out.println("Body "+s+" pose "+mRuntime.getBodyPose(s));
+			}
+		}
+		mRuntime.close();
 	}
 
 }

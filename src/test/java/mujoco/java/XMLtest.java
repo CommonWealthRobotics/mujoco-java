@@ -28,8 +28,8 @@ public class XMLtest {
 		Builder<Void> builder = Mujoco.builder();
 		builder.addActuator().addCylinder();
 		builder.addActuator().addMotor();
-		org.mujoco.xml.Mujoco.Worldbody.Builder<? extends Builder<Void>> addWorldbody = builder.addWorldbody();
-		org.mujoco.xml.BodyarchType.Builder<? extends Mujoco.Worldbody.Builder<?>> topbody = addWorldbody.addBody();
+		Mujoco.Worldbody.Builder<?> addWorldbody = builder.addWorldbody();
+		BodyarchType.Builder<?> topbody = addWorldbody.addBody();
 		topbody.withName("torso");
 		topbody.withChildclass("body");
 		topbody.withPos("0 0 1.282");

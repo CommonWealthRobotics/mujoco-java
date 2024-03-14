@@ -389,12 +389,46 @@ public class BodyarchType
         		throw new NullPointerException();
         	if(BodyarchType.class.isInstance(product)) {
         		BodyarchType  bat = (BodyarchType)product;
-                JAXBElement<BodyarchType> element =new JAXBElement<BodyarchType>(new QName("body"),BodyarchType.class,bat);
-        		return element;
+                return new JAXBElement<BodyarchType>(new QName("body"),BodyarchType.class,bat);
+        	}
+        	//GeomType
+        	if(GeomType.class.isInstance(product)) {
+        		GeomType  bat = (GeomType)product;
+                return new JAXBElement<GeomType>(new QName("geom"),GeomType.class,bat);
+        	}
+        	//LightType
+        	if(LightType.class.isInstance(product)) {
+        		LightType  bat = (LightType)product;
+                return new JAXBElement<LightType>(new QName("light"),LightType.class,bat);
+        	}
+        	//JointType
+        	if(JointType.class.isInstance(product)) {
+        		JointType  bat = (JointType)product;
+                return new JAXBElement<JointType>(new QName("freejoint"),JointType.class,bat);
+        	}
+        	//CameraType
+        	if(CameraType.class.isInstance(product)) {
+        		CameraType  bat = (CameraType)product;
+                return new JAXBElement<CameraType>(new QName("camera"),CameraType.class,bat);
         	}
         	return buildRecoursive(product);
         }	
-        
+        /**
+         * Returns a new builder to build an additional value of the "camera" property.
+         * Use {@link org.mujoco.xml.body.CameraType.Builder#end()} to return to the current builder.
+         * 
+         * @return
+         *     a new builder to build an additional value of the "camera" property.
+         *     Use {@link org.mujoco.xml.body.CameraType.Builder#end()} to return to the current builder.
+         */
+        public org.mujoco.xml.body.CameraType.Builder<? extends BodyType.Builder<_B>> addCamera() {
+            if (this.inertialOrJointOrFreejoint == null) {
+                this.inertialOrJointOrFreejoint = new ArrayList<Buildable>();
+            }
+            final org.mujoco.xml.body.CameraType.Builder<BodyType.Builder<_B>> camera_Builder = new org.mujoco.xml.body.CameraType.Builder<BodyType.Builder<_B>>(this, null, false);
+            this.inertialOrJointOrFreejoint.add(camera_Builder);
+            return camera_Builder;
+        }
         /**
          * Returns a new builder to build an additional value of the "body" property.
          * Use {@link org.mujoco.xml.BodyarchType.Builder#end()} to return to the current builder.
@@ -412,7 +446,56 @@ public class BodyarchType
             this.inertialOrJointOrFreejoint.add(body_Builder);
             return body_Builder;
         }
-
+        /**
+         * Returns a new builder to build an additional value of the "geom" property.
+         * Use {@link org.mujoco.xml.body.GeomType.Builder#end()} to return to the current builder.
+         * 
+         * @return
+         *     a new builder to build an additional value of the "geom" property.
+         *     Use {@link org.mujoco.xml.body.GeomType.Builder#end()} to return to the current builder.
+         */
+        public org.mujoco.xml.body.GeomType.Builder<? extends BodyType.Builder<_B>> addGeom() {
+            if (this.inertialOrJointOrFreejoint == null) {
+                this.inertialOrJointOrFreejoint = new ArrayList<Buildable>();
+            }
+            final org.mujoco.xml.body.GeomType.Builder<BodyType.Builder<_B>> geom_Builder = new org.mujoco.xml.body.GeomType.Builder<BodyType.Builder<_B>>(this, null, false);
+            this.inertialOrJointOrFreejoint.add(geom_Builder);
+            return geom_Builder;
+        }
+        
+        /**
+         * Returns a new builder to build an additional value of the "light" property.
+         * Use {@link org.mujoco.xml.body.LightType.Builder#end()} to return to the current builder.
+         * 
+         * @return
+         *     a new builder to build an additional value of the "light" property.
+         *     Use {@link org.mujoco.xml.body.LightType.Builder#end()} to return to the current builder.
+         */
+        public org.mujoco.xml.body.LightType.Builder<? extends BodyType.Builder<_B>> addLight() {
+            if (this.inertialOrJointOrFreejoint == null) {
+                this.inertialOrJointOrFreejoint = new ArrayList<Buildable>();
+            }
+            final org.mujoco.xml.body.LightType.Builder<BodyType.Builder<_B>> light_Builder = new org.mujoco.xml.body.LightType.Builder<BodyType.Builder<_B>>(this, null, false);
+            this.inertialOrJointOrFreejoint.add(light_Builder);
+            return light_Builder;
+        }
+        //JointType
+        /**
+         * Returns a new builder to build an additional value of the "joint" property.
+         * Use {@link org.mujoco.xml.body.JointType.Builder#end()} to return to the current builder.
+         * 
+         * @return
+         *     a new builder to build an additional value of the "joint" property.
+         *     Use {@link org.mujoco.xml.body.JointType.Builder#end()} to return to the current builder.
+         */
+        public org.mujoco.xml.body.JointType.Builder<? extends BodyType.Builder<_B>> addFreejoint() {
+            if (this.inertialOrJointOrFreejoint == null) {
+                this.inertialOrJointOrFreejoint = new ArrayList<Buildable>();
+            }
+            final org.mujoco.xml.body.JointType.Builder<BodyType.Builder<_B>> light_Builder = new org.mujoco.xml.body.JointType.Builder<BodyType.Builder<_B>>(this, null, false);
+            this.inertialOrJointOrFreejoint.add(light_Builder);
+            return light_Builder;
+        }
         /**
          * Adds the given items to the value of "inertialOrJointOrFreejoint"
          * 

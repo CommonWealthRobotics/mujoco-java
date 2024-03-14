@@ -68,7 +68,7 @@ public class XMLtest {
 		builder.addTendon()
 			.addFixed()
 				.addJoint()
-				.withJoint("torso")
+				.withJoint("neck")
 				.withCoef(BigDecimal.valueOf(-0.5))
 		
 		;
@@ -103,9 +103,9 @@ public class XMLtest {
 		Mujoco.Actuator.Builder<?> addActuator = builder.addActuator();
 		//addActuator.addMuscle();
 		addActuator.addMotor()
-					.withName("torso")
+					.withName("neck")
 					.withGear("100")
-					.withJoint("torso")
+					.withJoint("neck")
 		
 		;
 		Mujoco.Worldbody.Builder<?> addWorldbody = builder.addWorldbody();
@@ -161,10 +161,15 @@ public class XMLtest {
 			.withMass(BigDecimal.valueOf(0.01))
 			.withPos(".1 .1 .1")
 		;
-		head.addJoint(JointtypeType.HINGE)
-				.withName("torso")
+		head.addJoint()
+				.withName("neck")
 				.withAxis("2 1 1")
 		;
+		head.addGeom()
+		.withName("head")
+		.withSize("0.07")
+		.withFromto("0 -.07 0 0 .07 0");
+		
 //		topbody.addBody().withName("arm").withPos("0 1.1 0");		
 		
 		Mujoco m =builder.build();

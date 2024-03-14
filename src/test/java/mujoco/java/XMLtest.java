@@ -32,7 +32,10 @@ public class XMLtest {
 	public void marshal() throws JAXBException, IOException, InterruptedException {
 		
 		
-		Builder<Void> builder = Mujoco.builder();
+		Mujoco.Builder<Void> builder = Mujoco.builder()
+									.withModel("Test Robot")
+		;
+		
 		builder.addOption()
 				.withTimestep(new BigDecimal(0.005));
 		builder.addVisual()
@@ -105,17 +108,14 @@ public class XMLtest {
 		addActuator.addMotor()
 					.withName("neck")
 					.withGear("100")
-					.withJoint("neck")
-		
-		;
+					.withJoint("neck");
 		Mujoco.Worldbody.Builder<?> addWorldbody = builder.addWorldbody();
 		addWorldbody.addGeom()
 				.withName("floor")
 				.withType(GeomtypeType.PLANE)
 				.withCondim(3)
 				.withSize("0 0 .05")
-				.withMaterial("grid")
-		;
+				.withMaterial("grid");
 		addWorldbody.addCamera();
 		
 		addWorldbody.addLight()
@@ -125,8 +125,7 @@ public class XMLtest {
 			.withPos("0 -6 4")
 			.withCutoff(BigDecimal.valueOf(30))
 			.withDiffuse(".8 .8 .8")
-			.withSpecular(null)
-		;
+			.withSpecular(null);
 		BodyarchType.Builder<?> topbody = addWorldbody.addBody();
 		topbody	.withName("torso")
 				.withChildclass("body")
@@ -134,15 +133,12 @@ public class XMLtest {
 				.addGeom()
 					.withName("torso")
 					.withSize("0.07")
-					.withFromto("0 -.07 0 0 .07 0")
-
-		;
+					.withFromto("0 -.07 0 0 .07 0");
 		
 		topbody.addLight()
 				.withName("top")
 				.withMode(CameramodeType.TRACKCOM)
-				.withPos("0 0 2")
-		;
+				.withPos("0 0 2");
 		topbody.addCamera();
 		topbody.addFreejoint().withName("root");
 //		topbody.addInertial()
@@ -155,16 +151,14 @@ public class XMLtest {
 		BodyarchType.Builder<?> head = topbody.addBody();
 		head
 			.withName("head")
-			.withPos("0 0 2.2")
-		;
+			.withPos("0 0 2.2");
 //		head.addInertial()
 //			.withMass(BigDecimal.valueOf(0.01))
 //			.withPos(".1 .1 .1")
 //		;
 		head.addJoint()
 				.withName("neck")
-				.withAxis("2 1 1")
-		;
+				.withAxis("2 1 1");
 		head.addGeom()
 		.withName("head")
 		.withSize("0.07")

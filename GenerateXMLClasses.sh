@@ -19,6 +19,8 @@ do
 	sed -i '/Generated on\:/d' $VARIABLE
 	sed -i -e 's/{@link PropertyPath}//g'  $VARIABLE
 done
+sed -i '/Generated on\:/d' src/main/java/META-INF/*.episode
+
 
 #./gradlew javadoc
 

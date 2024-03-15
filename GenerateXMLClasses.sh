@@ -6,6 +6,18 @@
 
 #cd ../
 
-mvn generate-sources
+#mvn generate-sources
 
-#echo Error! the generated sources needed extensive hand edits to work correctly!
+#echo "Error! the generated sources needed extensive hand edits to work correctly!";return 1
+
+
+
+FILES=$(grep -r -l "// Generated on: " src/main/java/org/mujoco/xml/)
+
+for VARIABLE in $FILES
+do
+	sed -i '/Generated on\:/d' $VARIABLE
+done
+
+#./gradlew javadoc
+

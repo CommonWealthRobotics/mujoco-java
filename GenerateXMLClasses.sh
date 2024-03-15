@@ -6,6 +6,6 @@
 
 #cd ../
 
-#mvn generate-sources
+mvn generate-sources
 
-echo Error! the generated sources needed extensive hand edits to work correctly!
+#echo Error! the generated sources needed extensive hand edits to work correctly!

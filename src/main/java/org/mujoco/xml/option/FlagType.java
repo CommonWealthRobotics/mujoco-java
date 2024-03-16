@@ -48,10 +48,16 @@ import org.mujoco.xml.attributetypes.FlagSimpleType;
  *       &lt;attribute name="filterparent" type="{attributeTypes}flagSimpleType" default="enable" /&gt;
  *       &lt;attribute name="actuation" type="{attributeTypes}flagSimpleType" default="enable" /&gt;
  *       &lt;attribute name="refsafe" type="{attributeTypes}flagSimpleType" default="enable" /&gt;
+ *       &lt;attribute name="sensor" type="{attributeTypes}flagSimpleType" default="enable" /&gt;
+ *       &lt;attribute name="midphase" type="{attributeTypes}flagSimpleType" default="enable" /&gt;
+ *       &lt;attribute name="eulerdamp" type="{attributeTypes}flagSimpleType" default="enable" /&gt;
  *       &lt;attribute name="override" type="{attributeTypes}flagSimpleType" default="disable" /&gt;
  *       &lt;attribute name="energy" type="{attributeTypes}flagSimpleType" default="disable" /&gt;
  *       &lt;attribute name="fwdinv" type="{attributeTypes}flagSimpleType" default="disable" /&gt;
+ *       &lt;attribute name="invdiscrete" type="{attributeTypes}flagSimpleType" default="disable" /&gt;
  *       &lt;attribute name="sensornoise" type="{attributeTypes}flagSimpleType" default="disable" /&gt;
+ *       &lt;attribute name="multiccd" type="{attributeTypes}flagSimpleType" default="disable" /&gt;
+ *       &lt;attribute name="island" type="{attributeTypes}flagSimpleType" default="disable" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -88,14 +94,26 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
     protected FlagSimpleType actuation;
     @XmlAttribute(name = "refsafe")
     protected FlagSimpleType refsafe;
+    @XmlAttribute(name = "sensor")
+    protected FlagSimpleType sensor;
+    @XmlAttribute(name = "midphase")
+    protected FlagSimpleType midphase;
+    @XmlAttribute(name = "eulerdamp")
+    protected FlagSimpleType eulerdamp;
     @XmlAttribute(name = "override")
     protected FlagSimpleType override;
     @XmlAttribute(name = "energy")
     protected FlagSimpleType energy;
     @XmlAttribute(name = "fwdinv")
     protected FlagSimpleType fwdinv;
+    @XmlAttribute(name = "invdiscrete")
+    protected FlagSimpleType invdiscrete;
     @XmlAttribute(name = "sensornoise")
     protected FlagSimpleType sensornoise;
+    @XmlAttribute(name = "multiccd")
+    protected FlagSimpleType multiccd;
+    @XmlAttribute(name = "island")
+    protected FlagSimpleType island;
     protected final transient VetoableChangeSupport vetoableChange__Support = new VetoableChangeSupport(this);
     protected final transient PropertyChangeSupport propertyChange__Support = new PropertyChangeSupport(this);
 
@@ -126,10 +144,16 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         this.filterparent = _other.filterparent;
         this.actuation = _other.actuation;
         this.refsafe = _other.refsafe;
+        this.sensor = _other.sensor;
+        this.midphase = _other.midphase;
+        this.eulerdamp = _other.eulerdamp;
         this.override = _other.override;
         this.energy = _other.energy;
         this.fwdinv = _other.fwdinv;
+        this.invdiscrete = _other.invdiscrete;
         this.sensornoise = _other.sensornoise;
+        this.multiccd = _other.multiccd;
+        this.island = _other.island;
     }
 
     /**
@@ -191,6 +215,18 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(refsafePropertyTree!= null):((refsafePropertyTree == null)||(!refsafePropertyTree.isLeaf())))) {
             this.refsafe = _other.refsafe;
         }
+        final PropertyTree sensorPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("sensor"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(sensorPropertyTree!= null):((sensorPropertyTree == null)||(!sensorPropertyTree.isLeaf())))) {
+            this.sensor = _other.sensor;
+        }
+        final PropertyTree midphasePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("midphase"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(midphasePropertyTree!= null):((midphasePropertyTree == null)||(!midphasePropertyTree.isLeaf())))) {
+            this.midphase = _other.midphase;
+        }
+        final PropertyTree eulerdampPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("eulerdamp"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(eulerdampPropertyTree!= null):((eulerdampPropertyTree == null)||(!eulerdampPropertyTree.isLeaf())))) {
+            this.eulerdamp = _other.eulerdamp;
+        }
         final PropertyTree overridePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("override"));
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(overridePropertyTree!= null):((overridePropertyTree == null)||(!overridePropertyTree.isLeaf())))) {
             this.override = _other.override;
@@ -203,9 +239,21 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(fwdinvPropertyTree!= null):((fwdinvPropertyTree == null)||(!fwdinvPropertyTree.isLeaf())))) {
             this.fwdinv = _other.fwdinv;
         }
+        final PropertyTree invdiscretePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("invdiscrete"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(invdiscretePropertyTree!= null):((invdiscretePropertyTree == null)||(!invdiscretePropertyTree.isLeaf())))) {
+            this.invdiscrete = _other.invdiscrete;
+        }
         final PropertyTree sensornoisePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("sensornoise"));
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(sensornoisePropertyTree!= null):((sensornoisePropertyTree == null)||(!sensornoisePropertyTree.isLeaf())))) {
             this.sensornoise = _other.sensornoise;
+        }
+        final PropertyTree multiccdPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("multiccd"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(multiccdPropertyTree!= null):((multiccdPropertyTree == null)||(!multiccdPropertyTree.isLeaf())))) {
+            this.multiccd = _other.multiccd;
+        }
+        final PropertyTree islandPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("island"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(islandPropertyTree!= null):((islandPropertyTree == null)||(!islandPropertyTree.isLeaf())))) {
+            this.island = _other.island;
         }
     }
 
@@ -402,6 +450,54 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
     }
 
     /**
+     * Gets the value of the sensor property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link FlagSimpleType }
+     *     
+     */
+    public FlagSimpleType getSensor() {
+        if (sensor == null) {
+            return FlagSimpleType.ENABLE;
+        } else {
+            return sensor;
+        }
+    }
+
+    /**
+     * Gets the value of the midphase property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link FlagSimpleType }
+     *     
+     */
+    public FlagSimpleType getMidphase() {
+        if (midphase == null) {
+            return FlagSimpleType.ENABLE;
+        } else {
+            return midphase;
+        }
+    }
+
+    /**
+     * Gets the value of the eulerdamp property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link FlagSimpleType }
+     *     
+     */
+    public FlagSimpleType getEulerdamp() {
+        if (eulerdamp == null) {
+            return FlagSimpleType.ENABLE;
+        } else {
+            return eulerdamp;
+        }
+    }
+
+    /**
      * Gets the value of the override property.
      * 
      * @return
@@ -450,6 +546,22 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
     }
 
     /**
+     * Gets the value of the invdiscrete property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link FlagSimpleType }
+     *     
+     */
+    public FlagSimpleType getInvdiscrete() {
+        if (invdiscrete == null) {
+            return FlagSimpleType.DISABLE;
+        } else {
+            return invdiscrete;
+        }
+    }
+
+    /**
      * Gets the value of the sensornoise property.
      * 
      * @return
@@ -462,6 +574,38 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
             return FlagSimpleType.DISABLE;
         } else {
             return sensornoise;
+        }
+    }
+
+    /**
+     * Gets the value of the multiccd property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link FlagSimpleType }
+     *     
+     */
+    public FlagSimpleType getMulticcd() {
+        if (multiccd == null) {
+            return FlagSimpleType.DISABLE;
+        } else {
+            return multiccd;
+        }
+    }
+
+    /**
+     * Gets the value of the island property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link FlagSimpleType }
+     *     
+     */
+    public FlagSimpleType getIsland() {
+        if (island == null) {
+            return FlagSimpleType.DISABLE;
+        } else {
+            return island;
         }
     }
 
@@ -623,6 +767,39 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         this.propertyChange__Support.firePropertyChange("refsafe", __oldValue, value);
     }
 
+    public void setSensor(final FlagSimpleType value) {
+        final FlagSimpleType __oldValue = this.sensor;
+        try {
+            this.vetoableChange__Support.fireVetoableChange("sensor", __oldValue, value);
+        } catch (PropertyVetoException x) {
+            throw new RuntimeException(x);
+        }
+        this.sensor = value;
+        this.propertyChange__Support.firePropertyChange("sensor", __oldValue, value);
+    }
+
+    public void setMidphase(final FlagSimpleType value) {
+        final FlagSimpleType __oldValue = this.midphase;
+        try {
+            this.vetoableChange__Support.fireVetoableChange("midphase", __oldValue, value);
+        } catch (PropertyVetoException x) {
+            throw new RuntimeException(x);
+        }
+        this.midphase = value;
+        this.propertyChange__Support.firePropertyChange("midphase", __oldValue, value);
+    }
+
+    public void setEulerdamp(final FlagSimpleType value) {
+        final FlagSimpleType __oldValue = this.eulerdamp;
+        try {
+            this.vetoableChange__Support.fireVetoableChange("eulerdamp", __oldValue, value);
+        } catch (PropertyVetoException x) {
+            throw new RuntimeException(x);
+        }
+        this.eulerdamp = value;
+        this.propertyChange__Support.firePropertyChange("eulerdamp", __oldValue, value);
+    }
+
     public void setOverride(final FlagSimpleType value) {
         final FlagSimpleType __oldValue = this.override;
         try {
@@ -656,6 +833,17 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         this.propertyChange__Support.firePropertyChange("fwdinv", __oldValue, value);
     }
 
+    public void setInvdiscrete(final FlagSimpleType value) {
+        final FlagSimpleType __oldValue = this.invdiscrete;
+        try {
+            this.vetoableChange__Support.fireVetoableChange("invdiscrete", __oldValue, value);
+        } catch (PropertyVetoException x) {
+            throw new RuntimeException(x);
+        }
+        this.invdiscrete = value;
+        this.propertyChange__Support.firePropertyChange("invdiscrete", __oldValue, value);
+    }
+
     public void setSensornoise(final FlagSimpleType value) {
         final FlagSimpleType __oldValue = this.sensornoise;
         try {
@@ -665,6 +853,28 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         }
         this.sensornoise = value;
         this.propertyChange__Support.firePropertyChange("sensornoise", __oldValue, value);
+    }
+
+    public void setMulticcd(final FlagSimpleType value) {
+        final FlagSimpleType __oldValue = this.multiccd;
+        try {
+            this.vetoableChange__Support.fireVetoableChange("multiccd", __oldValue, value);
+        } catch (PropertyVetoException x) {
+            throw new RuntimeException(x);
+        }
+        this.multiccd = value;
+        this.propertyChange__Support.firePropertyChange("multiccd", __oldValue, value);
+    }
+
+    public void setIsland(final FlagSimpleType value) {
+        final FlagSimpleType __oldValue = this.island;
+        try {
+            this.vetoableChange__Support.fireVetoableChange("island", __oldValue, value);
+        } catch (PropertyVetoException x) {
+            throw new RuntimeException(x);
+        }
+        this.island = value;
+        this.propertyChange__Support.firePropertyChange("island", __oldValue, value);
     }
 
     @Override
@@ -698,10 +908,16 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         _newObject.filterparent = this.filterparent;
         _newObject.actuation = this.actuation;
         _newObject.refsafe = this.refsafe;
+        _newObject.sensor = this.sensor;
+        _newObject.midphase = this.midphase;
+        _newObject.eulerdamp = this.eulerdamp;
         _newObject.override = this.override;
         _newObject.energy = this.energy;
         _newObject.fwdinv = this.fwdinv;
+        _newObject.invdiscrete = this.invdiscrete;
         _newObject.sensornoise = this.sensornoise;
+        _newObject.multiccd = this.multiccd;
+        _newObject.island = this.island;
         return _newObject;
     }
 
@@ -761,6 +977,18 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(refsafePropertyTree!= null):((refsafePropertyTree == null)||(!refsafePropertyTree.isLeaf())))) {
             _newObject.refsafe = this.refsafe;
         }
+        final PropertyTree sensorPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("sensor"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(sensorPropertyTree!= null):((sensorPropertyTree == null)||(!sensorPropertyTree.isLeaf())))) {
+            _newObject.sensor = this.sensor;
+        }
+        final PropertyTree midphasePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("midphase"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(midphasePropertyTree!= null):((midphasePropertyTree == null)||(!midphasePropertyTree.isLeaf())))) {
+            _newObject.midphase = this.midphase;
+        }
+        final PropertyTree eulerdampPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("eulerdamp"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(eulerdampPropertyTree!= null):((eulerdampPropertyTree == null)||(!eulerdampPropertyTree.isLeaf())))) {
+            _newObject.eulerdamp = this.eulerdamp;
+        }
         final PropertyTree overridePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("override"));
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(overridePropertyTree!= null):((overridePropertyTree == null)||(!overridePropertyTree.isLeaf())))) {
             _newObject.override = this.override;
@@ -773,9 +1001,21 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(fwdinvPropertyTree!= null):((fwdinvPropertyTree == null)||(!fwdinvPropertyTree.isLeaf())))) {
             _newObject.fwdinv = this.fwdinv;
         }
+        final PropertyTree invdiscretePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("invdiscrete"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(invdiscretePropertyTree!= null):((invdiscretePropertyTree == null)||(!invdiscretePropertyTree.isLeaf())))) {
+            _newObject.invdiscrete = this.invdiscrete;
+        }
         final PropertyTree sensornoisePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("sensornoise"));
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(sensornoisePropertyTree!= null):((sensornoisePropertyTree == null)||(!sensornoisePropertyTree.isLeaf())))) {
             _newObject.sensornoise = this.sensornoise;
+        }
+        final PropertyTree multiccdPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("multiccd"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(multiccdPropertyTree!= null):((multiccdPropertyTree == null)||(!multiccdPropertyTree.isLeaf())))) {
+            _newObject.multiccd = this.multiccd;
+        }
+        final PropertyTree islandPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("island"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(islandPropertyTree!= null):((islandPropertyTree == null)||(!islandPropertyTree.isLeaf())))) {
+            _newObject.island = this.island;
         }
         return _newObject;
     }
@@ -809,10 +1049,16 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         _other.filterparent = this.filterparent;
         _other.actuation = this.actuation;
         _other.refsafe = this.refsafe;
+        _other.sensor = this.sensor;
+        _other.midphase = this.midphase;
+        _other.eulerdamp = this.eulerdamp;
         _other.override = this.override;
         _other.energy = this.energy;
         _other.fwdinv = this.fwdinv;
+        _other.invdiscrete = this.invdiscrete;
         _other.sensornoise = this.sensornoise;
+        _other.multiccd = this.multiccd;
+        _other.island = this.island;
     }
 
     public<_B >FlagType.Builder<_B> newCopyBuilder(final _B _parentBuilder) {
@@ -888,6 +1134,18 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(refsafePropertyTree!= null):((refsafePropertyTree == null)||(!refsafePropertyTree.isLeaf())))) {
             _other.refsafe = this.refsafe;
         }
+        final PropertyTree sensorPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("sensor"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(sensorPropertyTree!= null):((sensorPropertyTree == null)||(!sensorPropertyTree.isLeaf())))) {
+            _other.sensor = this.sensor;
+        }
+        final PropertyTree midphasePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("midphase"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(midphasePropertyTree!= null):((midphasePropertyTree == null)||(!midphasePropertyTree.isLeaf())))) {
+            _other.midphase = this.midphase;
+        }
+        final PropertyTree eulerdampPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("eulerdamp"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(eulerdampPropertyTree!= null):((eulerdampPropertyTree == null)||(!eulerdampPropertyTree.isLeaf())))) {
+            _other.eulerdamp = this.eulerdamp;
+        }
         final PropertyTree overridePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("override"));
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(overridePropertyTree!= null):((overridePropertyTree == null)||(!overridePropertyTree.isLeaf())))) {
             _other.override = this.override;
@@ -900,9 +1158,21 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(fwdinvPropertyTree!= null):((fwdinvPropertyTree == null)||(!fwdinvPropertyTree.isLeaf())))) {
             _other.fwdinv = this.fwdinv;
         }
+        final PropertyTree invdiscretePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("invdiscrete"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(invdiscretePropertyTree!= null):((invdiscretePropertyTree == null)||(!invdiscretePropertyTree.isLeaf())))) {
+            _other.invdiscrete = this.invdiscrete;
+        }
         final PropertyTree sensornoisePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("sensornoise"));
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(sensornoisePropertyTree!= null):((sensornoisePropertyTree == null)||(!sensornoisePropertyTree.isLeaf())))) {
             _other.sensornoise = this.sensornoise;
+        }
+        final PropertyTree multiccdPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("multiccd"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(multiccdPropertyTree!= null):((multiccdPropertyTree == null)||(!multiccdPropertyTree.isLeaf())))) {
+            _other.multiccd = this.multiccd;
+        }
+        final PropertyTree islandPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("island"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(islandPropertyTree!= null):((islandPropertyTree == null)||(!islandPropertyTree.isLeaf())))) {
+            _other.island = this.island;
         }
     }
 
@@ -949,10 +1219,16 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         private FlagSimpleType filterparent;
         private FlagSimpleType actuation;
         private FlagSimpleType refsafe;
+        private FlagSimpleType sensor;
+        private FlagSimpleType midphase;
+        private FlagSimpleType eulerdamp;
         private FlagSimpleType override;
         private FlagSimpleType energy;
         private FlagSimpleType fwdinv;
+        private FlagSimpleType invdiscrete;
         private FlagSimpleType sensornoise;
+        private FlagSimpleType multiccd;
+        private FlagSimpleType island;
 
         public Builder(final _B _parentBuilder, final FlagType _other, final boolean _copy) {
             this._parentBuilder = _parentBuilder;
@@ -969,10 +1245,16 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
                 this.filterparent = _other.filterparent;
                 this.actuation = _other.actuation;
                 this.refsafe = _other.refsafe;
+                this.sensor = _other.sensor;
+                this.midphase = _other.midphase;
+                this.eulerdamp = _other.eulerdamp;
                 this.override = _other.override;
                 this.energy = _other.energy;
                 this.fwdinv = _other.fwdinv;
+                this.invdiscrete = _other.invdiscrete;
                 this.sensornoise = _other.sensornoise;
+                this.multiccd = _other.multiccd;
+                this.island = _other.island;
             }
         }
 
@@ -1027,6 +1309,18 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
                 if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(refsafePropertyTree!= null):((refsafePropertyTree == null)||(!refsafePropertyTree.isLeaf())))) {
                     this.refsafe = _other.refsafe;
                 }
+                final PropertyTree sensorPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("sensor"));
+                if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(sensorPropertyTree!= null):((sensorPropertyTree == null)||(!sensorPropertyTree.isLeaf())))) {
+                    this.sensor = _other.sensor;
+                }
+                final PropertyTree midphasePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("midphase"));
+                if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(midphasePropertyTree!= null):((midphasePropertyTree == null)||(!midphasePropertyTree.isLeaf())))) {
+                    this.midphase = _other.midphase;
+                }
+                final PropertyTree eulerdampPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("eulerdamp"));
+                if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(eulerdampPropertyTree!= null):((eulerdampPropertyTree == null)||(!eulerdampPropertyTree.isLeaf())))) {
+                    this.eulerdamp = _other.eulerdamp;
+                }
                 final PropertyTree overridePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("override"));
                 if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(overridePropertyTree!= null):((overridePropertyTree == null)||(!overridePropertyTree.isLeaf())))) {
                     this.override = _other.override;
@@ -1039,9 +1333,21 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
                 if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(fwdinvPropertyTree!= null):((fwdinvPropertyTree == null)||(!fwdinvPropertyTree.isLeaf())))) {
                     this.fwdinv = _other.fwdinv;
                 }
+                final PropertyTree invdiscretePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("invdiscrete"));
+                if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(invdiscretePropertyTree!= null):((invdiscretePropertyTree == null)||(!invdiscretePropertyTree.isLeaf())))) {
+                    this.invdiscrete = _other.invdiscrete;
+                }
                 final PropertyTree sensornoisePropertyTree = ((_propertyTree == null)?null:_propertyTree.get("sensornoise"));
                 if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(sensornoisePropertyTree!= null):((sensornoisePropertyTree == null)||(!sensornoisePropertyTree.isLeaf())))) {
                     this.sensornoise = _other.sensornoise;
+                }
+                final PropertyTree multiccdPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("multiccd"));
+                if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(multiccdPropertyTree!= null):((multiccdPropertyTree == null)||(!multiccdPropertyTree.isLeaf())))) {
+                    this.multiccd = _other.multiccd;
+                }
+                final PropertyTree islandPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("island"));
+                if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(islandPropertyTree!= null):((islandPropertyTree == null)||(!islandPropertyTree.isLeaf())))) {
+                    this.island = _other.island;
                 }
             }
         }
@@ -1063,10 +1369,16 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
             _product.filterparent = this.filterparent;
             _product.actuation = this.actuation;
             _product.refsafe = this.refsafe;
+            _product.sensor = this.sensor;
+            _product.midphase = this.midphase;
+            _product.eulerdamp = this.eulerdamp;
             _product.override = this.override;
             _product.energy = this.energy;
             _product.fwdinv = this.fwdinv;
+            _product.invdiscrete = this.invdiscrete;
             _product.sensornoise = this.sensornoise;
+            _product.multiccd = this.multiccd;
+            _product.island = this.island;
             return _product;
         }
 
@@ -1203,6 +1515,39 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         }
 
         /**
+         * Sets the new value of "sensor" (any previous value will be replaced)
+         * 
+         * @param sensor
+         *     New value of the "sensor" property.
+         */
+        public FlagType.Builder<_B> withSensor(final FlagSimpleType sensor) {
+            this.sensor = sensor;
+            return this;
+        }
+
+        /**
+         * Sets the new value of "midphase" (any previous value will be replaced)
+         * 
+         * @param midphase
+         *     New value of the "midphase" property.
+         */
+        public FlagType.Builder<_B> withMidphase(final FlagSimpleType midphase) {
+            this.midphase = midphase;
+            return this;
+        }
+
+        /**
+         * Sets the new value of "eulerdamp" (any previous value will be replaced)
+         * 
+         * @param eulerdamp
+         *     New value of the "eulerdamp" property.
+         */
+        public FlagType.Builder<_B> withEulerdamp(final FlagSimpleType eulerdamp) {
+            this.eulerdamp = eulerdamp;
+            return this;
+        }
+
+        /**
          * Sets the new value of "override" (any previous value will be replaced)
          * 
          * @param override
@@ -1236,6 +1581,17 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         }
 
         /**
+         * Sets the new value of "invdiscrete" (any previous value will be replaced)
+         * 
+         * @param invdiscrete
+         *     New value of the "invdiscrete" property.
+         */
+        public FlagType.Builder<_B> withInvdiscrete(final FlagSimpleType invdiscrete) {
+            this.invdiscrete = invdiscrete;
+            return this;
+        }
+
+        /**
          * Sets the new value of "sensornoise" (any previous value will be replaced)
          * 
          * @param sensornoise
@@ -1243,6 +1599,28 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
          */
         public FlagType.Builder<_B> withSensornoise(final FlagSimpleType sensornoise) {
             this.sensornoise = sensornoise;
+            return this;
+        }
+
+        /**
+         * Sets the new value of "multiccd" (any previous value will be replaced)
+         * 
+         * @param multiccd
+         *     New value of the "multiccd" property.
+         */
+        public FlagType.Builder<_B> withMulticcd(final FlagSimpleType multiccd) {
+            this.multiccd = multiccd;
+            return this;
+        }
+
+        /**
+         * Sets the new value of "island" (any previous value will be replaced)
+         * 
+         * @param island
+         *     New value of the "island" property.
+         */
+        public FlagType.Builder<_B> withIsland(final FlagSimpleType island) {
+            this.island = island;
             return this;
         }
 
@@ -1276,10 +1654,16 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         public final static transient String FILTERPARENT = "filterparent";
         public final static transient String ACTUATION = "actuation";
         public final static transient String REFSAFE = "refsafe";
+        public final static transient String SENSOR = "sensor";
+        public final static transient String MIDPHASE = "midphase";
+        public final static transient String EULERDAMP = "eulerdamp";
         public final static transient String OVERRIDE = "override";
         public final static transient String ENERGY = "energy";
         public final static transient String FWDINV = "fwdinv";
+        public final static transient String INVDISCRETE = "invdiscrete";
         public final static transient String SENSORNOISE = "sensornoise";
+        public final static transient String MULTICCD = "multiccd";
+        public final static transient String ISLAND = "island";
 
     }
 
@@ -1314,10 +1698,16 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
         private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> filterparent = null;
         private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> actuation = null;
         private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> refsafe = null;
+        private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> sensor = null;
+        private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> midphase = null;
+        private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> eulerdamp = null;
         private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> override = null;
         private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> energy = null;
         private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> fwdinv = null;
+        private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> invdiscrete = null;
         private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> sensornoise = null;
+        private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> multiccd = null;
+        private com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> island = null;
 
         public Selector(final TRoot root, final TParent parent, final String propertyName) {
             super(root, parent, propertyName);
@@ -1363,6 +1753,15 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
             if (this.refsafe!= null) {
                 products.put("refsafe", this.refsafe.init());
             }
+            if (this.sensor!= null) {
+                products.put("sensor", this.sensor.init());
+            }
+            if (this.midphase!= null) {
+                products.put("midphase", this.midphase.init());
+            }
+            if (this.eulerdamp!= null) {
+                products.put("eulerdamp", this.eulerdamp.init());
+            }
             if (this.override!= null) {
                 products.put("override", this.override.init());
             }
@@ -1372,8 +1771,17 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
             if (this.fwdinv!= null) {
                 products.put("fwdinv", this.fwdinv.init());
             }
+            if (this.invdiscrete!= null) {
+                products.put("invdiscrete", this.invdiscrete.init());
+            }
             if (this.sensornoise!= null) {
                 products.put("sensornoise", this.sensornoise.init());
+            }
+            if (this.multiccd!= null) {
+                products.put("multiccd", this.multiccd.init());
+            }
+            if (this.island!= null) {
+                products.put("island", this.island.init());
             }
             return products;
         }
@@ -1426,6 +1834,18 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
             return ((this.refsafe == null)?this.refsafe = new com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>>(this._root, this, "refsafe"):this.refsafe);
         }
 
+        public com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> sensor() {
+            return ((this.sensor == null)?this.sensor = new com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>>(this._root, this, "sensor"):this.sensor);
+        }
+
+        public com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> midphase() {
+            return ((this.midphase == null)?this.midphase = new com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>>(this._root, this, "midphase"):this.midphase);
+        }
+
+        public com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> eulerdamp() {
+            return ((this.eulerdamp == null)?this.eulerdamp = new com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>>(this._root, this, "eulerdamp"):this.eulerdamp);
+        }
+
         public com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> override() {
             return ((this.override == null)?this.override = new com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>>(this._root, this, "override"):this.override);
         }
@@ -1438,8 +1858,20 @@ public class FlagType implements Cloneable, Copyable, PartialCopyable
             return ((this.fwdinv == null)?this.fwdinv = new com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>>(this._root, this, "fwdinv"):this.fwdinv);
         }
 
+        public com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> invdiscrete() {
+            return ((this.invdiscrete == null)?this.invdiscrete = new com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>>(this._root, this, "invdiscrete"):this.invdiscrete);
+        }
+
         public com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> sensornoise() {
             return ((this.sensornoise == null)?this.sensornoise = new com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>>(this._root, this, "sensornoise"):this.sensornoise);
+        }
+
+        public com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> multiccd() {
+            return ((this.multiccd == null)?this.multiccd = new com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>>(this._root, this, "multiccd"):this.multiccd);
+        }
+
+        public com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>> island() {
+            return ((this.island == null)?this.island = new com.kscs.util.jaxb.Selector<TRoot, FlagType.Selector<TRoot, TParent>>(this._root, this, "island"):this.island);
         }
 
     }

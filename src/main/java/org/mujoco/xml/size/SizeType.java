@@ -35,9 +35,7 @@ import com.kscs.util.jaxb.PropertyVisitor;
  * &lt;complexType name="sizeType"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;attribute name="njmax" type="{http://www.w3.org/2001/XMLSchema}int" default="-1" /&gt;
- *       &lt;attribute name="nconmax" type="{http://www.w3.org/2001/XMLSchema}int" default="-1" /&gt;
- *       &lt;attribute name="nstack" type="{http://www.w3.org/2001/XMLSchema}int" default="-1" /&gt;
+ *       &lt;attribute name="memory" type="{http://www.w3.org/2001/XMLSchema}string" default="-1" /&gt;
  *       &lt;attribute name="nuserdata" type="{http://www.w3.org/2001/XMLSchema}int" default="0" /&gt;
  *       &lt;attribute name="nkey" type="{http://www.w3.org/2001/XMLSchema}int" default="0" /&gt;
  *       &lt;attribute name="nuser_body" type="{http://www.w3.org/2001/XMLSchema}int" default="0" /&gt;
@@ -60,12 +58,8 @@ import com.kscs.util.jaxb.PropertyVisitor;
 public class SizeType implements Cloneable, Copyable, PartialCopyable
 {
 
-    @XmlAttribute(name = "njmax")
-    protected Integer njmax;
-    @XmlAttribute(name = "nconmax")
-    protected Integer nconmax;
-    @XmlAttribute(name = "nstack")
-    protected Integer nstack;
+    @XmlAttribute(name = "memory")
+    protected String memory;
     @XmlAttribute(name = "nuserdata")
     protected Integer nuserdata;
     @XmlAttribute(name = "nkey")
@@ -104,9 +98,7 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
      *     The original SizeType from which to copy state.
      */
     public SizeType(final SizeType _other) {
-        this.njmax = _other.njmax;
-        this.nconmax = _other.nconmax;
-        this.nstack = _other.nstack;
+        this.memory = _other.memory;
         this.nuserdata = _other.nuserdata;
         this.nkey = _other.nkey;
         this.nuserBody = _other.nuserBody;
@@ -130,17 +122,9 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
      *     The original SizeType from which to copy state.
      */
     public SizeType(final SizeType _other, final PropertyTree _propertyTree, final PropertyTreeUse _propertyTreeUse) {
-        final PropertyTree njmaxPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("njmax"));
-        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(njmaxPropertyTree!= null):((njmaxPropertyTree == null)||(!njmaxPropertyTree.isLeaf())))) {
-            this.njmax = _other.njmax;
-        }
-        final PropertyTree nconmaxPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nconmax"));
-        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nconmaxPropertyTree!= null):((nconmaxPropertyTree == null)||(!nconmaxPropertyTree.isLeaf())))) {
-            this.nconmax = _other.nconmax;
-        }
-        final PropertyTree nstackPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nstack"));
-        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nstackPropertyTree!= null):((nstackPropertyTree == null)||(!nstackPropertyTree.isLeaf())))) {
-            this.nstack = _other.nstack;
+        final PropertyTree memoryPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("memory"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(memoryPropertyTree!= null):((memoryPropertyTree == null)||(!memoryPropertyTree.isLeaf())))) {
+            this.memory = _other.memory;
         }
         final PropertyTree nuserdataPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nuserdata"));
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nuserdataPropertyTree!= null):((nuserdataPropertyTree == null)||(!nuserdataPropertyTree.isLeaf())))) {
@@ -185,50 +169,18 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
     }
 
     /**
-     * Gets the value of the njmax property.
+     * Gets the value of the memory property.
      * 
      * @return
      *     possible object is
-     *     {@link Integer }
+     *     {@link String }
      *     
      */
-    public int getNjmax() {
-        if (njmax == null) {
-            return -1;
+    public String getMemory() {
+        if (memory == null) {
+            return "-1";
         } else {
-            return njmax;
-        }
-    }
-
-    /**
-     * Gets the value of the nconmax property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public int getNconmax() {
-        if (nconmax == null) {
-            return -1;
-        } else {
-            return nconmax;
-        }
-    }
-
-    /**
-     * Gets the value of the nstack property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public int getNstack() {
-        if (nstack == null) {
-            return -1;
-        } else {
-            return nstack;
+            return memory;
         }
     }
 
@@ -418,37 +370,15 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
         return this;
     }
 
-    public void setNjmax(final Integer value) {
-        final Integer __oldValue = this.njmax;
+    public void setMemory(final String value) {
+        final String __oldValue = this.memory;
         try {
-            this.vetoableChange__Support.fireVetoableChange("njmax", __oldValue, value);
+            this.vetoableChange__Support.fireVetoableChange("memory", __oldValue, value);
         } catch (PropertyVetoException x) {
             throw new RuntimeException(x);
         }
-        this.njmax = value;
-        this.propertyChange__Support.firePropertyChange("njmax", __oldValue, value);
-    }
-
-    public void setNconmax(final Integer value) {
-        final Integer __oldValue = this.nconmax;
-        try {
-            this.vetoableChange__Support.fireVetoableChange("nconmax", __oldValue, value);
-        } catch (PropertyVetoException x) {
-            throw new RuntimeException(x);
-        }
-        this.nconmax = value;
-        this.propertyChange__Support.firePropertyChange("nconmax", __oldValue, value);
-    }
-
-    public void setNstack(final Integer value) {
-        final Integer __oldValue = this.nstack;
-        try {
-            this.vetoableChange__Support.fireVetoableChange("nstack", __oldValue, value);
-        } catch (PropertyVetoException x) {
-            throw new RuntimeException(x);
-        }
-        this.nstack = value;
-        this.propertyChange__Support.firePropertyChange("nstack", __oldValue, value);
+        this.memory = value;
+        this.propertyChange__Support.firePropertyChange("memory", __oldValue, value);
     }
 
     public void setNuserdata(final Integer value) {
@@ -580,9 +510,7 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
-        _newObject.njmax = this.njmax;
-        _newObject.nconmax = this.nconmax;
-        _newObject.nstack = this.nstack;
+        _newObject.memory = this.memory;
         _newObject.nuserdata = this.nuserdata;
         _newObject.nkey = this.nkey;
         _newObject.nuserBody = this.nuserBody;
@@ -604,17 +532,9 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
-        final PropertyTree njmaxPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("njmax"));
-        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(njmaxPropertyTree!= null):((njmaxPropertyTree == null)||(!njmaxPropertyTree.isLeaf())))) {
-            _newObject.njmax = this.njmax;
-        }
-        final PropertyTree nconmaxPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nconmax"));
-        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nconmaxPropertyTree!= null):((nconmaxPropertyTree == null)||(!nconmaxPropertyTree.isLeaf())))) {
-            _newObject.nconmax = this.nconmax;
-        }
-        final PropertyTree nstackPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nstack"));
-        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nstackPropertyTree!= null):((nstackPropertyTree == null)||(!nstackPropertyTree.isLeaf())))) {
-            _newObject.nstack = this.nstack;
+        final PropertyTree memoryPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("memory"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(memoryPropertyTree!= null):((memoryPropertyTree == null)||(!memoryPropertyTree.isLeaf())))) {
+            _newObject.memory = this.memory;
         }
         final PropertyTree nuserdataPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nuserdata"));
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nuserdataPropertyTree!= null):((nuserdataPropertyTree == null)||(!nuserdataPropertyTree.isLeaf())))) {
@@ -676,9 +596,7 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
      *     A builder instance to which the state of this object will be copied.
      */
     public<_B >void copyTo(final SizeType.Builder<_B> _other) {
-        _other.njmax = this.njmax;
-        _other.nconmax = this.nconmax;
-        _other.nstack = this.nstack;
+        _other.memory = this.memory;
         _other.nuserdata = this.nuserdata;
         _other.nkey = this.nkey;
         _other.nuserBody = this.nuserBody;
@@ -716,17 +634,9 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
      *     A builder instance to which the state of this object will be copied.
      */
     public<_B >void copyTo(final SizeType.Builder<_B> _other, final PropertyTree _propertyTree, final PropertyTreeUse _propertyTreeUse) {
-        final PropertyTree njmaxPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("njmax"));
-        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(njmaxPropertyTree!= null):((njmaxPropertyTree == null)||(!njmaxPropertyTree.isLeaf())))) {
-            _other.njmax = this.njmax;
-        }
-        final PropertyTree nconmaxPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nconmax"));
-        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nconmaxPropertyTree!= null):((nconmaxPropertyTree == null)||(!nconmaxPropertyTree.isLeaf())))) {
-            _other.nconmax = this.nconmax;
-        }
-        final PropertyTree nstackPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nstack"));
-        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nstackPropertyTree!= null):((nstackPropertyTree == null)||(!nstackPropertyTree.isLeaf())))) {
-            _other.nstack = this.nstack;
+        final PropertyTree memoryPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("memory"));
+        if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(memoryPropertyTree!= null):((memoryPropertyTree == null)||(!memoryPropertyTree.isLeaf())))) {
+            _other.memory = this.memory;
         }
         final PropertyTree nuserdataPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nuserdata"));
         if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nuserdataPropertyTree!= null):((nuserdataPropertyTree == null)||(!nuserdataPropertyTree.isLeaf())))) {
@@ -801,9 +711,7 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
     {
 
         protected final _B _parentBuilder;
-        private Integer njmax;
-        private Integer nconmax;
-        private Integer nstack;
+        private String memory;
         private Integer nuserdata;
         private Integer nkey;
         private Integer nuserBody;
@@ -818,9 +726,7 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
         public Builder(final _B _parentBuilder, final SizeType _other, final boolean _copy) {
             this._parentBuilder = _parentBuilder;
             if (_other!= null) {
-                this.njmax = _other.njmax;
-                this.nconmax = _other.nconmax;
-                this.nstack = _other.nstack;
+                this.memory = _other.memory;
                 this.nuserdata = _other.nuserdata;
                 this.nkey = _other.nkey;
                 this.nuserBody = _other.nuserBody;
@@ -837,17 +743,9 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
         public Builder(final _B _parentBuilder, final SizeType _other, final boolean _copy, final PropertyTree _propertyTree, final PropertyTreeUse _propertyTreeUse) {
             this._parentBuilder = _parentBuilder;
             if (_other!= null) {
-                final PropertyTree njmaxPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("njmax"));
-                if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(njmaxPropertyTree!= null):((njmaxPropertyTree == null)||(!njmaxPropertyTree.isLeaf())))) {
-                    this.njmax = _other.njmax;
-                }
-                final PropertyTree nconmaxPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nconmax"));
-                if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nconmaxPropertyTree!= null):((nconmaxPropertyTree == null)||(!nconmaxPropertyTree.isLeaf())))) {
-                    this.nconmax = _other.nconmax;
-                }
-                final PropertyTree nstackPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nstack"));
-                if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nstackPropertyTree!= null):((nstackPropertyTree == null)||(!nstackPropertyTree.isLeaf())))) {
-                    this.nstack = _other.nstack;
+                final PropertyTree memoryPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("memory"));
+                if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(memoryPropertyTree!= null):((memoryPropertyTree == null)||(!memoryPropertyTree.isLeaf())))) {
+                    this.memory = _other.memory;
                 }
                 final PropertyTree nuserdataPropertyTree = ((_propertyTree == null)?null:_propertyTree.get("nuserdata"));
                 if (((_propertyTreeUse == PropertyTreeUse.INCLUDE)?(nuserdataPropertyTree!= null):((nuserdataPropertyTree == null)||(!nuserdataPropertyTree.isLeaf())))) {
@@ -897,9 +795,7 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
         }
 
         protected<_P extends SizeType >_P init(final _P _product) {
-            _product.njmax = this.njmax;
-            _product.nconmax = this.nconmax;
-            _product.nstack = this.nstack;
+            _product.memory = this.memory;
             _product.nuserdata = this.nuserdata;
             _product.nkey = this.nkey;
             _product.nuserBody = this.nuserBody;
@@ -914,35 +810,13 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
         }
 
         /**
-         * Sets the new value of "njmax" (any previous value will be replaced)
+         * Sets the new value of "memory" (any previous value will be replaced)
          * 
-         * @param njmax
-         *     New value of the "njmax" property.
+         * @param memory
+         *     New value of the "memory" property.
          */
-        public SizeType.Builder<_B> withNjmax(final Integer njmax) {
-            this.njmax = njmax;
-            return this;
-        }
-
-        /**
-         * Sets the new value of "nconmax" (any previous value will be replaced)
-         * 
-         * @param nconmax
-         *     New value of the "nconmax" property.
-         */
-        public SizeType.Builder<_B> withNconmax(final Integer nconmax) {
-            this.nconmax = nconmax;
-            return this;
-        }
-
-        /**
-         * Sets the new value of "nstack" (any previous value will be replaced)
-         * 
-         * @param nstack
-         *     New value of the "nstack" property.
-         */
-        public SizeType.Builder<_B> withNstack(final Integer nstack) {
-            this.nstack = nstack;
+        public SizeType.Builder<_B> withMemory(final String memory) {
+            this.memory = memory;
             return this;
         }
 
@@ -1074,9 +948,7 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
 
     public static class PropInfo {
 
-        public final static transient String NJMAX = "njmax";
-        public final static transient String NCONMAX = "nconmax";
-        public final static transient String NSTACK = "nstack";
+        public final static transient String MEMORY = "memory";
         public final static transient String NUSERDATA = "nuserdata";
         public final static transient String NKEY = "nkey";
         public final static transient String NUSER_BODY = "nuserBody";
@@ -1109,9 +981,7 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
         extends com.kscs.util.jaxb.Selector<TRoot, TParent>
     {
 
-        private com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> njmax = null;
-        private com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> nconmax = null;
-        private com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> nstack = null;
+        private com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> memory = null;
         private com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> nuserdata = null;
         private com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> nkey = null;
         private com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> nuserBody = null;
@@ -1131,14 +1001,8 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
         public Map<String, PropertyTree> buildChildren() {
             final Map<String, PropertyTree> products = new HashMap<String, PropertyTree>();
             products.putAll(super.buildChildren());
-            if (this.njmax!= null) {
-                products.put("njmax", this.njmax.init());
-            }
-            if (this.nconmax!= null) {
-                products.put("nconmax", this.nconmax.init());
-            }
-            if (this.nstack!= null) {
-                products.put("nstack", this.nstack.init());
+            if (this.memory!= null) {
+                products.put("memory", this.memory.init());
             }
             if (this.nuserdata!= null) {
                 products.put("nuserdata", this.nuserdata.init());
@@ -1173,16 +1037,8 @@ public class SizeType implements Cloneable, Copyable, PartialCopyable
             return products;
         }
 
-        public com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> njmax() {
-            return ((this.njmax == null)?this.njmax = new com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>>(this._root, this, "njmax"):this.njmax);
-        }
-
-        public com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> nconmax() {
-            return ((this.nconmax == null)?this.nconmax = new com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>>(this._root, this, "nconmax"):this.nconmax);
-        }
-
-        public com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> nstack() {
-            return ((this.nstack == null)?this.nstack = new com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>>(this._root, this, "nstack"):this.nstack);
+        public com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> memory() {
+            return ((this.memory == null)?this.memory = new com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>>(this._root, this, "memory"):this.memory);
         }
 
         public com.kscs.util.jaxb.Selector<TRoot, SizeType.Selector<TRoot, TParent>> nuserdata() {

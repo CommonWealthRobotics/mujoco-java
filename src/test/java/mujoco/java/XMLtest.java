@@ -35,7 +35,7 @@ public class XMLtest {
 		Mujoco.Builder<Void> builder = Mujoco.builder()
 									.withModel("Test Robot")
 		;
-		
+		builder.addSize().withMemory("100M");
 		builder.addOption()
 				.withTimestep(new BigDecimal(0.005));
 		builder.addVisual()

@@ -21,3 +21,4 @@ src/main/java/mujoco/*.h
 *.DS_Store*
 cppbuild
 *hs_err_*.log
+/MUJOCO_LOG.TXT

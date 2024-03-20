@@ -305,9 +305,11 @@ public class MuJoCoModelManager {
 	}
 
 	public void close() {
-		connected = false;
-		MuJoCoLib.mj_deleteData(d);
-		MuJoCoLib.mj_deleteModel(m);
+		if(connected) {
+			connected = false;
+			MuJoCoLib.mj_deleteData(d);
+			MuJoCoLib.mj_deleteModel(m);
+		}
 	}
 
 	/**

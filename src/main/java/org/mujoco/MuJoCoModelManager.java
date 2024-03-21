@@ -176,6 +176,14 @@ public class MuJoCoModelManager {
 		}
 		return positions;
 	}
+	public void setAllJointPositions(HashMap<String, Double> putPositions) {
+		check();
+		for (String jointName:putPositions.keySet()) {
+			int i = getJointIndex(jointName);
+			double position =putPositions.get(jointName);
+			data.qpos().put(i, position);
+		}
+	}
 	public HashMap<String, Double> getControlInstance() {
 		return setEfforts;
 	}

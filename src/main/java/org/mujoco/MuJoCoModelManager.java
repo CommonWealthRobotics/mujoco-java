@@ -181,7 +181,7 @@ public class MuJoCoModelManager {
 		for (String jointName:putPositions.keySet()) {
 			int i = getJointIndex(jointName);
 			double position =putPositions.get(jointName);
-			data.qpos().put(i, position);
+			data.qpos().put(model.jnt_qposadr().get(i), position);
 		}
 	}
 	public HashMap<String, Double> getControlInstance() {

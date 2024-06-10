@@ -32,7 +32,7 @@ jobs:
       run: bash build-windows.sh
 
   macos:
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
     - name: Checkout
       uses: actions/checkout@v1

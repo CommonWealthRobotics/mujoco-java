@@ -76,7 +76,7 @@ jobs:
           path: src/main/resources/macosx-x86_64/*
   publish:
     runs-on: ubuntu-latest 
-    needs: [macos,windows,linux]
+    needs: [macos,windows,linux,linux-arm]
     permissions: 
       contents: write
       packages: write 

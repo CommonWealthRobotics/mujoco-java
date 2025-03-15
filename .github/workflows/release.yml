@@ -17,7 +17,7 @@ jobs:
           distribution: 'zulu'
     - name: Build
       run: bash build-linux-arm.sh
-   - name: Upload math result for job Linux
+    - name: Upload math result for job Linux
       uses: actions/upload-artifact@v3
       with:
           name: linux-arm-lib

@@ -18,7 +18,7 @@ jobs:
     - name: Build
       run: bash build-linux-arm.sh
     - name: Upload math result for job Linux
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: linux-arm-lib
           path: src/main/resources/linux-arm64/*
@@ -34,7 +34,7 @@ jobs:
     - name: Build
       run: bash build-linux.sh
     - name: Upload math result for job Linux
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: linux-lib
           path: src/main/resources/linux-x86_64/*
@@ -53,7 +53,7 @@ jobs:
     - name: Build
       run: bash build-windows.sh
     - name: Upload math result for job Windows
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: win-lib
           path: src/main/resources/windows-x86_64/*
@@ -70,7 +70,7 @@ jobs:
     - name: Build
       run: bash build-mac.sh
     - name: Upload math result for job Mac
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: mac-lib
           path: src/main/resources/macosx-x86_64/*

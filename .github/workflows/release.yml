@@ -98,22 +98,22 @@ jobs:
           echo $VERSION_SEMVER
           echo ${{ steps.vars.outputs.tag }}
       - name: Download math result for job Windows
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: win-lib 
           path: src/main/resources/windows-x86_64/
       - name: Download math result for job Linux Arm
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linux-arm-lib 
           path: src/main/resources/linux-arm64/           
       - name: Download math result for job Linux
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linux-lib 
           path: src/main/resources/linux-x86_64/ 
       - name: Download math result for job Mac
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: mac-lib
           path: src/main/resources/macosx-x86_64/

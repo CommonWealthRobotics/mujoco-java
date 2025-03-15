@@ -2,8 +2,8 @@
 
 echo "Linux Arm Build"
 VER=$(cat mujocoRelease.txt)
-TYPE=linux-aarch64
-ARCHIVE=mujoco-$VER-$TYPE.tar.gz
+TYPE=linux-arm64
+ARCHIVE=mujoco-$VER-linux-aarch64.tar.gz
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 JAVADIR=$SCRIPT_DIR/src/main/java/
 

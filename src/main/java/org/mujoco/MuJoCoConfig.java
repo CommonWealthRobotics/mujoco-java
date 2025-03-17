@@ -21,6 +21,50 @@ public class MuJoCoConfig implements InfoMapper {
 	public void map(InfoMap infoMap) {
 		infoMap.put(new Info("MJ_STATIC").define(true));
 		infoMap.put(new Info("mjtNum").cast().valueTypes("double").pointerTypes("DoublePointer"));
+//		infoMap.put(new Info("mjString")
+//			    .cast()
+//			    .valueTypes("@StdString String")
+//			    .pointerTypes("@StdString BytePointer"));
+		// Define mjString as an opaque pointer type to avoid direct conversions
+		// Add this to your JavaCPP configuration
+		//infoMap.put(new Info().define("mjString std::string"));
+
+		// Then skip the mjString type and use String/BytePointer directly
+//		infoMap.put(new Info("mjString").skip());
+//		infoMap.put(new Info("std::string").annotations("@StdString").pointerTypes("BytePointer").valueTypes("String"));
+
+		// Handle mjString (std::string)
+		infoMap.put(new Info("mjString").skip());
+		infoMap.put(new Info("std::string").annotations("@StdString").pointerTypes("BytePointer").valueTypes("String"));
+
+		// Handle mjStringVec (std::vector<std::string>)
+		infoMap.put(new Info("mjStringVec").skip());
+		infoMap.put(new Info("std::vector<std::string>").pointerTypes("StringVector").valueTypes("StringVector"));
+
+		// Handle mjIntVec (std::vector<int>)
+		infoMap.put(new Info("mjIntVec").skip());
+		infoMap.put(new Info("std::vector<int>").pointerTypes("IntPointer").valueTypes("IntBuffer"));
+
+		// Handle mjIntVecVec (std::vector<std::vector<int>>)
+		infoMap.put(new Info("mjIntVecVec").skip());
+		infoMap.put(new Info("std::vector<std::vector<int>>").pointerTypes("PointerPointer<IntPointer>"));
+
+		// Handle mjFloatVec (std::vector<float>)
+		infoMap.put(new Info("mjFloatVec").skip());
+		infoMap.put(new Info("std::vector<float>").pointerTypes("FloatPointer").valueTypes("FloatBuffer"));
+
+		// Handle mjFloatVecVec (std::vector<std::vector<float>>)
+		infoMap.put(new Info("mjFloatVecVec").skip());
+		infoMap.put(new Info("std::vector<std::vector<float>>").pointerTypes("PointerPointer<FloatPointer>"));
+
+		// Handle mjDoubleVec (std::vector<double>)
+		infoMap.put(new Info("mjDoubleVec").skip());
+		infoMap.put(new Info("std::vector<double>").pointerTypes("DoublePointer").valueTypes("DoubleBuffer"));
+
+		// Handle mjByteVec (std::vector<std::byte>)
+		infoMap.put(new Info("mjByteVec").skip());
+		infoMap.put(new Info("std::vector<std::byte>").pointerTypes("BytePointer").valueTypes("ByteBuffer"));
+		
 		// mjString
 		// infoMap.put(new
 		// Info("mjString").cast().valueTypes("String").pointerTypes("StringPointer"));
@@ -79,42 +123,14 @@ public class MuJoCoConfig implements InfoMapper {
 		infoMap.put(new Info("mjs_firstElement").skip());
 		// mjs_firstChild
 		infoMap.put(new Info("mjs_firstChild").skip());
-		// Add this to your MuJoCoConfig.java
-		// Add this to your JavaCPP configuration class
-		// This adds custom code at the beginning of the generated file
-		infoMap.put(new Info().cppText(
-		    // Add a macro that will be used for string assignments
-		    "#include <string>\n" +
-		    "#define ASSIGN_TO_STRING_PTR(ptr, val) if(ptr) *ptr = val;\n" +
-		    
-		    // Create a function to override the problematic assignments
-		    "template<typename T>\n" +
-		    "void assign_string(T* ptr, const std::string& val) {\n" +
-		    "    if(ptr) *ptr = val;\n" +
-		    "}\n" +
-		    
-		    // This is the critical part - redefine the cast operator to call our safe function
-		    "#define __JAVACPP_HACK\n" +
-		    "#ifdef __JAVACPP_HACK\n" +
-		    "#define JAVACPP_STRING_CAST(x)\n" +
-		    "#endif\n"
-		));
+		// mjSpec_modelfiledir
+		infoMap.put(new Info("mjs_setString").skip());
+		infoMap.put(new Info("mjs_getString").skip());
+		//modelname
 
-		// Tell JavaCPP how to handle specific problematic cases
-		infoMap.put(new Info("ptr->meshdir = (std::basic_string< char >&)adapter0")
-		    .define(false)
-		    .cppText("    assign_string(ptr->meshdir, adapter0)"));
-
-		infoMap.put(new Info("ptr->modelname = (std::basic_string< char >&)adapter0")
-		    .define(false)
-		    .cppText("    assign_string(ptr->modelname, adapter0)"));
-
-		infoMap.put(new Info("ptr->modelfiledir = (std::basic_string< char >&)adapter0")
-		    .define(false)
-		    .cppText("    assign_string(ptr->modelfiledir, adapter0)"));
-
-		// Add similar entries for other problematic assignments
-
-
+		infoMap.put(new Info("modelname").skip());
+		//modelfiledir
+		infoMap.put(new Info("modelfiledir").skip());
+		
 	}
 }

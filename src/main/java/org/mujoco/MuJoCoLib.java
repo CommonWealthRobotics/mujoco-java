@@ -1886,48 +1886,25 @@ public static native mjsElement mjs_nextElement(mjSpec s, mjsElement element);
 //---------------------------------- Attribute setters ---------------------------------------------
 
 // Copy buffer.
-public static native void mjs_setBuffer(mjByteVec dest, @Const Pointer array, int size);
 
 // Copy text to string.
-public static native void mjs_setString(mjString dest, @Cast("const char*") BytePointer text);
-public static native void mjs_setString(mjString dest, String text);
+
 
 // Split text to entries and copy to string vector.
-public static native void mjs_setStringVec(mjStringVec dest, @Cast("const char*") BytePointer text);
-public static native void mjs_setStringVec(mjStringVec dest, String text);
 
 // Set entry in string vector.
-public static native @Cast("mjtByte") byte mjs_setInStringVec(mjStringVec dest, int i, @Cast("const char*") BytePointer text);
-public static native @Cast("mjtByte") byte mjs_setInStringVec(mjStringVec dest, int i, String text);
 
 // Append text entry to string vector.
-public static native void mjs_appendString(mjStringVec dest, @Cast("const char*") BytePointer text);
-public static native void mjs_appendString(mjStringVec dest, String text);
 
 // Copy int array to vector.
-public static native void mjs_setInt(mjIntVec dest, @Const IntPointer array, int size);
-public static native void mjs_setInt(mjIntVec dest, @Const IntBuffer array, int size);
-public static native void mjs_setInt(mjIntVec dest, @Const int[] array, int size);
 
 // Append int array to vector of arrays.
-public static native void mjs_appendIntVec(mjIntVecVec dest, @Const IntPointer array, int size);
-public static native void mjs_appendIntVec(mjIntVecVec dest, @Const IntBuffer array, int size);
-public static native void mjs_appendIntVec(mjIntVecVec dest, @Const int[] array, int size);
 
 // Copy float array to vector.
-public static native void mjs_setFloat(mjFloatVec dest, @Const FloatPointer array, int size);
-public static native void mjs_setFloat(mjFloatVec dest, @Const FloatBuffer array, int size);
-public static native void mjs_setFloat(mjFloatVec dest, @Const float[] array, int size);
 
 // Append float array to vector of arrays.
-public static native void mjs_appendFloatVec(mjFloatVecVec dest, @Const FloatPointer array, int size);
-public static native void mjs_appendFloatVec(mjFloatVecVec dest, @Const FloatBuffer array, int size);
-public static native void mjs_appendFloatVec(mjFloatVecVec dest, @Const float[] array, int size);
 
 // Copy double array to vector.
-public static native void mjs_setDouble(mjDoubleVec dest, @Const DoublePointer array, int size);
-public static native void mjs_setDouble(mjDoubleVec dest, @Const DoubleBuffer array, int size);
-public static native void mjs_setDouble(mjDoubleVec dest, @Const double[] array, int size);
 
 // Set plugin attributes.
 public static native void mjs_setPluginAttributes(mjsPlugin plugin, Pointer attributes);
@@ -1936,12 +1913,9 @@ public static native void mjs_setPluginAttributes(mjsPlugin plugin, Pointer attr
 //---------------------------------- Attribute getters ---------------------------------------------
 
 // Get string contents.
-public static native @Cast("const char*") BytePointer mjs_getString(@Const mjString source);
+
 
 // Get double array contents and optionally its size.
-public static native @Const DoublePointer mjs_getDouble(@Const mjDoubleVec source, IntPointer size);
-public static native @Const DoubleBuffer mjs_getDouble(@Const mjDoubleVec source, IntBuffer size);
-public static native @Const double[] mjs_getDouble(@Const mjDoubleVec source, int[] size);
 
 
 //---------------------------------- Spec utilities ------------------------------------------------
@@ -6369,54 +6343,6 @@ public static class mjpPlugin_ extends Pointer {
   // C++: defined to be compatible with corresponding std types
 // #else
   // C: opaque types
-  @Opaque public static class mjString extends Pointer {
-      /** Empty constructor. Calls {@code super((Pointer)null)}. */
-      public mjString() { super((Pointer)null); }
-      /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-      public mjString(Pointer p) { super(p); }
-  }
-  @Opaque public static class mjStringVec extends Pointer {
-      /** Empty constructor. Calls {@code super((Pointer)null)}. */
-      public mjStringVec() { super((Pointer)null); }
-      /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-      public mjStringVec(Pointer p) { super(p); }
-  }
-  @Opaque public static class mjIntVec extends Pointer {
-      /** Empty constructor. Calls {@code super((Pointer)null)}. */
-      public mjIntVec() { super((Pointer)null); }
-      /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-      public mjIntVec(Pointer p) { super(p); }
-  }
-  @Opaque public static class mjIntVecVec extends Pointer {
-      /** Empty constructor. Calls {@code super((Pointer)null)}. */
-      public mjIntVecVec() { super((Pointer)null); }
-      /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-      public mjIntVecVec(Pointer p) { super(p); }
-  }
-  @Opaque public static class mjFloatVec extends Pointer {
-      /** Empty constructor. Calls {@code super((Pointer)null)}. */
-      public mjFloatVec() { super((Pointer)null); }
-      /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-      public mjFloatVec(Pointer p) { super(p); }
-  }
-  @Opaque public static class mjFloatVecVec extends Pointer {
-      /** Empty constructor. Calls {@code super((Pointer)null)}. */
-      public mjFloatVecVec() { super((Pointer)null); }
-      /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-      public mjFloatVecVec(Pointer p) { super(p); }
-  }
-  @Opaque public static class mjDoubleVec extends Pointer {
-      /** Empty constructor. Calls {@code super((Pointer)null)}. */
-      public mjDoubleVec() { super((Pointer)null); }
-      /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-      public mjDoubleVec(Pointer p) { super(p); }
-  }
-  @Opaque public static class mjByteVec extends Pointer {
-      /** Empty constructor. Calls {@code super((Pointer)null)}. */
-      public mjByteVec() { super((Pointer)null); }
-      /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-      public mjByteVec(Pointer p) { super(p); }
-  }
 // #endif
 
 
@@ -6558,14 +6484,11 @@ public static class mjSpec extends Pointer {
         return new mjSpec((Pointer)this).offsetAddress(i);
     }
            // model specification
-  public native mjsElement element(); public native mjSpec element(mjsElement setter);             // element type
-  public native @StdString BytePointer modelname(); public native mjSpec modelname(BytePointer setter);             // model name
+  public native mjsElement element(); public native mjSpec element(mjsElement setter);             // element type             // model name
 
   // compiler data
   public native @ByRef mjsCompiler compiler(); public native mjSpec compiler(mjsCompiler setter);            // compiler options
-  public native @Cast("mjtByte") byte strippath(); public native mjSpec strippath(byte setter);               // automatically strip paths from mesh files
-  public native @StdString BytePointer meshdir(); public native mjSpec meshdir(BytePointer setter);               // mesh and hfield directory
-  public native @StdString BytePointer texturedir(); public native mjSpec texturedir(BytePointer setter);            // texture directory
+  public native @Cast("mjtByte") byte strippath(); public native mjSpec strippath(byte setter);               // automatically strip paths from mesh files               // mesh and hfield directory            // texture directory
 
   // engine data
   public native @ByRef mjOption option(); public native mjSpec option(mjOption setter);                 // physics options
@@ -6589,9 +6512,7 @@ public static class mjSpec extends Pointer {
   public native int nconmax(); public native mjSpec nconmax(int setter);                     // (deprecated) max number of detected contacts
   public native @Cast("size_t") long nstack(); public native mjSpec nstack(long setter);                   // (deprecated) number of mjtNums in mjData stack
 
-  // global data
-  public native @StdString BytePointer comment(); public native mjSpec comment(BytePointer setter);               // comment at top of XML
-  public native @StdString BytePointer modelfiledir(); public native mjSpec modelfiledir(BytePointer setter);          // path to model file
+  // global data               // comment at top of XML          // path to model file
 
   // other
   public native @Cast("mjtByte") byte hasImplicitPluginElem(); public native mjSpec hasImplicitPluginElem(byte setter);   // already encountered an implicit plugin sensor/actuator
@@ -6644,11 +6565,8 @@ public static class mjsPlugin extends Pointer {
         return new mjsPlugin((Pointer)this).offsetAddress(i);
     }
         // plugin specification
-  public native mjsElement element(); public native mjsPlugin element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsPlugin name(BytePointer setter);                  // instance name
-  public native @StdString BytePointer plugin_name(); public native mjsPlugin plugin_name(BytePointer setter);           // plugin name
-  public native @Cast("mjtByte") byte active(); public native mjsPlugin active(byte setter);                  // is the plugin active
-  public native @StdString BytePointer info(); public native mjsPlugin info(BytePointer setter);                  // message appended to compiler errors
+  public native mjsElement element(); public native mjsPlugin element(mjsElement setter);             // element type                  // instance name           // plugin name
+  public native @Cast("mjtByte") byte active(); public native mjsPlugin active(byte setter);                  // is the plugin active                  // message appended to compiler errors
 }
 
 
@@ -6669,9 +6587,7 @@ public static class mjsBody extends Pointer {
         return new mjsBody((Pointer)this).offsetAddress(i);
     }
           // body specification
-  public native mjsElement element(); public native mjsBody element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsBody name(BytePointer setter);                  // name
-  public native @StdString BytePointer childclass(); public native mjsBody childclass(BytePointer setter);            // childclass name
+  public native mjsElement element(); public native mjsBody element(mjsElement setter);             // element type                  // name            // childclass name
 
   // body frame
   public native double pos(int i); public native mjsBody pos(int i, double setter);
@@ -6694,11 +6610,9 @@ public static class mjsBody extends Pointer {
 
   // other
   public native @Cast("mjtByte") byte mocap(); public native mjsBody mocap(byte setter);                   // is this a mocap body
-  public native double gravcomp(); public native mjsBody gravcomp(double setter);                 // gravity compensation
-  public native @StdVector DoublePointer userdata(); public native mjsBody userdata(DoublePointer setter);           // user data
+  public native double gravcomp(); public native mjsBody gravcomp(double setter);                 // gravity compensation           // user data
   public native @Cast("mjtByte") byte explicitinertial(); public native mjsBody explicitinertial(byte setter);        // whether to save the body with explicit inertial clause
-  public native @ByRef mjsPlugin plugin(); public native mjsBody plugin(mjsPlugin setter);                // passive force plugin
-  public native @StdString BytePointer info(); public native mjsBody info(BytePointer setter);                  // message appended to compiler errors
+  public native @ByRef mjsPlugin plugin(); public native mjsBody plugin(mjsPlugin setter);                // passive force plugin                  // message appended to compiler errors
 }
 
 
@@ -6719,15 +6633,12 @@ public static class mjsFrame extends Pointer {
         return new mjsFrame((Pointer)this).offsetAddress(i);
     }
          // frame specification
-  public native mjsElement element(); public native mjsFrame element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsFrame name(BytePointer setter);                  // name
-  public native @StdString BytePointer childclass(); public native mjsFrame childclass(BytePointer setter);            // childclass name
+  public native mjsElement element(); public native mjsFrame element(mjsElement setter);             // element type                  // name            // childclass name
   public native double pos(int i); public native mjsFrame pos(int i, double setter);
   @MemberGetter public native DoublePointer pos();                   // position
   public native double quat(int i); public native mjsFrame quat(int i, double setter);
   @MemberGetter public native DoublePointer quat();                  // orientation
-  public native @ByRef mjsOrientation alt(); public native mjsFrame alt(mjsOrientation setter);              // alternative orientation
-  public native @StdString BytePointer info(); public native mjsFrame info(BytePointer setter);                  // message appended to compiler errors
+  public native @ByRef mjsOrientation alt(); public native mjsFrame alt(mjsOrientation setter);              // alternative orientation                  // message appended to compiler errors
 }
 
 
@@ -6748,8 +6659,7 @@ public static class mjsJoint extends Pointer {
         return new mjsJoint((Pointer)this).offsetAddress(i);
     }
          // joint specification
-  public native mjsElement element(); public native mjsJoint element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsJoint name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsJoint element(mjsElement setter);             // element type                  // name
   public native @Cast("mjtJoint") int type(); public native mjsJoint type(int setter);                   // joint type
 
   // kinematics
@@ -6790,9 +6700,7 @@ public static class mjsJoint extends Pointer {
 
   // other
   public native int group(); public native mjsJoint group(int setter);                       // group
-  public native @Cast("mjtByte") byte actgravcomp(); public native mjsJoint actgravcomp(byte setter);             // is gravcomp force applied via actuators
-  public native @StdVector DoublePointer userdata(); public native mjsJoint userdata(DoublePointer setter);           // user data
-  public native @StdString BytePointer info(); public native mjsJoint info(BytePointer setter);                  // message appended to compiler errors
+  public native @Cast("mjtByte") byte actgravcomp(); public native mjsJoint actgravcomp(byte setter);             // is gravcomp force applied via actuators           // user data                  // message appended to compiler errors
 }
 
 
@@ -6813,8 +6721,7 @@ public static class mjsGeom extends Pointer {
         return new mjsGeom((Pointer)this).offsetAddress(i);
     }
           // geom specification
-  public native mjsElement element(); public native mjsGeom element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsGeom name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsGeom element(mjsElement setter);             // element type                  // name
   public native @Cast("mjtGeom") int type(); public native mjsGeom type(int setter);                    // geom type
 
   // frame, size
@@ -6853,19 +6760,14 @@ public static class mjsGeom extends Pointer {
   public native @Cast("mjtNum") double fluid_coefs(int i); public native mjsGeom fluid_coefs(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer fluid_coefs();           // ellipsoid-fluid interaction coefs
 
-  // visual
-  public native @StdString BytePointer material(); public native mjsGeom material(BytePointer setter);              // name of material
+  // visual              // name of material
   public native float rgba(int i); public native mjsGeom rgba(int i, float setter);
   @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted
   public native int group(); public native mjsGeom group(int setter);                       // group
 
-  // other
-  public native @StdString BytePointer hfieldname(); public native mjsGeom hfieldname(BytePointer setter);            // heightfield attached to geom
-  public native @StdString BytePointer meshname(); public native mjsGeom meshname(BytePointer setter);              // mesh attached to geom
-  public native double fitscale(); public native mjsGeom fitscale(double setter);                 // scale mesh uniformly
-  public native @StdVector DoublePointer userdata(); public native mjsGeom userdata(DoublePointer setter);           // user data
-  public native @ByRef mjsPlugin plugin(); public native mjsGeom plugin(mjsPlugin setter);                // sdf plugin
-  public native @StdString BytePointer info(); public native mjsGeom info(BytePointer setter);                  // message appended to compiler errors
+  // other            // heightfield attached to geom              // mesh attached to geom
+  public native double fitscale(); public native mjsGeom fitscale(double setter);                 // scale mesh uniformly           // user data
+  public native @ByRef mjsPlugin plugin(); public native mjsGeom plugin(mjsPlugin setter);                // sdf plugin                  // message appended to compiler errors
 }
 
 
@@ -6886,8 +6788,7 @@ public static class mjsSite extends Pointer {
         return new mjsSite((Pointer)this).offsetAddress(i);
     }
           // site specification
-  public native mjsElement element(); public native mjsSite element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsSite name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsSite element(mjsElement setter);             // element type                  // name
 
   // frame, size
   public native double pos(int i); public native mjsSite pos(int i, double setter);
@@ -6901,15 +6802,12 @@ public static class mjsSite extends Pointer {
   @MemberGetter public native DoublePointer size();                  // geom size
 
   // visual
-  public native @Cast("mjtGeom") int type(); public native mjsSite type(int setter);                    // geom type
-  public native @StdString BytePointer material(); public native mjsSite material(BytePointer setter);              // name of material
+  public native @Cast("mjtGeom") int type(); public native mjsSite type(int setter);                    // geom type              // name of material
   public native int group(); public native mjsSite group(int setter);                       // group
   public native float rgba(int i); public native mjsSite rgba(int i, float setter);
   @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted
 
-  // other
-  public native @StdVector DoublePointer userdata(); public native mjsSite userdata(DoublePointer setter);           // user data
-  public native @StdString BytePointer info(); public native mjsSite info(BytePointer setter);                  // message appended to compiler errors
+  // other           // user data                  // message appended to compiler errors
 }
 
 
@@ -6930,8 +6828,7 @@ public static class mjsCamera extends Pointer {
         return new mjsCamera((Pointer)this).offsetAddress(i);
     }
         // camera specification
-  public native mjsElement element(); public native mjsCamera element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsCamera name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsCamera element(mjsElement setter);             // element type                  // name
 
   // extrinsics
   public native double pos(int i); public native mjsCamera pos(int i, double setter);
@@ -6939,8 +6836,7 @@ public static class mjsCamera extends Pointer {
   public native double quat(int i); public native mjsCamera quat(int i, double setter);
   @MemberGetter public native DoublePointer quat();                  // orientation
   public native @ByRef mjsOrientation alt(); public native mjsCamera alt(mjsOrientation setter);              // alternative orientation
-  public native @Cast("mjtCamLight") int mode(); public native mjsCamera mode(int setter);                // tracking mode
-  public native @StdString BytePointer targetbody(); public native mjsCamera targetbody(BytePointer setter);            // target body for tracking/targeting
+  public native @Cast("mjtCamLight") int mode(); public native mjsCamera mode(int setter);                // tracking mode            // target body for tracking/targeting
 
   // intrinsics
   public native int orthographic(); public native mjsCamera orthographic(int setter);                // is camera orthographic
@@ -6961,9 +6857,7 @@ public static class mjsCamera extends Pointer {
   public native float principal_pixel(int i); public native mjsCamera principal_pixel(int i, float setter);
   @MemberGetter public native FloatPointer principal_pixel();        // principal point (pixel)
 
-  // other
-  public native @StdVector DoublePointer userdata(); public native mjsCamera userdata(DoublePointer setter);           // user data
-  public native @StdString BytePointer info(); public native mjsCamera info(BytePointer setter);                  // message appended to compiler errors
+  // other           // user data                  // message appended to compiler errors
 }
 
 
@@ -6984,16 +6878,14 @@ public static class mjsLight extends Pointer {
         return new mjsLight((Pointer)this).offsetAddress(i);
     }
          // light specification
-  public native mjsElement element(); public native mjsLight element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsLight name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsLight element(mjsElement setter);             // element type                  // name
 
   // frame
   public native double pos(int i); public native mjsLight pos(int i, double setter);
   @MemberGetter public native DoublePointer pos();                   // position
   public native double dir(int i); public native mjsLight dir(int i, double setter);
   @MemberGetter public native DoublePointer dir();                   // direction
-  public native @Cast("mjtCamLight") int mode(); public native mjsLight mode(int setter);                // tracking mode
-  public native @StdString BytePointer targetbody(); public native mjsLight targetbody(BytePointer setter);            // target body for targeting
+  public native @Cast("mjtCamLight") int mode(); public native mjsLight mode(int setter);                // tracking mode            // target body for targeting
 
   // intrinsics
   public native @Cast("mjtByte") byte active(); public native mjsLight active(byte setter);                  // is light active
@@ -7011,8 +6903,7 @@ public static class mjsLight extends Pointer {
   public native float specular(int i); public native mjsLight specular(int i, float setter);
   @MemberGetter public native FloatPointer specular();               // specular color
 
-  // other
-  public native @StdString BytePointer info(); public native mjsLight info(BytePointer setter);                  // message appended to compiler errorsx
+  // other                  // message appended to compiler errorsx
 }
 
 
@@ -7033,8 +6924,7 @@ public static class mjsFlex extends Pointer {
         return new mjsFlex((Pointer)this).offsetAddress(i);
     }
           // flex specification
-  public native mjsElement element(); public native mjsFlex element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsFlex name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsFlex element(mjsElement setter);             // element type                  // name
 
   // contact properties
   public native int contype(); public native mjsFlex contype(int setter);                     // contact type
@@ -7062,23 +6952,15 @@ public static class mjsFlex extends Pointer {
   public native double edgestiffness(); public native mjsFlex edgestiffness(double setter);            // edge stiffness
   public native double edgedamping(); public native mjsFlex edgedamping(double setter);              // edge damping
   public native float rgba(int i); public native mjsFlex rgba(int i, float setter);
-  @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted
-  public native @StdString BytePointer material(); public native mjsFlex material(BytePointer setter);              // name of material used for rendering
+  @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted              // name of material used for rendering
   public native double young(); public native mjsFlex young(double setter);                    // Young's modulus
   public native double poisson(); public native mjsFlex poisson(double setter);                  // Poisson's ratio
   public native double damping(); public native mjsFlex damping(double setter);                  // Rayleigh's damping
   public native double thickness(); public native mjsFlex thickness(double setter);                // thickness (2D only)
 
-  // mesh properties
-  public native @StdString BytePointer nodebody(); public native mjsFlex nodebody(BytePointer setter);           // node body names
-  public native @StdString BytePointer vertbody(); public native mjsFlex vertbody(BytePointer setter);           // vertex body names
-  public native @StdVector DoublePointer node(); public native mjsFlex node(DoublePointer setter);               // node positions
-  public native @StdVector DoublePointer vert(); public native mjsFlex vert(DoublePointer setter);               // vertex positions
-  public native @StdVector IntPointer elem(); public native mjsFlex elem(IntPointer setter);                  // element vertex ids
-  public native @StdVector FloatPointer texcoord(); public native mjsFlex texcoord(FloatPointer setter);            // vertex texture coordinates
+  // mesh properties           // node body names           // vertex body names               // node positions               // vertex positions                  // element vertex ids            // vertex texture coordinates
 
-  // other
-  public native @StdString BytePointer info(); public native mjsFlex info(BytePointer setter);                  // message appended to compiler errors
+  // other                  // message appended to compiler errors
 }
 
 
@@ -7099,10 +6981,7 @@ public static class mjsMesh extends Pointer {
         return new mjsMesh((Pointer)this).offsetAddress(i);
     }
           // mesh specification
-  public native mjsElement element(); public native mjsMesh element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsMesh name(BytePointer setter);                  // name
-  public native @StdString BytePointer content_type(); public native mjsMesh content_type(BytePointer setter);          // content type of file
-  public native @StdString BytePointer file(); public native mjsMesh file(BytePointer setter);                  // mesh file
+  public native mjsElement element(); public native mjsMesh element(mjsElement setter);             // element type                  // name          // content type of file                  // mesh file
   public native double refpos(int i); public native mjsMesh refpos(int i, double setter);
   @MemberGetter public native DoublePointer refpos();                // reference position
   public native double refquat(int i); public native mjsMesh refquat(int i, double setter);
@@ -7111,14 +6990,8 @@ public static class mjsMesh extends Pointer {
   @MemberGetter public native DoublePointer scale();                 // rescale mesh
   public native @Cast("mjtMeshInertia") int inertia(); public native mjsMesh inertia(int setter);          // inertia type (convex, legacy, exact, shell)
   public native @Cast("mjtByte") byte smoothnormal(); public native mjsMesh smoothnormal(byte setter);            // do not exclude large-angle faces from normals
-  public native int maxhullvert(); public native mjsMesh maxhullvert(int setter);                 // maximum vertex count for the convex hull
-  public native @StdVector FloatPointer uservert(); public native mjsMesh uservert(FloatPointer setter);            // user vertex data
-  public native @StdVector FloatPointer usernormal(); public native mjsMesh usernormal(FloatPointer setter);          // user normal data
-  public native @StdVector FloatPointer usertexcoord(); public native mjsMesh usertexcoord(FloatPointer setter);        // user texcoord data
-  public native @StdVector IntPointer userface(); public native mjsMesh userface(IntPointer setter);              // user vertex indices
-  public native @StdVector IntPointer userfacetexcoord(); public native mjsMesh userfacetexcoord(IntPointer setter);      // user texcoord indices
-  public native @ByRef mjsPlugin plugin(); public native mjsMesh plugin(mjsPlugin setter);                // sdf plugin
-  public native @StdString BytePointer info(); public native mjsMesh info(BytePointer setter);                  // message appended to compiler errors
+  public native int maxhullvert(); public native mjsMesh maxhullvert(int setter);                 // maximum vertex count for the convex hull            // user vertex data          // user normal data        // user texcoord data              // user vertex indices      // user texcoord indices
+  public native @ByRef mjsPlugin plugin(); public native mjsMesh plugin(mjsPlugin setter);                // sdf plugin                  // message appended to compiler errors
 }
 
 
@@ -7139,16 +7012,11 @@ public static class mjsHField extends Pointer {
         return new mjsHField((Pointer)this).offsetAddress(i);
     }
         // height field specification
-  public native mjsElement element(); public native mjsHField element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsHField name(BytePointer setter);                  // name
-  public native @StdString BytePointer content_type(); public native mjsHField content_type(BytePointer setter);          // content type of file
-  public native @StdString BytePointer file(); public native mjsHField file(BytePointer setter);                  // file: (nrow, ncol, [elevation data])
+  public native mjsElement element(); public native mjsHField element(mjsElement setter);             // element type                  // name          // content type of file                  // file: (nrow, ncol, [elevation data])
   public native double size(int i); public native mjsHField size(int i, double setter);
   @MemberGetter public native DoublePointer size();                  // hfield size (ignore referencing geom size)
   public native int nrow(); public native mjsHField nrow(int setter);                        // number of rows
-  public native int ncol(); public native mjsHField ncol(int setter);                        // number of columns
-  public native @StdVector FloatPointer userdata(); public native mjsHField userdata(FloatPointer setter);            // user-provided elevation data
-  public native @StdString BytePointer info(); public native mjsHField info(BytePointer setter);                  // message appended to compiler errors
+  public native int ncol(); public native mjsHField ncol(int setter);                        // number of columns            // user-provided elevation data                  // message appended to compiler errors
 }
 
 
@@ -7170,29 +7038,17 @@ public static class mjsSkin extends Pointer {
         return new mjsSkin((Pointer)this).offsetAddress(i);
     }
           // skin specification
-  public native mjsElement element(); public native mjsSkin element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsSkin name(BytePointer setter);                  // name
-  public native @StdString BytePointer file(); public native mjsSkin file(BytePointer setter);                  // skin file
-  public native @StdString BytePointer material(); public native mjsSkin material(BytePointer setter);              // name of material used for rendering
+  public native mjsElement element(); public native mjsSkin element(mjsElement setter);             // element type                  // name                  // skin file              // name of material used for rendering
   public native float rgba(int i); public native mjsSkin rgba(int i, float setter);
   @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted
   public native float inflate(); public native mjsSkin inflate(float setter);                   // inflate in normal direction
   public native int group(); public native mjsSkin group(int setter);                       // group for visualization
 
-  // mesh
-  public native @StdVector FloatPointer vert(); public native mjsSkin vert(FloatPointer setter);                // vertex positions
-  public native @StdVector FloatPointer texcoord(); public native mjsSkin texcoord(FloatPointer setter);            // texture coordinates
-  public native @StdVector IntPointer face(); public native mjsSkin face(IntPointer setter);                  // faces
+  // mesh                // vertex positions            // texture coordinates                  // faces
 
-  // skin
-  public native @StdString BytePointer bodyname(); public native mjsSkin bodyname(BytePointer setter);           // body names
-  public native @StdVector FloatPointer bindpos(); public native mjsSkin bindpos(FloatPointer setter);             // bind pos
-  public native @StdVector FloatPointer bindquat(); public native mjsSkin bindquat(FloatPointer setter);            // bind quat
-  public native @StdVector IntPointer vertid(); public native mjsSkin vertid(IntPointer setter);             // vertex ids
-  public native @StdVector FloatPointer vertweight(); public native mjsSkin vertweight(FloatPointer setter);       // vertex weights
+  // skin           // body names             // bind pos            // bind quat             // vertex ids       // vertex weights
 
-  // other
-  public native @StdString BytePointer info(); public native mjsSkin info(BytePointer setter);                  // message appended to compiler errors
+  // other                  // message appended to compiler errors
 }
 
 
@@ -7213,8 +7069,7 @@ public static class mjsTexture extends Pointer {
         return new mjsTexture((Pointer)this).offsetAddress(i);
     }
        // texture specification
-  public native mjsElement element(); public native mjsTexture element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsTexture name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsTexture element(mjsElement setter);             // element type                  // name
   public native @Cast("mjtTexture") int type(); public native mjsTexture type(int setter);                 // texture type
 
   // method 1: builtin
@@ -7231,26 +7086,21 @@ public static class mjsTexture extends Pointer {
   public native int width(); public native mjsTexture width(int setter);                       // width in pixels
   public native int nchannel(); public native mjsTexture nchannel(int setter);                    // number of channels
 
-  // method 2: single file
-  public native @StdString BytePointer content_type(); public native mjsTexture content_type(BytePointer setter);          // content type of file
-  public native @StdString BytePointer file(); public native mjsTexture file(BytePointer setter);                  // png file to load; use for all sides of cube
+  // method 2: single file          // content type of file                  // png file to load; use for all sides of cube
   public native int gridsize(int i); public native mjsTexture gridsize(int i, int setter);
   @MemberGetter public native IntPointer gridsize();                 // size of grid for composite file; (1,1)-repeat
   public native @Cast("char") byte gridlayout(int i); public native mjsTexture gridlayout(int i, byte setter);
   @MemberGetter public native @Cast("char*") BytePointer gridlayout();             // row-major: L,R,F,B,U,D for faces; . for unused
 
-  // method 3: separate files
-  public native @StdString BytePointer cubefiles(); public native mjsTexture cubefiles(BytePointer setter);          // different file for each side of the cube
+  // method 3: separate files          // different file for each side of the cube
 
-  // method 4: from buffer read by user
-  public native @StdVector PointerPointer data(); public native mjsTexture data(PointerPointer setter);                  // texture data
+  // method 4: from buffer read by user                  // texture data
 
   // flip options
   public native @Cast("mjtByte") byte hflip(); public native mjsTexture hflip(byte setter);                   // horizontal flip
   public native @Cast("mjtByte") byte vflip(); public native mjsTexture vflip(byte setter);                   // vertical flip
 
-  // other
-  public native @StdString BytePointer info(); public native mjsTexture info(BytePointer setter);                  // message appended to compiler errors
+  // other                  // message appended to compiler errors
 }
 
 
@@ -7271,9 +7121,7 @@ public static class mjsMaterial extends Pointer {
         return new mjsMaterial((Pointer)this).offsetAddress(i);
     }
       // material specification
-  public native mjsElement element(); public native mjsMaterial element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsMaterial name(BytePointer setter);                  // name
-  public native @StdString BytePointer textures(); public native mjsMaterial textures(BytePointer setter);           // names of textures (empty: none)
+  public native mjsElement element(); public native mjsMaterial element(mjsElement setter);             // element type                  // name           // names of textures (empty: none)
   public native @Cast("mjtByte") byte texuniform(); public native mjsMaterial texuniform(byte setter);              // make texture cube uniform
   public native float texrepeat(int i); public native mjsMaterial texrepeat(int i, float setter);
   @MemberGetter public native FloatPointer texrepeat();              // texture repetition for 2D mapping
@@ -7284,8 +7132,7 @@ public static class mjsMaterial extends Pointer {
   public native float metallic(); public native mjsMaterial metallic(float setter);                  // metallic
   public native float roughness(); public native mjsMaterial roughness(float setter);                 // roughness
   public native float rgba(int i); public native mjsMaterial rgba(int i, float setter);
-  @MemberGetter public native FloatPointer rgba();                   // rgba
-  public native @StdString BytePointer info(); public native mjsMaterial info(BytePointer setter);                  // message appended to compiler errors
+  @MemberGetter public native FloatPointer rgba();                   // rgba                  // message appended to compiler errors
 }
 
 
@@ -7306,10 +7153,7 @@ public static class mjsPair extends Pointer {
         return new mjsPair((Pointer)this).offsetAddress(i);
     }
           // pair specification
-  public native mjsElement element(); public native mjsPair element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsPair name(BytePointer setter);                  // name
-  public native @StdString BytePointer geomname1(); public native mjsPair geomname1(BytePointer setter);             // name of geom 1
-  public native @StdString BytePointer geomname2(); public native mjsPair geomname2(BytePointer setter);             // name of geom 2
+  public native mjsElement element(); public native mjsPair element(mjsElement setter);             // element type                  // name             // name of geom 1             // name of geom 2
 
   // optional parameters: computed from geoms if not set by user
   public native int condim(); public native mjsPair condim(int setter);                      // contact dimensionality
@@ -7322,8 +7166,7 @@ public static class mjsPair extends Pointer {
   public native double margin(); public native mjsPair margin(double setter);                   // margin for contact detection
   public native double gap(); public native mjsPair gap(double setter);                      // include in solver if dist<margin-gap
   public native double friction(int i); public native mjsPair friction(int i, double setter);
-  @MemberGetter public native DoublePointer friction();              // full contact friction
-  public native @StdString BytePointer info(); public native mjsPair info(BytePointer setter);                  // message appended to errors
+  @MemberGetter public native DoublePointer friction();              // full contact friction                  // message appended to errors
 }
 
 
@@ -7344,11 +7187,7 @@ public static class mjsExclude extends Pointer {
         return new mjsExclude((Pointer)this).offsetAddress(i);
     }
        // exclude specification
-  public native mjsElement element(); public native mjsExclude element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsExclude name(BytePointer setter);                  // name
-  public native @StdString BytePointer bodyname1(); public native mjsExclude bodyname1(BytePointer setter);             // name of geom 1
-  public native @StdString BytePointer bodyname2(); public native mjsExclude bodyname2(BytePointer setter);             // name of geom 2
-  public native @StdString BytePointer info(); public native mjsExclude info(BytePointer setter);                  // message appended to errors
+  public native mjsElement element(); public native mjsExclude element(mjsElement setter);             // element type                  // name             // name of geom 1             // name of geom 2                  // message appended to errors
 }
 
 
@@ -7369,20 +7208,16 @@ public static class mjsEquality extends Pointer {
         return new mjsEquality((Pointer)this).offsetAddress(i);
     }
       // equality specification
-  public native mjsElement element(); public native mjsEquality element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsEquality name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsEquality element(mjsElement setter);             // element type                  // name
   public native @Cast("mjtEq") int type(); public native mjsEquality type(int setter);                      // constraint type
   public native double data(int i); public native mjsEquality data(int i, double setter);
   @MemberGetter public native DoublePointer data();          // type-dependent data
-  public native @Cast("mjtByte") byte active(); public native mjsEquality active(byte setter);                  // is equality initially active
-  public native @StdString BytePointer name1(); public native mjsEquality name1(BytePointer setter);                 // name of object 1
-  public native @StdString BytePointer name2(); public native mjsEquality name2(BytePointer setter);                 // name of object 2
+  public native @Cast("mjtByte") byte active(); public native mjsEquality active(byte setter);                  // is equality initially active                 // name of object 1                 // name of object 2
   public native @Cast("mjtObj") int objtype(); public native mjsEquality objtype(int setter);                  // type of both objects
   public native @Cast("mjtNum") double solref(int i); public native mjsEquality solref(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer solref();           // solver reference
   public native @Cast("mjtNum") double solimp(int i); public native mjsEquality solimp(int i, double setter);
-  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp();           // solver impedance
-  public native @StdString BytePointer info(); public native mjsEquality info(BytePointer setter);                  // message appended to errors
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp();           // solver impedance                  // message appended to errors
 }
 
 
@@ -7403,8 +7238,7 @@ public static class mjsTendon extends Pointer {
         return new mjsTendon((Pointer)this).offsetAddress(i);
     }
         // tendon specification
-  public native mjsElement element(); public native mjsTendon element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsTendon name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsTendon element(mjsElement setter);             // element type                  // name
 
   // stiffness, damping, friction
   public native double stiffness(); public native mjsTendon stiffness(double setter);                // stiffness coefficient
@@ -7427,16 +7261,13 @@ public static class mjsTendon extends Pointer {
   public native @Cast("mjtNum") double solimp_limit(int i); public native mjsTendon solimp_limit(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp_limit();     // solver impedance: tendon limits
 
-  // visual
-  public native @StdString BytePointer material(); public native mjsTendon material(BytePointer setter);              // name of material for rendering
+  // visual              // name of material for rendering
   public native double width(); public native mjsTendon width(double setter);                    // width for rendering
   public native float rgba(int i); public native mjsTendon rgba(int i, float setter);
   @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted
   public native int group(); public native mjsTendon group(int setter);                       // group
 
-  // other
-  public native @StdVector DoublePointer userdata(); public native mjsTendon userdata(DoublePointer setter);           // user data
-  public native @StdString BytePointer info(); public native mjsTendon info(BytePointer setter);                  // message appended to errors
+  // other           // user data                  // message appended to errors
 }
 
 
@@ -7457,8 +7288,7 @@ public static class mjsWrap extends Pointer {
         return new mjsWrap((Pointer)this).offsetAddress(i);
     }
           // wrapping object specification
-  public native mjsElement element(); public native mjsWrap element(mjsElement setter);             // element type
-  public native @StdString BytePointer info(); public native mjsWrap info(BytePointer setter);                  // message appended to errors
+  public native mjsElement element(); public native mjsWrap element(mjsElement setter);             // element type                  // message appended to errors
 }
 
 
@@ -7479,8 +7309,7 @@ public static class mjsActuator extends Pointer {
         return new mjsActuator((Pointer)this).offsetAddress(i);
     }
       // actuator specification
-  public native mjsElement element(); public native mjsActuator element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsActuator name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsActuator element(mjsElement setter);             // element type                  // name
 
   // gain, bias
   public native @Cast("mjtGain") int gaintype(); public native mjsActuator gaintype(int setter);                // gain type
@@ -7500,10 +7329,7 @@ public static class mjsActuator extends Pointer {
   // transmission
   public native @Cast("mjtTrn") int trntype(); public native mjsActuator trntype(int setter);                  // transmission type
   public native double gear(int i); public native mjsActuator gear(int i, double setter);
-  @MemberGetter public native DoublePointer gear();                  // length and transmitted force scaling
-  public native @StdString BytePointer target(); public native mjsActuator target(BytePointer setter);                // name of transmission target
-  public native @StdString BytePointer refsite(); public native mjsActuator refsite(BytePointer setter);               // reference site, for site transmission
-  public native @StdString BytePointer slidersite(); public native mjsActuator slidersite(BytePointer setter);            // site defining cylinder, for slider-crank
+  @MemberGetter public native DoublePointer gear();                  // length and transmitted force scaling                // name of transmission target               // reference site, for site transmission            // site defining cylinder, for slider-crank
   public native double cranklength(); public native mjsActuator cranklength(double setter);              // crank length, for slider-crank
   public native double lengthrange(int i); public native mjsActuator lengthrange(int i, double setter);
   @MemberGetter public native DoublePointer lengthrange();           // transmission length range
@@ -7521,10 +7347,8 @@ public static class mjsActuator extends Pointer {
   @MemberGetter public native DoublePointer actrange();              // activation range
 
   // other
-  public native int group(); public native mjsActuator group(int setter);                       // group
-  public native @StdVector DoublePointer userdata(); public native mjsActuator userdata(DoublePointer setter);           // user data
-  public native @ByRef mjsPlugin plugin(); public native mjsActuator plugin(mjsPlugin setter);                // actuator plugin
-  public native @StdString BytePointer info(); public native mjsActuator info(BytePointer setter);                  // message appended to compiler errors
+  public native int group(); public native mjsActuator group(int setter);                       // group           // user data
+  public native @ByRef mjsPlugin plugin(); public native mjsActuator plugin(mjsPlugin setter);                // actuator plugin                  // message appended to compiler errors
 }
 
 
@@ -7545,15 +7369,12 @@ public static class mjsSensor extends Pointer {
         return new mjsSensor((Pointer)this).offsetAddress(i);
     }
         // sensor specification
-  public native mjsElement element(); public native mjsSensor element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsSensor name(BytePointer setter);                  // name
+  public native mjsElement element(); public native mjsSensor element(mjsElement setter);             // element type                  // name
 
   // sensor definition
   public native @Cast("mjtSensor") int type(); public native mjsSensor type(int setter);                  // type of sensor
-  public native @Cast("mjtObj") int objtype(); public native mjsSensor objtype(int setter);                  // type of sensorized object
-  public native @StdString BytePointer objname(); public native mjsSensor objname(BytePointer setter);               // name of sensorized object
-  public native @Cast("mjtObj") int reftype(); public native mjsSensor reftype(int setter);                  // type of referenced object
-  public native @StdString BytePointer refname(); public native mjsSensor refname(BytePointer setter);               // name of referenced object
+  public native @Cast("mjtObj") int objtype(); public native mjsSensor objtype(int setter);                  // type of sensorized object               // name of sensorized object
+  public native @Cast("mjtObj") int reftype(); public native mjsSensor reftype(int setter);                  // type of referenced object               // name of referenced object
 
   // user-defined sensors
   public native @Cast("mjtDataType") int datatype(); public native mjsSensor datatype(int setter);            // data type for sensor measurement
@@ -7564,10 +7385,8 @@ public static class mjsSensor extends Pointer {
   public native double cutoff(); public native mjsSensor cutoff(double setter);                   // cutoff for real and positive datatypes
   public native double noise(); public native mjsSensor noise(double setter);                    // noise stdev
 
-  // other
-  public native @StdVector DoublePointer userdata(); public native mjsSensor userdata(DoublePointer setter);           // user data
-  public native @ByRef mjsPlugin plugin(); public native mjsSensor plugin(mjsPlugin setter);                // sensor plugin
-  public native @StdString BytePointer info(); public native mjsSensor info(BytePointer setter);                  // message appended to compiler errors
+  // other           // user data
+  public native @ByRef mjsPlugin plugin(); public native mjsSensor plugin(mjsPlugin setter);                // sensor plugin                  // message appended to compiler errors
 }
 
 
@@ -7588,11 +7407,8 @@ public static class mjsNumeric extends Pointer {
         return new mjsNumeric((Pointer)this).offsetAddress(i);
     }
        // custom numeric field specification
-  public native mjsElement element(); public native mjsNumeric element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsNumeric name(BytePointer setter);                  // name
-  public native @StdVector DoublePointer data(); public native mjsNumeric data(DoublePointer setter);               // initialization data
-  public native int size(); public native mjsNumeric size(int setter);                        // array size, can be bigger than data size
-  public native @StdString BytePointer info(); public native mjsNumeric info(BytePointer setter);                  // message appended to compiler errors
+  public native mjsElement element(); public native mjsNumeric element(mjsElement setter);             // element type                  // name               // initialization data
+  public native int size(); public native mjsNumeric size(int setter);                        // array size, can be bigger than data size                  // message appended to compiler errors
 }
 
 
@@ -7613,10 +7429,7 @@ public static class mjsText extends Pointer {
         return new mjsText((Pointer)this).offsetAddress(i);
     }
           // custom text specification
-  public native mjsElement element(); public native mjsText element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsText name(BytePointer setter);                  // name
-  public native @StdString BytePointer data(); public native mjsText data(BytePointer setter);                  // text string
-  public native @StdString BytePointer info(); public native mjsText info(BytePointer setter);                  // message appended to compiler errors
+  public native mjsElement element(); public native mjsText element(mjsElement setter);             // element type                  // name                  // text string                  // message appended to compiler errors
 }
 
 
@@ -7637,12 +7450,7 @@ public static class mjsTuple extends Pointer {
         return new mjsTuple((Pointer)this).offsetAddress(i);
     }
          // tuple specification
-  public native mjsElement element(); public native mjsTuple element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsTuple name(BytePointer setter);                  // name
-  public native @StdVector IntPointer objtype(); public native mjsTuple objtype(IntPointer setter);               // object types
-  public native @StdString BytePointer objname(); public native mjsTuple objname(BytePointer setter);            // object names
-  public native @StdVector DoublePointer objprm(); public native mjsTuple objprm(DoublePointer setter);             // object parameters
-  public native @StdString BytePointer info(); public native mjsTuple info(BytePointer setter);                  // message appended to compiler errors
+  public native mjsElement element(); public native mjsTuple element(mjsElement setter);             // element type                  // name               // object types            // object names             // object parameters                  // message appended to compiler errors
 }
 
 
@@ -7663,16 +7471,8 @@ public static class mjsKey extends Pointer {
         return new mjsKey((Pointer)this).offsetAddress(i);
     }
            // keyframe specification
-  public native mjsElement element(); public native mjsKey element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsKey name(BytePointer setter);                  // name
-  public native double time(); public native mjsKey time(double setter);                     // time
-  public native @StdVector DoublePointer qpos(); public native mjsKey qpos(DoublePointer setter);               // qpos
-  public native @StdVector DoublePointer qvel(); public native mjsKey qvel(DoublePointer setter);               // qvel
-  public native @StdVector DoublePointer act(); public native mjsKey act(DoublePointer setter);                // act
-  public native @StdVector DoublePointer mpos(); public native mjsKey mpos(DoublePointer setter);               // mocap pos
-  public native @StdVector DoublePointer mquat(); public native mjsKey mquat(DoublePointer setter);              // mocap quat
-  public native @StdVector DoublePointer ctrl(); public native mjsKey ctrl(DoublePointer setter);               // ctrl
-  public native @StdString BytePointer info(); public native mjsKey info(BytePointer setter);                  // message appended to compiler errors
+  public native mjsElement element(); public native mjsKey element(mjsElement setter);             // element type                  // name
+  public native double time(); public native mjsKey time(double setter);                     // time               // qpos               // qvel                // act               // mocap pos              // mocap quat               // ctrl                  // message appended to compiler errors
 }
 
 
@@ -7693,8 +7493,7 @@ public static class mjsDefault extends Pointer {
         return new mjsDefault((Pointer)this).offsetAddress(i);
     }
        // default specification
-  public native mjsElement element(); public native mjsDefault element(mjsElement setter);             // element type
-  public native @StdString BytePointer name(); public native mjsDefault name(BytePointer setter);                  // class name
+  public native mjsElement element(); public native mjsDefault element(mjsElement setter);             // element type                  // class name
   public native mjsJoint joint(); public native mjsDefault joint(mjsJoint setter);                 // joint defaults
   public native mjsGeom geom(); public native mjsDefault geom(mjsGeom setter);                   // geom defaults
   public native mjsSite site(); public native mjsDefault site(mjsSite setter);                   // site defaults

@@ -4,22 +4,37 @@ import org.bytedeco.javacpp.*;
 import org.bytedeco.javacpp.annotation.*;
 import org.bytedeco.javacpp.tools.*;
 
-@Properties(value = { @Platform(includepath = { "/tmp/mujoco/include/" }, linkpath = { "/tmp/mujoco/lib/" }, include = {
-		"mujoco/mjtnum.h",
-
-		"mujoco/mjexport.h", "mujoco/mujoco.h", "mujoco/mjmacro.h", "mujoco/mjthread.h", "mujoco/mjdata.h",
-		"mujoco/mjmodel.h", "mujoco/mjrender.h", "mujoco/mjui.h", "mujoco/mjvisualize.h",
-
-		"mujoco/mjplugin.h", "mujoco/mjspec.h",
-				// "mujoco/mjxmacro.h" // This will not work with JavaCPP
-		}, link = { "mujoco" }),
-		@Platform(value = "windows-x86_64", includepath = { "mujoco/include/",
-				"C:/Users/runneradmin/AppData/Local/Temp/mujoco/include/" }, linkpath = { "mujoco/lib/",
-						"C:/Users/runneradmin/AppData/Local/Temp/mujoco/lib/" }) }, target = "org.mujoco.MuJoCoLib")
+@Properties(
+		value = { 
+				@Platform(
+						includepath = { "/tmp/mujoco/include/" }, 
+						linkpath = { "/tmp/mujoco/lib/" }, 
+						
+						include = {
+							"mujoco/mjtnum.h",
+					
+							"mujoco/mjexport.h", "mujoco/mujoco.h", "mujoco/mjmacro.h", "mujoco/mjthread.h", "mujoco/mjdata.h",
+							"mujoco/mjmodel.h", "mujoco/mjrender.h", "mujoco/mjui.h", "mujoco/mjvisualize.h",
+					
+							"mujoco/mjplugin.h", "mujoco/mjspec.h",
+									// "mujoco/mjxmacro.h" // This will not work with JavaCPP
+						}, 
+						link = {
+								"mujoco" 
+								}
+						)
+				,
+		@Platform(value = "windows-x86_64", 
+		includepath = { "mujoco/include/",
+				"C:/Users/runneradmin/AppData/Local/Temp/mujoco/include/" }, 
+		linkpath = { "mujoco/lib/",
+						"C:/Users/runneradmin/AppData/Local/Temp/mujoco/lib/" }) },
+	target = "org.mujoco.MuJoCoLib")
 
 public class MuJoCoConfig implements InfoMapper {
 	public void map(InfoMap infoMap) {
-		infoMap.put(new Info("MJ_STATIC").define(true));
+        
+        infoMap.put(new Info("MJ_STATIC").define(true));
 		infoMap.put(new Info("mjtNum").cast().valueTypes("double").pointerTypes("DoublePointer"));
 //		infoMap.put(new Info("mjString")
 //			    .cast()
@@ -62,11 +77,11 @@ public class MuJoCoConfig implements InfoMapper {
 		infoMap.put(new Info("std::vector<double>").pointerTypes("DoublePointer").valueTypes("DoubleBuffer"));
 
 		// Handle mjByteVec (std::vector<std::byte>)
-//		infoMap.put(new Info("mjByteVec").skip());
-//		infoMap.put(new Info("std::vector<std::byte>").pointerTypes("BytePointer").valueTypes("ByteBuffer"));
-		// For unsigned char:
 		infoMap.put(new Info("mjByteVec").skip());
-		infoMap.put(new Info("std::vector<unsigned char>").pointerTypes("BytePointer").valueTypes("ByteBuffer"));
+		infoMap.put(new Info("std::vector<std::byte>").pointerTypes("BytePointer").valueTypes("ByteBuffer"));
+		// For unsigned char:
+//		infoMap.put(new Info("mjByteVec").skip());
+//		infoMap.put(new Info("std::vector<unsigned char>").pointerTypes("BytePointer").valueTypes("ByteBuffer"));
 		
 		// mjString
 		// infoMap.put(new

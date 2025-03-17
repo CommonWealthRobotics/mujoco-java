@@ -45,15 +45,15 @@ public class MuJoCoConfig implements InfoMapper {
 		infoMap.put(new Info("mjIntVec").skip());
 		infoMap.put(new Info("std::vector<int>").pointerTypes("IntPointer").valueTypes("IntBuffer"));
 
-		// Handle mjIntVecVec (std::vector<std::vector<int>>)
+		// Handle mjIntVecVec (std::vector<std::vector<int> >)
 		infoMap.put(new Info("mjIntVecVec").skip());
-		infoMap.put(new Info("std::vector<std::vector<int>>").pointerTypes("PointerPointer<IntPointer>"));
+		infoMap.put(new Info("std::vector< std::vector<int> >").pointerTypes("PointerPointer<IntPointer>"));
 
 		// Handle mjFloatVec (std::vector<float>)
 		infoMap.put(new Info("mjFloatVec").skip());
 		infoMap.put(new Info("std::vector<float>").pointerTypes("FloatPointer").valueTypes("FloatBuffer"));
 
-		// Handle mjFloatVecVec (std::vector<std::vector<float>>)
+		// Handle mjFloatVecVec (std::vector<std::vector<float> >)
 		infoMap.put(new Info("mjFloatVecVec").skip());
 		infoMap.put(new Info("std::vector< std::vector<float> >").pointerTypes("PointerPointer<FloatPointer>"));
 

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo "Linux Build"
+echo "Linux Arm Build"
 VER=$(cat mujocoRelease.txt)
-TYPE=linux-x86_64
-ARCHIVE=mujoco-$VER-$TYPE.tar.gz
+TYPE=linux-arm64
+ARCHIVE=mujoco-$VER-linux-aarch64.tar.gz
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 JAVADIR=$SCRIPT_DIR/src/main/java/
 
@@ -45,7 +45,6 @@ echo "JavaCPP configs:"
 $JAVA_HOME/bin/java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -Dcompiler.includepath=$BUILDDIR/include/ -print properties.includepath
 
 $JAVA_HOME/bin/java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
-
 echo "Start compile \n\n"
 $JAVA_HOME/bin/java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  -copylibs -copyresources -Xcompiler "-no-pie"  -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
 LIBPATH=$PWD/../resources/$TYPE/

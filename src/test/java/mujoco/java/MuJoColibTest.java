@@ -8,18 +8,11 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.HashMap;
 
-import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.javacpp.IntPointer;
-import org.bytedeco.javacpp.Pointer;
 import org.junit.Test;
 import org.mujoco.IMujocoController;
 import org.mujoco.MuJoCoLib;
-import org.mujoco.MuJoCoLib.mjData;
 import org.mujoco.MuJoCoLib.mjData_;
-import org.mujoco.MuJoCoLib.mjModel;
 import org.mujoco.MuJoCoLib.mjModel_;
-import org.mujoco.MuJoCoLib.mjOption_;
-import org.mujoco.MuJoCoLib.mjVFS;
 import org.mujoco.MuJoCoModelManager;
 
 public class MuJoColibTest {

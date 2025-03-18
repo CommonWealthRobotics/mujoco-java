@@ -16,7 +16,8 @@ import org.bytedeco.javacpp.tools.*;
 							"mujoco/mjexport.h", "mujoco/mujoco.h", "mujoco/mjmacro.h", "mujoco/mjthread.h", "mujoco/mjdata.h",
 							"mujoco/mjmodel.h", "mujoco/mjrender.h", "mujoco/mjui.h", "mujoco/mjvisualize.h",
 					
-							"mujoco/mjplugin.h", "mujoco/mjspec.h",
+							"mujoco/mjplugin.h", 
+							//"mujoco/mjspec.h",
 									// "mujoco/mjxmacro.h" // This will not work with JavaCPP
 						}, 
 						link = {

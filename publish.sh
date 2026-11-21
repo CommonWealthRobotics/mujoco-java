@@ -1,5 +1,12 @@
 #!/bin/bash
 
+set -e
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# install and use the JDK pinned in the jvm submodule
+. "$SCRIPT_DIR/setupJvm.sh"
+
 cat <(echo -e $OSSRH_GPG_SECRET_KEY) | gpg1 --batch --import
 gpg1 --list-secret-keys --keyid-format LONG
 
@@ -10,4 +17,3 @@ ls -al $HOME/.gnupg/
 cp  build/libs/mujoco-java-$VERSION_SEMVER.jar  mujoco-java.jar
 # close and release Sonatype
 ./gradlew closeAndReleaseRepository -PnexusUsername=$MAVEN_USERNAME -PnexusPassword=$MAVEN_PASSWORD
-

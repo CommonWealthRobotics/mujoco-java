@@ -47,7 +47,7 @@ dependencies {
 
 
 group='com.neuronrobotics'
-archivesBaseName='mujoco-java'
+base { archivesName = 'mujoco-java' }
 version = System.getenv("VERSION_SEMVER")
 
 nexusStaging {

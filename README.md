@@ -69,6 +69,19 @@ The binding tracks the MuJoCo release in `mujocoRelease.txt`. The XML schema
 `schema/mjcf.xsd` is vendored from that same release; regenerate the JAXB
 classes with `bash GenerateXMLClasses.sh` after upgrading it.
 
+The JDK is pinned in the `jvm` submodule (`jvm/jvm.json`), not taken from
+`JAVA_HOME` or `PATH`. The build scripts source `setupJvm.sh`, which installs
+that JDK to `~/bin/CaDoodle-ApplicationInstall/` on first use and then exports
+`JAVA_HOME`/`PATH` for the rest of the build. Clone with submodules:
+
+```
+git clone --recurse-submodules <url>
+git submodule update --init jvm    # existing checkouts
+```
+
+`jq` must be on `PATH`; the `jvm` scripts use it to read `jvm.json`. Override
+the install location or pin with `JDK_INSTALL_ROOT` / `JVM_KEY`.
+
 Windows `bash build-windows.sh`
 
 Linux `bash build-linux.sh`

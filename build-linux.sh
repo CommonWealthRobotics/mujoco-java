@@ -2,18 +2,16 @@
 
 set -e
 
-: "${JAVA_HOME:?set JAVA_HOME to a JDK 17 or newer}"
-
 echo "Linux Build"
 VER=$(cat mujocoRelease.txt)
 TYPE=linux-x86_64
 ARCHIVE=mujoco-$VER-$TYPE.tar.gz
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# install and use the JDK pinned in the jvm submodule
+. "$SCRIPT_DIR/setupJvm.sh"
 JAVADIR=$SCRIPT_DIR/src/main/java/
 RESDIR=$SCRIPT_DIR/src/main/resources/$TYPE/
-
-# javacpp invokes "javac" from PATH for its code generator
-export PATH=$JAVA_HOME/bin:$PATH
 
 BUILDDIR=$SCRIPT_DIR/cppbuild
 if [ -f "$SCRIPT_DIR/$ARCHIVE" ]; then

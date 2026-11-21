@@ -5,6 +5,9 @@ VER=$(cat mujocoRelease.txt)
 TYPE=linux-arm64
 ARCHIVE=mujoco-$VER-linux-aarch64.tar.gz
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# install and use the JDK pinned in the jvm submodule
+. "$SCRIPT_DIR/setupJvm.sh"
 JAVADIR=$SCRIPT_DIR/src/main/java/
 
 BUILDDIR=$SCRIPT_DIR/cppbuild

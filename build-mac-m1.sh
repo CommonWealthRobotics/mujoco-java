@@ -9,6 +9,9 @@ ARCHIVE=mujoco-$VER-macos-universal2.dmg
 URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
 echo "$URL"
 SCRIPT_DIR=$( pwd )
+
+# install and use the JDK pinned in the jvm submodule
+. "$SCRIPT_DIR/setupJvm.sh"
 BUILDDIR=/tmp/
 set -e
 
@@ -61,8 +64,8 @@ cp $BUILDDIR/mujoco/lib/* $JAVADIR/
 echo "Moving headers "
 rm -rf $JAVADIR/mujoco/
 cp -r $BUILDDIR/mujoco/include/mujoco $JAVADIR/
-java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
-java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
+$JAVA_HOME/bin/java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
+$JAVA_HOME/bin/java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
 
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/

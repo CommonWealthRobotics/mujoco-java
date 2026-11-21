@@ -23,7 +23,7 @@ jobs:
           name: linux-arm-lib
           path: src/main/resources/linux-arm64/*
   linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Checkout
       uses: actions/checkout@v1
@@ -59,7 +59,7 @@ jobs:
           path: src/main/resources/windows-x86_64/*
 
   macos:
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
     - name: Checkout
       uses: actions/checkout@v1

@@ -21,24 +21,24 @@ Examples are designed to run in [Bowler Studio](http://commonwealthrobotics.com)
 
 # Clojars
 
-[![Clojars Project](https://img.shields.io/clojars/v/com.neuronrobotics/mujoco-java.svg)](https://clojars.org/com.neuronrobotics/mujoco-java)
+[![Clojars Project](https://img.shields.io/clojars/v/com.github.madhephaestus/mujoco-java.svg)](https://clojars.org/com.github.madhephaestus/mujoco-java)
 
-MuJoCo-Java is published to [Clojars](https://clojars.org/com.neuronrobotics/mujoco-java).
+MuJoCo-Java is published to [Clojars](https://clojars.org/com.github.madhephaestus/mujoco-java).
 
 Maven:
 
 ```
 <dependency>
-  <groupId>com.neuronrobotics</groupId>
+  <groupId>com.github.madhephaestus</groupId>
   <artifactId>mujoco-java</artifactId>
-  <version>4.0.1-pre1</version>
+  <version>4.0.1-pre2</version>
 </dependency>
 ```
 
 Leiningen / Clojure:
 
 ```clojure
-[com.neuronrobotics/mujoco-java "4.0.1-pre1"]
+[com.github.madhephaestus/mujoco-java "4.0.1-pre2"]
 ```
 
 Gradle:
@@ -49,7 +49,7 @@ repositories {
 }
 
 dependencies {
-	implementation group: 'com.neuronrobotics', name: 'mujoco-java', version: '4.0.1-pre1'
+	implementation group: 'com.github.madhephaestus', name: 'mujoco-java', version: '4.0.1-pre2'
 }
 ```
 
@@ -96,12 +96,12 @@ aborts if JavaCPP produced a different arch directory than it expects.
 
 # Publishing
 
-Publishing goes to [Clojars](https://clojars.org/com.neuronrobotics/mujoco-java)
+Publishing goes to [Clojars](https://clojars.org/com.github.madhephaestus/mujoco-java)
 and is triggered by pushing a tag. The tag is the published version:
 
 ```
-git tag 4.0.1-pre1
-git push origin 4.0.1-pre1
+git tag 4.0.1-pre2
+git push origin 4.0.1-pre2
 ```
 
 The `release.yml` workflow builds each platform, collects the natives, then
@@ -125,7 +125,7 @@ platform build scripts first (or fetch the CI artifacts) to get all the natives,
 then:
 
 ```
-./publish.sh 4.0.1-pre1
+./publish.sh 4.0.1-pre2
 ```
 
 `publish.sh` refuses to run without both environment variables, and warns when

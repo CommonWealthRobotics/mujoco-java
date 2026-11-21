@@ -45,7 +45,7 @@ dependencies {
 
 
 // Clojars coordinates. The version comes from the git tag; see findVersion.sh.
-group = 'com.neuronrobotics'
+group = 'com.github.madhephaestus'
 base { archivesName = 'mujoco-java' }
 version = System.getenv("VERSION_SEMVER") ?: '0.0.0-SNAPSHOT'
 

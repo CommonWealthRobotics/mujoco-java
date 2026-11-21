@@ -3,8 +3,8 @@
 	<artifactId>mujoco-java</artifactId>
 	<name>mujoco-java</name>
 
-	<groupId>com.neuronrobotics</groupId>
-	<version>4.0.1-pre1</version>
+	<groupId>com.github.madhephaestus</groupId>
+	<version>4.0.1-pre2</version>
 	<description>JAXB code generation only; publishing is done by build.gradle</description>
 	<dependencies>
 		<dependency>

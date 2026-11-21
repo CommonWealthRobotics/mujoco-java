@@ -5,15 +5,22 @@ on:
    push
 
 jobs:
+  linux-arm:
+    runs-on: ubuntu-24.04-arm
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+      with:
+          submodules: recursive
+    - name: Build
+      run: bash build-linux-arm.sh
   linux:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-    - uses: actions/setup-java@v3
       with:
-          java-version: '8'
-          distribution: 'zulu'
+          submodules: recursive
     - name: Build
       run: bash build-linux.sh
 
@@ -22,23 +29,19 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+      with:
+          submodules: recursive
     - uses: ilammy/msvc-dev-cmd@v1
     - uses: microsoft/setup-msbuild@v1.1
-    - uses: actions/setup-java@v3
-      with:
-          java-version: '8'
-          distribution: 'zulu'
     - name: Build
       run: bash build-windows.sh
 
   macos:
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-    - uses: actions/setup-java@v3
       with:
-          java-version: '8'
-          distribution: 'zulu' 
+          submodules: recursive
     - name: Build
-      run:  bash build-mac.sh
+      run: bash build-mac-m1.sh

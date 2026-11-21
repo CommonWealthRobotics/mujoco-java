@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 bash --version
 g++ --version
 echo "Mac M1 Build"
@@ -9,6 +11,9 @@ ARCHIVE=mujoco-$VER-macos-universal2.dmg
 URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
 echo "$URL"
 SCRIPT_DIR=$( pwd )
+
+# install and use the JDK pinned in the jvm submodule
+. "$SCRIPT_DIR/setupJvm.sh"
 BUILDDIR=/tmp/
 set -e
 
@@ -61,23 +66,30 @@ cp $BUILDDIR/mujoco/lib/* $JAVADIR/
 echo "Moving headers "
 rm -rf $JAVADIR/mujoco/
 cp -r $BUILDDIR/mujoco/include/mujoco $JAVADIR/
-java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
-java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
+$JAVA_HOME/bin/java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
+# mjspec.h uses std::byte; clang on macOS defaults to C++14
+$JAVA_HOME/bin/java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-std=c++17" -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
 
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
-rm -rf $JAVADIR../resources/$TYPE
+rm -rf $JAVADIR/../resources/$TYPE
+mkdir -p $JAVADIR/../resources/$TYPE
 find $SCRIPT_DIR|grep $TYPE
-mv $JAVADIR/org/mujoco/$TYPE/ $JAVADIR../resources/
-cp $BUILDDIR/mujoco/lib/* $JAVADIR../resources/$TYPE/
+BUILT_TYPE=$(ls -d $JAVADIR/org/mujoco/macosx-* 2>/dev/null | xargs -n1 basename | head -1)
+[ "$BUILT_TYPE" = "$TYPE" ] || {
+	echo "JavaCPP built '$BUILT_TYPE' but this script expects '$TYPE'; run the script matching the host arch (uname -m: $(uname -m))" >&2
+	exit 1
+}
+mv $JAVADIR/org/mujoco/$TYPE/* $JAVADIR/../resources/$TYPE/
+cp $BUILDDIR/mujoco/lib/* $JAVADIR/../resources/$TYPE/
 
-echo "ls -al $JAVADIR../resources/"
-ls -al $JAVADIR../resources/
+echo "ls -al $JAVADIR/../resources/"
+ls -al $JAVADIR/../resources/
 
 cd $SCRIPT_DIR/
 echo "Resource Files: "
-ls -al $JAVADIR../resources/*
-ls -al $JAVADIR../resources/$TYPE
+ls -al $JAVADIR/../resources/*
+ls -al $JAVADIR/../resources/$TYPE
 ./gradlew jar  --stacktrace test
 
 

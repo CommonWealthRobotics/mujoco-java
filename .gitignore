@@ -22,3 +22,4 @@ src/main/java/mujoco/*.h
 cppbuild
 *hs_err_*.log
 /MUJOCO_LOG.TXT
+/.jdkverify/

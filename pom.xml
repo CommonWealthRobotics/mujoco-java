@@ -3,8 +3,9 @@
 	<artifactId>mujoco-java</artifactId>
 	<name>mujoco-java</name>
 
-	<groupId>org.mujoco</groupId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>com.github.madhephaestus</groupId>
+	<version>4.0.1-pre2</version>
+	<description>JAXB code generation only; publishing is done by build.gradle</description>
 	<dependencies>
 		<dependency>
 			<groupId>net.codesup.util</groupId>
@@ -17,7 +18,7 @@
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.14.0</version>
+				<version>0.15.3</version>
 				<executions>
 					<execution>
 						<id>xsd-generate</id>
@@ -31,7 +32,7 @@
 					<schemaDirectory>schema/</schemaDirectory>
 					<generateDirectory>src/main/java/</generateDirectory>
 					<schemaIncludes>
-						<schemaInclude>mujoco.xsd</schemaInclude>
+						<schemaInclude>mjcf.xsd</schemaInclude>
 					</schemaIncludes>
 					<strict>false</strict>
 					<verbose>true</verbose>
@@ -97,17 +98,17 @@
 						<dependency>
 							<groupId>org.glassfish.jaxb</groupId>
 							<artifactId>jaxb-runtime</artifactId>
-							<version>2.3</version>
+							<version>2.3.9</version>
 						</dependency>
 						<dependency>
 							<groupId>org.glassfish.jaxb</groupId>
 							<artifactId>jaxb-core</artifactId>
-							<version>2.3</version>
+							<version>2.3.9</version>
 						</dependency>
 						<dependency>
 							<groupId>org.glassfish.jaxb</groupId>
 							<artifactId>jaxb-xjc</artifactId>
-							<version>2.3</version>
+							<version>2.3.9</version>
 						</dependency>
 					</dependencies>
 				</configuration>

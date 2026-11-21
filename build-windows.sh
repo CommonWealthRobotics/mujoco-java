@@ -11,6 +11,9 @@ export ARCHIVE=mujoco-$VER-$TYPE.zip
 export URL=https://github.com/deepmind/mujoco/releases/download/$VER/$ARCHIVE
 echo "$URL"
 SCRIPT_DIR=$( pwd )
+
+# install and use the JDK pinned in the jvm submodule
+. "$SCRIPT_DIR/setupJvm.sh"
 JAVADIR=$SCRIPT_DIR/src/main/java/
 BUILDDIR=/tmp/
 mkdir -p $BUILDDIR
@@ -22,8 +25,6 @@ else
 	mkdir mujoco
 	cd mujoco
 	7z x ../$ARCHIVE
-	echo $BUILDDIRmujoco
-	ls -al $BUILDDIRmujoco
 	cd $BUILDDIR
 	echo $BUILDDIR
 	ls -al
@@ -55,8 +56,10 @@ fi
 cp $BUILDDIR/mujoco/lib/* $JAVADIR/
 mv $BUILDDIR/mujoco/include/mujoco $JAVADIR/
 cd $JAVADIR
-java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
-java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
+$JAVA_HOME/bin/java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
+# mjspec.h uses std::byte, and JavaCPP 1.5.7 ships no /std: flag for MSVC,
+# which then defaults to C++14
+$JAVA_HOME/bin/java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "/std:c++17" -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
 
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
@@ -65,8 +68,9 @@ echo "ls -al JAVADIR $JAVADIR"
 ls -al $JAVADIR
 
 rm -rf $JAVADIR../resources/$TYPE
+mkdir -p $JAVADIR../resources/$TYPE
 find $SCRIPT_DIR|grep $TYPE
-mv $JAVADIR/org/mujoco/$TYPE/ $JAVADIR../resources/
+mv $JAVADIR/org/mujoco/$TYPE/* $JAVADIR../resources/$TYPE/
 cp $BUILDDIR/mujoco/lib/* $JAVADIR../resources/$TYPE/
 cp $BUILDDIR/mujoco/bin/mujoco.dll $JAVADIR../resources/$TYPE/
 echo "ls -al $JAVADIR../resources/"

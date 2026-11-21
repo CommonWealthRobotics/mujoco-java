@@ -11,19 +11,17 @@ import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacpp.IntPointer;
 import org.mujoco.MuJoCoLib.mjData;
-import org.mujoco.MuJoCoLib.mjData_;
 import org.mujoco.MuJoCoLib.mjModel;
-import org.mujoco.MuJoCoLib.mjModel_;
-import org.mujoco.MuJoCoLib.mjOption_;
+import org.mujoco.MuJoCoLib.mjOption;
 
 public class MuJoCoModelManager {
 	MuJoCoLib lib = new MuJoCoLib();
 
 	private mjModel m;
 	private mjData d;
-	private mjModel_ model;
-	private mjData_ data;
-	private mjOption_ opt;
+	private mjModel model;
+	private mjData data;
+	private mjOption opt;
 	private IMujocoController controller = null;
 
 	private BytePointer modelNames;
@@ -56,9 +54,9 @@ public class MuJoCoModelManager {
 			throw new RuntimeException("Model File Failed to load " + error.getString() + " code " + error_sz);
 		System.out.println("MuJoCo model loaded " + config.getAbsolutePath());
 		d = MuJoCoLib.mj_makeData(m);
-		setModel(new mjModel_(m));
-		setData(new mjData_(d));
-		setOpt(new mjOption_(getModel().opt()));
+		setModel(new mjModel(m));
+		setData(new mjData(d));
+		setOpt(new mjOption(getModel().opt()));
 		setModelNames(model.names());
 		jointNameIndexes = model.name_jntadr();
 		bodyNameIndex = model.name_bodyadr();
@@ -77,12 +75,12 @@ public class MuJoCoModelManager {
 
 	public int getNumberOfBodys() {
 		check();
-		return model.nbody();
+		return (int) model.nbody();
 	}
 
 	public int getNumberOfGeometrys() {
 		check();
-		return model.ngeom();
+		return (int) model.ngeom();
 	}
 
 	public String getBodyName(int i) {
@@ -217,7 +215,7 @@ public class MuJoCoModelManager {
 
 	public int getNumberOfActuators() {
 		check();
-		return model.nu();
+		return (int) model.nu();
 	}
 
 	public String getActuatorName(int i) {
@@ -247,7 +245,7 @@ public class MuJoCoModelManager {
 
 	public int getNumberOfJoints() {
 		check();
-		return model.njnt();
+		return (int) model.njnt();
 	}
 
 	public String getJointName(int i) {
@@ -323,21 +321,21 @@ public class MuJoCoModelManager {
 	/**
 	 * @return the maccessable
 	 */
-	public mjModel_ getModel() {
+	public mjModel getModel() {
 		return model;
 	}
 
 	/**
 	 * @param maccessable the maccessable to set
 	 */
-	private void setModel(mjModel_ maccessable) {
+	private void setModel(mjModel maccessable) {
 		this.model = maccessable;
 	}
 
 	/**
 	 * @return the daccessable
 	 */
-	public mjData_ getData() {
+	public mjData getData() {
 		check();
 		return data;
 	}
@@ -345,7 +343,7 @@ public class MuJoCoModelManager {
 	/**
 	 * @param daccessable the daccessable to set
 	 */
-	private void setData(mjData_ daccessable) {
+	private void setData(mjData daccessable) {
 		this.data = daccessable;
 	}
 
@@ -367,7 +365,7 @@ public class MuJoCoModelManager {
 	/**
 	 * @return the opt
 	 */
-	public mjOption_ getOpt() {
+	public mjOption getOpt() {
 		check();
 		return opt;
 	}
@@ -375,7 +373,7 @@ public class MuJoCoModelManager {
 	/**
 	 * @param opt the opt to set
 	 */
-	public void setOpt(mjOption_ opt) {
+	public void setOpt(mjOption opt) {
 		this.opt = opt;
 	}
 

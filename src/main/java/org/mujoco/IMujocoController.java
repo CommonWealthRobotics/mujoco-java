@@ -1,7 +1,7 @@
 package org.mujoco;
 
-import org.mujoco.MuJoCoLib.mjData_;
-import org.mujoco.MuJoCoLib.mjModel_;
+import org.mujoco.MuJoCoLib.mjData;
+import org.mujoco.MuJoCoLib.mjModel;
 
 public interface IMujocoController {
 	public void controlStep(MuJoCoModelManager manager);

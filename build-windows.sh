@@ -25,8 +25,6 @@ else
 	mkdir mujoco
 	cd mujoco
 	7z x ../$ARCHIVE
-	echo $BUILDDIRmujoco
-	ls -al $BUILDDIRmujoco
 	cd $BUILDDIR
 	echo $BUILDDIR
 	ls -al

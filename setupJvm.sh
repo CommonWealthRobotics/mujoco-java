@@ -5,23 +5,28 @@
 # The jvm submodule resolves the archive per OS/arch, so nothing here is
 # platform-specific. Overrides it honours: JDK_INSTALL_ROOT, JVM_KEY,
 # JVM_MAJOR_VERSION, JDK_ARCHIVE_PATH.
-set -euo pipefail
+#
+# Sourced, so it must not touch the caller's shell options: setting -u here
+# would make every unset variable in the calling build script fatal.
 
 SETUPJVM_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 JVM_SCRIPTS=$SETUPJVM_DIR/jvm
 
-[ -d "$JVM_SCRIPTS" ] || {
+if [ ! -d "$JVM_SCRIPTS" ]; then
 	echo "jvm submodule missing: run 'git submodule update --init jvm'" >&2
 	return 1 2>/dev/null || exit 1
-}
+fi
 
 # getJdk*/installJdk.sh parse jvm.json with jq; Git Bash and fresh MSYS2 lack it
-command -v jq >/dev/null 2>&1 || {
+if ! command -v jq >/dev/null 2>&1; then
 	echo "jq is required by jvm/*.sh but was not found on PATH" >&2
 	return 1 2>/dev/null || exit 1
-}
+fi
 
-bash "$JVM_SCRIPTS/installJdk.sh"
+bash "$JVM_SCRIPTS/installJdk.sh" || {
+	echo "JDK install failed" >&2
+	return 1 2>/dev/null || exit 1
+}
 
 JAVA_HOME=$(bash "$JVM_SCRIPTS/getJdkHome.sh")
 export JAVA_HOME

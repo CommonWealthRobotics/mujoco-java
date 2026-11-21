@@ -1,17 +1,11 @@
 #!/bin/bash
 
-#cd schema
-
-#xjc -nv -extension -d ../src/main/java/  -b customization.xjb mujoco.xsd
-
-#cd ../
+# regenerates org/mujoco/xml from the MuJoCo MJCF schema in schema/mjcf.xsd
+set -e
 
 mvn generate-sources
 
-#echo "Error! the generated sources needed extensive hand edits to work correctly!";return 1
-
-
-
+# timestamps would make every run dirty the tree
 FILES=$(grep -r -l "// Generated on: " src/main/java/org/mujoco/xml/)
 
 for VARIABLE in $FILES
@@ -21,6 +15,5 @@ do
 done
 sed -i '/Generated on\:/d' src/main/java/META-INF/*.episode
 
-
-#./gradlew javadoc
-
+# javadoc-invalid markup the JAXB plugin copies from its bundled sources
+sed -i -e 's|<tt>||g' -e 's|</tt>||g' src/main/java/com/kscs/util/jaxb/*.java

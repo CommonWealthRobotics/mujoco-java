@@ -9,7 +9,7 @@ import org.bytedeco.javacpp.annotation.*;
 public class MuJoCoLib extends org.mujoco.MuJoCoConfig {
     static { Loader.load(); }
 
-// Parsed from mujoco/mjtnum.h
+// Parsed from mujoco/mjtype.h
 
 // Copyright 2021 DeepMind Technologies Limited
 //
@@ -25,28 +25,2080 @@ public class MuJoCoLib extends org.mujoco.MuJoCoConfig {
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// #ifndef MUJOCO_INCLUDE_MJTNUM_H_
-// #define MUJOCO_INCLUDE_MJTNUM_H_
+// #ifndef MUJOCO_INCLUDE_MJTYPE_H_
+// #define MUJOCO_INCLUDE_MJTYPE_H_
+
+// #include <stdbool.h>
+// #include <stdint.h>
+
 
 //---------------------------------- floating-point definition -------------------------------------
 
-// compile-time configuration options
-// #define mjUSEDOUBLE               // single or double precision for mjtNum
-
-
-// floating point data type and minval
-// #ifdef mjUSEDOUBLE
+// floating point data type and constants
+// #ifndef mjUSESINGLE
   public static final double mjMINVAL =    1E-15;       // minimum value in any denominator
+  public static final double mjMAXVAL =    1E+10;       // maximum value in qpos, qvel, qacc
 // #else
 // #endif
 
+// ratio of circumference to diameter
+public static final double mjPI =          3.14159265358979323846;
 
 
-//-------------------------------------- byte definition -------------------------------------------    // used for true/false
+//---------------------------------- byte definition -----------------------------------------------    // used for small integers and binary data
+
+// #ifndef __cplusplus          // used for boolean values
+// #else           // used for boolean values
+// #endif
+
+
+//---------------------------------- size definition -----------------------------------------------          // used for buffer sizes
+
+
+//---------------------------------- enum types (mjModel) ------------------------------------------
+
+/** enum mjtDisableBit */
+public static final int      // disable default feature bitflags
+  mjDSBL_CONSTRAINT   = 1<<0,     // entire constraint solver
+  mjDSBL_EQUALITY     = 1<<1,     // equality constraints
+  mjDSBL_FRICTIONLOSS = 1<<2,     // joint and tendon frictionloss constraints
+  mjDSBL_LIMIT        = 1<<3,     // joint and tendon limit constraints
+  mjDSBL_CONTACT      = 1<<4,     // contact constraints
+  mjDSBL_SPRING       = 1<<5,     // passive spring forces
+  mjDSBL_DAMPER       = 1<<6,     // passive damping forces
+  mjDSBL_GRAVITY      = 1<<7,     // gravitational forces
+  mjDSBL_CLAMPCTRL    = 1<<8,     // clamp control to specified range
+  mjDSBL_WARMSTART    = 1<<9,     // warmstart constraint solver
+  mjDSBL_FILTERPARENT = 1<<10,    // remove collisions with parent body
+  mjDSBL_ACTUATION    = 1<<11,    // apply actuation forces
+  mjDSBL_REFSAFE      = 1<<12,    // integrator safety: make ref[0]>=2*timestep
+  mjDSBL_SENSOR       = 1<<13,    // sensors
+  mjDSBL_MIDPHASE     = 1<<14,    // mid-phase collision filtering
+  mjDSBL_EULERDAMP    = 1<<15,    // implicit integration of joint damping in Euler integrator
+  mjDSBL_AUTORESET    = 1<<16,    // automatic reset when numerical issues are detected
+  mjDSBL_NATIVECCD    = 1<<17,    // native convex collision detection
+  mjDSBL_ISLAND       = 1<<18,    // constraint island discovery
+  mjDSBL_MULTICCD     = 1<<19,    // multiple CCD contact points
+
+  mjNDISABLE          = 20;        // number of disable flags
+
+
+/** enum mjtEnableBit */
+public static final int       // enable optional feature bitflags
+  mjENBL_OVERRIDE     = 1<<0,     // override contact parameters
+  mjENBL_ENERGY       = 1<<1,     // energy computation
+  mjENBL_FWDINV       = 1<<2,     // record solver statistics
+  mjENBL_INVDISCRETE  = 1<<3,     // discrete-time inverse dynamics
+  mjENBL_SLEEP        = 1<<4,     // sleeping
+  mjENBL_DIAGEXACT    = 1<<5,     // exact diagonal of constraint inertia
+  mjENBL_IPC          = 1<<6,     // IPC flex contact mode of the discrete integrator
+  mjENBL_SPECULATIVE  = 1<<7,     // speculative contacts
+
+  mjNENABLE           = 8;         // number of enable flags
+
+
+/** enum mjtJoint */
+public static final int           // type of degree of freedom
+  mjJNT_FREE          = 0,        // global position and orientation (quat)       (7)
+  mjJNT_BALL = 1,                     // orientation (quat) relative to parent        (4)
+  mjJNT_SLIDE = 2,                    // sliding distance along body-fixed axis       (1)
+  mjJNT_HINGE = 3;                     // rotation angle (rad) around body-fixed axis  (1)
+
+
+/** enum mjtGeom */
+public static final int            // type of geometric shape
+  // regular geom types
+  mjGEOM_PLANE        = 0,        // plane
+  mjGEOM_HFIELD = 1,                  // height field
+  mjGEOM_SPHERE = 2,                  // sphere
+  mjGEOM_CAPSULE = 3,                 // capsule
+  mjGEOM_ELLIPSOID = 4,               // ellipsoid
+  mjGEOM_CYLINDER = 5,                // cylinder
+  mjGEOM_BOX = 6,                     // box
+  mjGEOM_MESH = 7,                    // mesh
+  mjGEOM_SDF = 8,                     // signed distance field
+
+  mjNGEOMTYPES = 9,                   // number of regular geom types
+
+  // rendering-only geom types: not used in mjModel, not counted in mjNGEOMTYPES
+  mjGEOM_ARROW        = 100,      // arrow
+  mjGEOM_ARROW1 = 101,                  // arrow without wedges
+  mjGEOM_ARROW2 = 102,                  // arrow in both directions
+  mjGEOM_LINE = 103,                    // line
+  mjGEOM_LINEBOX = 104,                 // box with line edges
+  mjGEOM_FLEX = 105,                    // flex
+  mjGEOM_SKIN = 106,                    // skin
+  mjGEOM_LABEL = 107,                   // text label
+  mjGEOM_TRIANGLE = 108,                // triangle
+
+  mjGEOM_NONE         = 1001;      // missing geom type
+
+
+/** enum mjtProjection */
+public static final int      // type of camera projection
+  mjPROJ_PERSPECTIVE  = 0,        // perspective
+  mjPROJ_ORTHOGRAPHIC = 1;             // orthographic
+
+
+/** enum mjtCamLight */
+public static final int        // tracking mode for camera and light
+  mjCAMLIGHT_FIXED    = 0,        // pos and rot fixed in body
+  mjCAMLIGHT_TRACK = 1,               // pos tracks body, rot fixed in global
+  mjCAMLIGHT_TRACKCOM = 2,            // pos tracks subtree com, rot fixed in body
+  mjCAMLIGHT_TARGETBODY = 3,          // pos fixed in body, rot tracks target body
+  mjCAMLIGHT_TARGETBODYCOM = 4;        // pos fixed in body, rot tracks target subtree com
+
+
+/** enum mjtLightType */
+public static final int       // type of light
+  mjLIGHT_SPOT        = 0,        // spot
+  mjLIGHT_DIRECTIONAL = 1,            // directional
+  mjLIGHT_POINT = 2,                  // point
+  mjLIGHT_IMAGE = 3;                  // image-based
+
+
+/** enum mjtTexture */
+public static final int         // type of texture
+  mjTEXTURE_2D        = 0,        // 2d texture, suitable for planes and hfields
+  mjTEXTURE_CUBE = 1,                 // cube texture, suitable for all other geom types
+  mjTEXTURE_SKYBOX = 2;                // cube texture used as skybox
+
+
+/** enum mjtTextureRole */
+public static final int     // role of texture map in rendering
+  mjTEXROLE_USER      = 0,        // unspecified
+  mjTEXROLE_RGB = 1,                  // base color (albedo)
+  mjTEXROLE_OCCLUSION = 2,            // ambient occlusion
+  mjTEXROLE_ROUGHNESS = 3,            // roughness
+  mjTEXROLE_METALLIC = 4,             // metallic
+  mjTEXROLE_NORMAL = 5,               // normal (bump) map
+  mjTEXROLE_OPACITY = 6,              // opacity
+  mjTEXROLE_EMISSIVE = 7,             // light emission
+  mjTEXROLE_RGBA = 8,                 // base color, opacity
+  mjTEXROLE_ORM = 9,                  // occlusion, roughness, metallic
+  mjNTEXROLE = 10;
+
+
+/** enum mjtColorSpace */
+public static final int      // type of color space encoding
+  mjCOLORSPACE_AUTO   = 0,        // attempts to autodetect color space, defaults to linear
+  mjCOLORSPACE_LINEAR = 1,            // linear color space
+  mjCOLORSPACE_SRGB = 2;               // standard RGB color space
+
+
+/** enum mjtIntegrator */
+public static final int      // integrator mode
+  mjINT_EULER         = 0,        // semi-implicit Euler
+  mjINT_RK4 = 1,                      // 4th-order Runge Kutta
+  mjINT_IMPLICIT = 2,                 // implicit in velocity
+  mjINT_IMPLICITFAST = 3,             // implicit in velocity, no rne derivative
+  mjINT_DISCRETE = 4;                  // discrete step map: constraint solve in the effective metric
+
+
+/** enum mjtCone */
+public static final int            // type of friction cone
+  mjCONE_PYRAMIDAL     = 0,       // pyramidal
+  mjCONE_ELLIPTIC = 1;                 // elliptic
+
+
+/** enum mjtJacobian */
+public static final int        // type of constraint Jacobian
+  mjJAC_DENSE          = 0,       // dense
+  mjJAC_SPARSE = 1,                   // sparse
+  mjJAC_AUTO = 2;                      // dense if nv<60, sparse otherwise
+
+
+/** enum mjtSolver */
+public static final int          // constraint solver algorithm
+  mjSOL_PGS            = 0,       // PGS    (dual)
+  mjSOL_CG = 1,                       // CG     (primal)
+  mjSOL_NEWTON = 2;                    // Newton (primal)
+
+
+/** enum mjtEq */
+public static final int              // type of equality constraint
+  mjEQ_CONNECT        = 0,        // connect two bodies at a point (ball joint)
+  mjEQ_WELD = 1,                      // fix relative position and orientation of two bodies
+  mjEQ_JOINT = 2,                     // couple the values of two scalar joints with cubic
+  mjEQ_TENDON = 3,                    // couple the lengths of two tendons with cubic
+  mjEQ_FLEX = 4,                      // fix all edge lengths of a flex
+  mjEQ_FLEXVERT = 5,                  // unsupported, will cause an error if used
+  mjEQ_FLEXSTRAIN = 6,                // constrain strain of a trilinear/quadratic flex (B-bar)
+  mjEQ_DISTANCE = 7;                   // unsupported, will cause an error if used
+
+
+/** enum mjtTendon */
+public static final int          // type of tendon
+  mjTENDON_FIXED      = 0,        // linear combination of joint coordinates
+  mjTENDON_SPATIAL = 1;                // path through sites, around geoms
+
+
+/** enum mjtWrap */
+public static final int            // type of tendon wrap object
+  mjWRAP_NONE         = 0,        // null object
+  mjWRAP_JOINT = 1,                   // constant moment arm
+  mjWRAP_PULLEY = 2,                  // pulley used to split tendon
+  mjWRAP_SITE = 3,                    // pass through site
+  mjWRAP_SPHERE = 4,                  // wrap around sphere
+  mjWRAP_CYLINDER = 5;                 // wrap around (infinite) cylinder
+
+
+/** enum mjtTrn */
+public static final int             // type of actuator transmission
+  mjTRN_JOINT         = 0,        // force on joint
+  mjTRN_JOINTINPARENT = 1,            // force on joint, expressed in parent frame
+  mjTRN_SLIDERCRANK = 2,              // force via slider-crank linkage
+  mjTRN_TENDON = 3,                   // force on tendon
+  mjTRN_SITE = 4,                     // force on site
+  mjTRN_BODY = 5,                     // adhesion force on a body's geoms
+  mjTRN_SO3 = 6,                      // torque on a relative orientation (3 force outputs)
+
+  mjTRN_UNDEFINED     = 1000;      // undefined transmission type
+
+
+/** enum mjtDyn */
+public static final int             // type of actuator dynamics
+  mjDYN_NONE          = 0,        // no internal dynamics; ctrl specifies force
+  mjDYN_INTEGRATOR = 1,               // integrator: da/dt = u
+  mjDYN_FILTER = 2,                   // linear filter: da/dt = (u-a) / tau
+  mjDYN_FILTEREXACT = 3,              // linear filter: da/dt = (u-a) / tau, with exact integration
+  mjDYN_MUSCLE = 4,                   // piecewise linear filter with two time constants
+  mjDYN_DCMOTOR = 5,                  // DC motor electrical dynamics
+  mjDYN_PID = 6,                      // PID controller states: slew, integral
+  mjDYN_USER = 7;                      // user-defined dynamics type
+
+
+/** enum mjtGain */
+public static final int            // type of actuator gain
+  mjGAIN_FIXED        = 0,        // fixed gain
+  mjGAIN_AFFINE = 1,                  // const + kp*length + kv*velocity
+  mjGAIN_MUSCLE = 2,                  // muscle FLV curve computed by mju_muscleGain()
+  mjGAIN_DCMOTOR = 3,                 // DC motor gain: K or K/R
+  mjGAIN_SO3 = 4,                     // geodesic servo on an SO3 transmission: force = kp * log(error)
+  mjGAIN_PID = 5,                     // PID controller: position and velocity setpoint inputs
+  mjGAIN_USER = 6;                     // user-defined gain type
+
+
+/** enum mjtBias */
+public static final int            // type of actuator bias
+  mjBIAS_NONE         = 0,        // no bias
+  mjBIAS_AFFINE = 1,                  // const + kp*length + kv*velocity
+  mjBIAS_MUSCLE = 2,                  // muscle passive force computed by mju_muscleBias()
+  mjBIAS_DCMOTOR = 3,                 // DC motor bias: back-EMF, cogging, LuGre friction
+  mjBIAS_SO3 = 4,                     // damping term of the SO3 geodesic servo
+  mjBIAS_USER = 5;                     // user-defined bias type
+
+
+/** enum mjtCtrlChart */
+public static final int       // so3 input signature (actuator_ctrlspec): orientation chart
+  mjCHART_EXPMAP      = 1,        // exponential-map orientation target: 3 controls
+  mjCHART_QUAT        = 2;         // quaternion orientation target: 4 controls
+
+
+/** enum mjtCtrlInput */
+public static final int       // input signature (actuator_ctrlspec): present/declared inputs
+  mjINPUT_POS         = 1,        // position setpoint input
+  mjINPUT_VEL         = 2,        // velocity setpoint input
+  mjINPUT_FF          = 4,        // feedforward input, in the actuator's output space
+  mjINPUT_VOLTAGE     = 8,        // raw terminal voltage input (dcmotor)
+  mjINPUT_NONE        = 16,       // explicitly no inputs: purely passive (dcmotor)
+  mjINPUT_PRESSURE    = 32;        // pressure input (cylinder)
+
+
+/** enum mjtObj */
+public static final int             // type of MujoCo object
+  mjOBJ_UNKNOWN       = 0,        // unknown object type
+  mjOBJ_BODY = 1,                     // body
+  mjOBJ_XBODY = 2,                    // body, used to access regular frame instead of i-frame
+  mjOBJ_JOINT = 3,                    // joint
+  mjOBJ_DOF = 4,                      // dof
+  mjOBJ_GEOM = 5,                     // geom
+  mjOBJ_SITE = 6,                     // site
+  mjOBJ_CAMERA = 7,                   // camera
+  mjOBJ_LIGHT = 8,                    // light
+  mjOBJ_FLEX = 9,                     // flex
+  mjOBJ_MESH = 10,                     // mesh
+  mjOBJ_SKIN = 11,                     // skin
+  mjOBJ_HFIELD = 12,                   // heightfield
+  mjOBJ_TEXTURE = 13,                  // texture
+  mjOBJ_MATERIAL = 14,                 // material for rendering
+  mjOBJ_PAIR = 15,                     // geom pair to include
+  mjOBJ_EXCLUDE = 16,                  // body pair to exclude
+  mjOBJ_EQUALITY = 17,                 // equality constraint
+  mjOBJ_TENDON = 18,                   // tendon
+  mjOBJ_ACTUATOR = 19,                 // actuator
+  mjOBJ_SENSOR = 20,                   // sensor
+  mjOBJ_NUMERIC = 21,                  // numeric
+  mjOBJ_TEXT = 22,                     // text
+  mjOBJ_TUPLE = 23,                    // tuple
+  mjOBJ_KEY = 24,                      // keyframe
+  mjOBJ_PLUGIN = 25,                   // plugin instance
+
+  mjNOBJECT = 26,                      // number of object types
+
+  // meta elements, do not appear in mjModel
+  mjOBJ_FRAME         = 100,      // frame
+  mjOBJ_DEFAULT = 101,                  // default
+  mjOBJ_MODEL = 102;                     // entire model
+
+
+/** enum mjtSensor */
+public static final int         // type of sensor
+  // common robotic sensors, attached to a site
+  mjSENS_TOUCH        = 0,        // scalar contact normal forces summed over sensor zone
+  mjSENS_ACCELEROMETER = 1,           // 3D linear acceleration, in local frame
+  mjSENS_VELOCIMETER = 2,             // 3D linear velocity, in local frame
+  mjSENS_GYRO = 3,                    // 3D angular velocity, in local frame
+  mjSENS_FORCE = 4,                   // 3D force between site's body and its parent body
+  mjSENS_TORQUE = 5,                  // 3D torque between site's body and its parent body
+  mjSENS_MAGNETOMETER = 6,            // 3D magnetometer
+  mjSENS_RANGEFINDER = 7,             // scalar distance to nearest geom along z-axis
+  mjSENS_CAMPROJECTION = 8,           // pixel coordinates of a site in the camera image
+
+  // sensors related to scalar joints, tendons, actuators
+  mjSENS_JOINTPOS = 9,                // scalar joint position (hinge and slide only)
+  mjSENS_JOINTVEL = 10,                // scalar joint velocity (hinge and slide only)
+  mjSENS_TENDONPOS = 11,               // scalar tendon position
+  mjSENS_TENDONVEL = 12,               // scalar tendon velocity
+  mjSENS_ACTUATORPOS = 13,             // scalar actuator position
+  mjSENS_ACTUATORVEL = 14,             // scalar actuator velocity
+  mjSENS_ACTUATORFRC = 15,             // scalar actuator force
+  mjSENS_JOINTACTFRC = 16,             // scalar actuator force, measured at the joint
+  mjSENS_TENDONACTFRC = 17,            // scalar actuator force, measured at the tendon
+
+  // sensors related to ball joints
+  mjSENS_BALLQUAT = 18,                // 4D ball joint quaternion
+  mjSENS_BALLANGVEL = 19,              // 3D ball joint angular velocity
+
+  // joint and tendon limit sensors, in constraint space
+  mjSENS_JOINTLIMITPOS = 20,           // joint limit distance-margin
+  mjSENS_JOINTLIMITVEL = 21,           // joint limit velocity
+  mjSENS_JOINTLIMITFRC = 22,           // joint limit force
+  mjSENS_TENDONLIMITPOS = 23,          // tendon limit distance-margin
+  mjSENS_TENDONLIMITVEL = 24,          // tendon limit velocity
+  mjSENS_TENDONLIMITFRC = 25,          // tendon limit force
+
+  // sensors attached to an object with spatial frame: (x)body, geom, site, camera
+  mjSENS_FRAMEPOS = 26,                // 3D position
+  mjSENS_FRAMEQUAT = 27,               // 4D unit quaternion orientation
+  mjSENS_FRAMEXAXIS = 28,              // 3D unit vector: x-axis of object's frame
+  mjSENS_FRAMEYAXIS = 29,              // 3D unit vector: y-axis of object's frame
+  mjSENS_FRAMEZAXIS = 30,              // 3D unit vector: z-axis of object's frame
+  mjSENS_FRAMELINVEL = 31,             // 3D linear velocity
+  mjSENS_FRAMEANGVEL = 32,             // 3D angular velocity
+  mjSENS_FRAMELINACC = 33,             // 3D linear acceleration
+  mjSENS_FRAMEANGACC = 34,             // 3D angular acceleration
+
+  // sensors related to kinematic subtrees; attached to a body (which is the subtree root)
+  mjSENS_SUBTREECOM = 35,              // 3D center of mass of subtree
+  mjSENS_SUBTREELINVEL = 36,           // 3D linear velocity of subtree
+  mjSENS_SUBTREEANGMOM = 37,           // 3D angular momentum of subtree
+
+  // sensors of geometric relationships
+  mjSENS_INSIDESITE = 38,              // 1 if object is inside a site, 0 otherwise
+  mjSENS_GEOMDIST = 39,                // signed distance between two geoms
+  mjSENS_GEOMNORMAL = 40,              // normal direction between two geoms
+  mjSENS_GEOMFROMTO = 41,              // segment between two geoms
+
+  // sensors for reporting contacts which occurred during the simulation
+  mjSENS_CONTACT = 42,                 // contacts which occurred during the simulation
+
+  // global sensors
+  mjSENS_E_POTENTIAL = 43,             // potential energy
+  mjSENS_E_KINETIC = 44,               // kinetic energy
+  mjSENS_CLOCK = 45,                   // simulation time
+
+  // sensors related to SDFs
+  mjSENS_TACTILE = 46,                 // tactile sensor
+
+  // plugin-controlled sensors
+  mjSENS_PLUGIN = 47,                  // plugin-controlled
+
+  // user-defined sensor
+  mjSENS_USER = 48;                     // sensor data provided by mjcb_sensor callback
+
+
+/** enum mjtStage */
+public static final int           // computation stage
+  mjSTAGE_NONE        = 0,        // no computations
+  mjSTAGE_POS = 1,                    // position-dependent computations
+  mjSTAGE_VEL = 2,                    // velocity-dependent computations
+  mjSTAGE_ACC = 3;                     // acceleration/force-dependent computations
+
+
+/** enum mjtDataType */
+public static final int        // data type for sensors
+  mjDATATYPE_REAL     = 0,        // real values, no constraints
+  mjDATATYPE_POSITIVE = 1,            // positive values; 0 or negative: inactive
+  mjDATATYPE_AXIS = 2,                // 3D unit vector
+  mjDATATYPE_QUATERNION = 3;           // unit quaternion
+
+
+/** enum mjtConDataField */
+public static final int    // data fields returned by contact sensors
+  mjCONDATA_FOUND     = 0,        // whether a contact was found
+  mjCONDATA_FORCE = 1,                // contact force
+  mjCONDATA_TORQUE = 2,               // contact torque
+  mjCONDATA_DIST = 3,                 // contact penetration distance
+  mjCONDATA_POS = 4,                  // contact position
+  mjCONDATA_NORMAL = 5,               // contact frame normal
+  mjCONDATA_TANGENT = 6,              // contact frame first tangent
+  mjCONDATA_LINVEL = 7,               // contact linear velocity
+  mjCONDATA_ANGVEL = 8,               // contact angular velocity
+
+  mjNCONDATA = 9;                      // number of contact sensor data fields
+
+
+/** enum mjtRayDataField */
+public static final int    // data fields returned by rangefinder sensors
+  mjRAYDATA_DIST     = 0,         // distance from ray origin to nearest surface
+  mjRAYDATA_DIR = 1,                  // normalized ray direction
+  mjRAYDATA_ORIGIN = 2,               // ray origin
+  mjRAYDATA_POINT = 3,                // point at which ray intersects nearest surface
+  mjRAYDATA_NORMAL = 4,               // surface normal at intersection point
+  mjRAYDATA_DEPTH = 5,                // depth along z-axis
+
+  mjNRAYDATA = 6;                      // number of rangefinder sensor data fields
+
+
+/** enum mjtCamOutBit */
+public static final int       // camera output type bitflags
+  mjCAMOUT_RGB        = 1<<0,     // RGB image
+  mjCAMOUT_DEPTH      = 1<<1,     // depth image (distance from camera plane)
+  mjCAMOUT_DIST       = 1<<2,     // distance image (distance from camera origin)
+  mjCAMOUT_NORMAL     = 1<<3,     // normal image
+  mjCAMOUT_SEG        = 1<<4,     // segmentation image
+
+  mjNCAMOUT           = 5;         // number of camera output types
+
+
+/** enum mjtSameFrame */
+public static final int       // frame alignment of bodies with their children
+  mjSAMEFRAME_NONE    = 0,        // no alignment
+  mjSAMEFRAME_BODY = 1,               // frame is same as body frame
+  mjSAMEFRAME_INERTIA = 2,            // frame is same as inertial frame
+  mjSAMEFRAME_BODYROT = 3,            // frame orientation is same as body orientation
+  mjSAMEFRAME_INERTIAROT = 4;          // frame orientation is same as inertia orientation
+
+
+/** enum mjtSleepPolicy */
+public static final int     // per-tree sleep policy
+  mjSLEEP_AUTO        = 0,        // compiler chooses sleep policy
+  mjSLEEP_AUTO_NEVER = 1,             // compiler sleep policy: never
+  mjSLEEP_AUTO_ALLOWED = 2,           // compiler sleep policy: allowed
+  mjSLEEP_NEVER = 3,                  // user sleep policy: never
+  mjSLEEP_ALLOWED = 4,                // user sleep policy: allowed
+  mjSLEEP_INIT = 5;                   // user sleep policy: initialized asleep
+
+
+/** enum mjtLRMode */
+public static final int          // mode for actuator length range computation
+  mjLRMODE_NONE       = 0,        // do not process any actuators
+  mjLRMODE_MUSCLE = 1,                // process muscle actuators
+  mjLRMODE_MUSCLEUSER = 2,            // process muscle and user actuators
+  mjLRMODE_ALL = 3;                    // process all actuators
+
+
+/** enum mjtFlexSelf */
+public static final int        // mode for flex selfcollide
+  mjFLEXSELF_NONE     = 0,        // no self-collisions
+  mjFLEXSELF_NARROW = 1,              // skip midphase, go directly to narrowphase
+  mjFLEXSELF_BVH = 2,                 // use BVH in midphase (if midphase enabled)
+  mjFLEXSELF_SAP = 3,                 // use SAP in midphase
+  mjFLEXSELF_AUTO = 4;                 // choose between BVH and SAP automatically
+
+
+/** enum mjtSDFType */
+public static final int         // signed distance function (SDF) type
+  mjSDFTYPE_SINGLE    = 0,        // single SDF
+  mjSDFTYPE_INTERSECTION = 1,         // max(A, B)
+  mjSDFTYPE_MIDSURFACE = 2,           // A - B
+  mjSDFTYPE_COLLISION = 3;            // A + B + abs(max(A, B))
+
+
+//---------------------------------- enum types (mjData) -------------------------------------------
+
+/** enum mjtState */
+public static final int             // state elements
+  mjSTATE_TIME           = 1<<0,    // time
+  mjSTATE_QPOS           = 1<<1,    // position
+  mjSTATE_QVEL           = 1<<2,    // velocity
+  mjSTATE_ACT            = 1<<3,    // actuator activation
+  mjSTATE_HISTORY        = 1<<4,    // history buffers (control, sensor)
+  mjSTATE_WARMSTART      = 1<<5,    // acceleration used for warmstart
+  mjSTATE_CTRL           = 1<<6,    // control
+  mjSTATE_QFRC_APPLIED   = 1<<7,    // applied generalized force
+  mjSTATE_XFRC_APPLIED   = 1<<8,    // applied Cartesian force/torque
+  mjSTATE_EQ_ACTIVE      = 1<<9,    // enable/disable constraints
+  mjSTATE_MOCAP_POS      = 1<<10,   // positions of mocap bodies
+  mjSTATE_MOCAP_QUAT     = 1<<11,   // orientations of mocap bodies
+  mjSTATE_USERDATA       = 1<<12,   // user data
+  mjSTATE_PLUGIN         = 1<<13,   // plugin state
+  mjSTATE_PLASTIC        = 1<<14,   // plastic state
+
+  mjNSTATE               = 15,      // number of state elements
+
+  // convenience values for commonly used state specifications
+  mjSTATE_PHYSICS        = mjSTATE_QPOS | mjSTATE_QVEL | mjSTATE_ACT | mjSTATE_HISTORY |
+                           mjSTATE_PLASTIC,
+  mjSTATE_FULLPHYSICS    = mjSTATE_TIME | mjSTATE_PHYSICS | mjSTATE_PLUGIN,
+  mjSTATE_USER           = mjSTATE_CTRL | mjSTATE_QFRC_APPLIED | mjSTATE_XFRC_APPLIED |
+                           mjSTATE_EQ_ACTIVE | mjSTATE_MOCAP_POS | mjSTATE_MOCAP_QUAT |
+                           mjSTATE_USERDATA,
+  mjSTATE_INTEGRATION    = mjSTATE_FULLPHYSICS | mjSTATE_USER | mjSTATE_WARMSTART;
+
+
+/** enum mjtConstraint */
+public static final int        // type of constraint
+  mjCNSTR_EQUALITY       = 0,       // equality constraint
+  mjCNSTR_FRICTION_DOF = 1,             // dof friction
+  mjCNSTR_FRICTION_TENDON = 2,          // tendon friction
+  mjCNSTR_LIMIT_JOINT = 3,              // joint limit
+  mjCNSTR_LIMIT_TENDON = 4,             // tendon limit
+  mjCNSTR_CONTACT_FRICTIONLESS = 5,     // frictionless contact
+  mjCNSTR_CONTACT_PYRAMIDAL = 6,        // frictional contact, pyramidal friction cone
+  mjCNSTR_CONTACT_ELLIPTIC = 7;          // frictional contact, elliptic friction cone
+
+
+/** enum mjtConstraintState */
+public static final int   // constraint state
+  mjCNSTRSTATE_SATISFIED = 0,       // constraint satisfied, zero cost (limit, contact)
+  mjCNSTRSTATE_QUADRATIC = 1,           // quadratic cost (equality, friction, limit, contact)
+  mjCNSTRSTATE_LINEARNEG = 2,           // linear cost, negative side (friction)
+  mjCNSTRSTATE_LINEARPOS = 3,           // linear cost, positive side (friction)
+  mjCNSTRSTATE_CONE = 4;                 // squared distance to cone cost (elliptic contact)
+
+
+/** enum mjtWarning */
+public static final int           // warning types
+  mjWARN_INERTIA         = 0,       // (near) singular inertia matrix
+  mjWARN_CONTACTFULL = 1,               // too many contacts in contact list
+  mjWARN_CNSTRFULL = 2,                 // too many constraints
+  mjWARN_BADQPOS = 3,                   // bad number in qpos
+  mjWARN_BADQVEL = 4,                   // bad number in qvel
+  mjWARN_BADQACC = 5,                   // bad number in qacc
+  mjWARN_BADCTRL = 6,                   // bad number in ctrl
+
+  mjNWARNING = 7;                        // number of warnings
+
+
+/** enum mjtTimer */
+public static final int             // internal timers
+  // main api
+  mjTIMER_STEP           = 0,       // step
+  mjTIMER_FORWARD = 1,                  // forward
+  mjTIMER_INVERSE = 2,                  // inverse
+
+  // breakdown of step/forward
+  mjTIMER_POSITION = 3,                 // fwdPosition
+  mjTIMER_VELOCITY = 4,                 // fwdVelocity
+  mjTIMER_ACTUATION = 5,                // fwdActuation
+  mjTIMER_CONSTRAINT = 6,               // fwdConstraint
+  mjTIMER_ADVANCE = 7,                  // mj_Euler, mj_implicit
+
+  // breakdown of fwdPosition
+  mjTIMER_POS_KINEMATICS = 8,           // kinematics, com, tendon, transmission
+  mjTIMER_POS_INERTIA = 9,              // inertia computations
+  mjTIMER_POS_COLLISION = 10,            // collision detection
+  mjTIMER_POS_MAKE = 11,                 // make constraints
+  mjTIMER_POS_PROJECT = 12,              // project constraints
+
+  // breakdown of mj_collision
+  mjTIMER_COL_BROAD = 13,                // broadphase
+  mjTIMER_COL_NARROW = 14,               // narrowphase
+
+  mjNTIMER = 15;                          // number of timers
+
+
+/** enum mjtSleepState */
+public static final int        // sleep state of an object
+  mjS_STATIC = -1,                  // object is static
+  mjS_ASLEEP = 0,                   // object is asleep
+  mjS_AWAKE  = 1;                    // object is awake
+
+
+//---------------------------------- logging -------------------------------------------------------
+
+/** enum mjtLogLevel */
+public static final int        // log message severity
+  mjLOG_DEBUG       = 0,          // internal engine debug trace (opt-in via topic filtering)
+  mjLOG_INFO = 1,                     // informational (opt-in via topic filtering)
+  mjLOG_WARNING = 2,                  // warning
+  mjLOG_ERROR = 3;                    // error
+
+/** enum mjtLogTopic */
+public static final int        // log topic identifiers
+  mjTOPIC_NONE     = 0,           // no topic (always passes filtering)
+                                  // INFO topics:
+  mjTOPIC_TIME_STP = 1,           // timing diagnostics (step)
+  mjTOPIC_TIME_CMP = 2,           // timing diagnostics (compile)
+                                  // DEBUG topics:
+  mjTOPIC_SLEEP    = 3,           // sleep/wake events
+
+  mjNTOPIC         = 3;            // number of filterable topics
+
+public static class mjLogMessage extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjLogMessage() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjLogMessage(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjLogMessage(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjLogMessage position(long position) {
+        return (mjLogMessage)super.position(position);
+    }
+    @Override public mjLogMessage getPointer(long i) {
+        return new mjLogMessage((Pointer)this).offsetAddress(i);
+    }
+    // structured log message
+  public native int level(); public native mjLogMessage level(int setter);                      // mjtLogLevel
+  public native int topic(); public native mjLogMessage topic(int setter);                      // mjtLogTopic (0 for error/warning/user)
+  public native @Cast("char") byte subject(int i); public native mjLogMessage subject(int i, byte setter);
+  @MemberGetter public native @Cast("char*") BytePointer subject();             // message subject (one-liner, printf-formatted)
+  public native @Cast("const char*") BytePointer body(); public native mjLogMessage body(BytePointer setter);               // message body (multi-line detail, or NULL)
+  public native @Cast("const char*") BytePointer func(); public native mjLogMessage func(BytePointer setter);               // __func__ or NULL
+  public native @Cast("const char*") BytePointer file(); public native mjLogMessage file(BytePointer setter);               // __FILE__ or NULL
+  public native int line(); public native mjLogMessage line(int setter);                       // __LINE__ or 0
+  public native @Cast("mjtBool") boolean timestamp(); public native mjLogMessage timestamp(boolean setter);              // prepend timestamp to output
+}
+
+public static class mjLogConfig extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjLogConfig() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjLogConfig(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjLogConfig(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjLogConfig position(long position) {
+        return (mjLogConfig)super.position(position);
+    }
+    @Override public mjLogConfig getPointer(long i) {
+        return new mjLogConfig((Pointer)this).offsetAddress(i);
+    }
+     // log handler default configuration
+  public native @Cast("mjtBool") boolean logto_console(); public native mjLogConfig logto_console(boolean setter);          // print to console (default: true)
+  public native @Cast("mjtBool") boolean logto_file(); public native mjLogConfig logto_file(boolean setter);             // print to log file (default: true)
+  public native @Cast("char") byte logfile(int i); public native mjLogConfig logfile(int i, byte setter);
+  @MemberGetter public native @Cast("char*") BytePointer logfile();             // log file path (default: "MUJOCO_LOG.TXT")
+  public native int topics(); public native mjLogConfig topics(int setter);                     // enabled info topic bitmask (default: 0)
+}
+
+// function type for log handler callback; must be thread-safe, must not call mju_error
+public static class mjfLogHandler extends FunctionPointer {
+    static { Loader.load(); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public    mjfLogHandler(Pointer p) { super(p); }
+    protected mjfLogHandler() { allocate(); }
+    private native void allocate();
+    public native void call(@Const mjLogMessage arg0);
+}
+
+// #endif  // MUJOCO_INCLUDE_MJTYPE_H_
+
+
+// Parsed from mujoco/mjspec.h
+
+// Copyright 2024 DeepMind Technologies Limited
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// #ifndef MUJOCO_INCLUDE_MJSPEC_H_
+// #define MUJOCO_INCLUDE_MJSPEC_H_
+
+// #include <stddef.h>
+// #include <mujoco/mjmodel.h>
+// #include <mujoco/mjtype.h>
+
+
+// this is a C-API
+// #ifdef __cplusplus
+// #include <cstddef>
+// #include <cstdint>
+// #include <string>
+// #include <vector>
+// #endif
+
+//-------------------------------- handles to strings and arrays -----------------------------------
+
+// #ifdef __cplusplus
+  // C++: defined to be compatible with corresponding std types
+// #else
+  // C: opaque types
+// #endif
+
+
+//-------------------------------- enum types (mjt) ------------------------------------------------
+
+/** enum mjtGeomInertia */
+public static final int      // type of inertia inference
+  mjINERTIA_VOLUME = 0,            // mass distributed in the volume
+  mjINERTIA_SHELL = 1;                 // mass distributed on the surface
+
+
+/** enum mjtMeshInertia */
+public static final int      // type of mesh inertia
+  mjMESH_INERTIA_CONVEX = 0,       // convex mesh inertia
+  mjMESH_INERTIA_EXACT = 1,            // exact mesh inertia
+  mjMESH_INERTIA_LEGACY = 2,           // legacy mesh inertia
+  mjMESH_INERTIA_SHELL = 3;             // shell mesh inertia
+
+
+/** enum mjtMeshBuiltin */
+public static final int      // type of built-in procedural mesh
+  mjMESH_BUILTIN_NONE = 0,         // no built-in mesh
+  mjMESH_BUILTIN_SPHERE = 1,           // sphere
+  mjMESH_BUILTIN_HEMISPHERE = 2,       // hemisphere
+  mjMESH_BUILTIN_CONE = 3,             // cone
+  mjMESH_BUILTIN_SUPERSPHERE = 4,      // supersphere
+  mjMESH_BUILTIN_SUPERTORUS = 5,       // supertorus
+  mjMESH_BUILTIN_WEDGE = 6,            // wedge
+  mjMESH_BUILTIN_PLATE = 7,            // plate
+  mjMESH_BUILTIN_GRID = 8,             // grid (2D or 3D)
+  mjMESH_BUILTIN_BOX = 9,              // box
+  mjMESH_BUILTIN_CYLINDER = 10,         // cylinder
+  mjMESH_BUILTIN_ELLIPSOID = 11,        // ellipsoid
+  mjMESH_BUILTIN_SQUARE = 12,           // square
+  mjMESH_BUILTIN_DISC = 13;              // disc
+
+
+/** enum mjtFlexSection */
+public static final int      // cross-section of 1D flex elasticity
+  mjFLEXSECTION_CIRCLE = 0,        // circle of the flex radius
+  mjFLEXSECTION_BOX = 1;                // box with half-sizes sectionsize
+
+
+/** enum mjtBuiltin */
+public static final int          // type of built-in procedural texture
+  mjBUILTIN_NONE = 0,              // no built-in texture
+  mjBUILTIN_GRADIENT = 1,              // gradient: rgb1->rgb2
+  mjBUILTIN_CHECKER = 2,               // checker pattern: rgb1, rgb2
+  mjBUILTIN_FLAT = 3;                   // 2d: rgb1; cube: rgb1-up, rgb2-side, rgb3-down
+
+
+/** enum mjtMark */
+public static final int             // mark type for procedural textures
+  mjMARK_NONE = 0,                 // no mark
+  mjMARK_EDGE = 1,                     // edges
+  mjMARK_CROSS = 2,                    // cross
+  mjMARK_RANDOM = 3;                    // random dots
+
+
+/** enum mjtLimited */
+public static final int          // type of limit specification
+  mjLIMITED_FALSE = 0,             // not limited
+  mjLIMITED_TRUE = 1,                  // limited
+  mjLIMITED_AUTO = 2;                  // limited inferred from presence of range
+
+
+/** enum mjtAlignFree */
+public static final int        // whether to align free joints with the inertial frame
+  mjALIGNFREE_FALSE = 0,           // don't align
+  mjALIGNFREE_TRUE = 1,                // align
+  mjALIGNFREE_AUTO = 2;                // respect the global compiler flag
+
+
+/** enum mjtPassthrough */
+public static final int      // which assets the compiler leaves by reference (bitmask)
+  mjPASSTHROUGH_NONE     = 0,      // all assets embedded
+  mjPASSTHROUGH_TEXTURES = 1<<0;   // textures by reference; meshes reserved for a later bit
+
+
+/** enum mjtEmbed */
+public static final int            // whether an asset's payload is in the model
+  mjEMBED_FALSE = 0,               // by reference
+  mjEMBED_TRUE = 1,                    // embedded
+  mjEMBED_AUTO = 2;                    // respect the global compiler flag
+
+
+/** enum mjtInertiaFromGeom */
+public static final int  // whether to infer body inertias from child geoms
+  mjINERTIAFROMGEOM_FALSE = 0,     // do not use; inertial element required
+  mjINERTIAFROMGEOM_TRUE = 1,          // always use; overwrite inertial element
+  mjINERTIAFROMGEOM_AUTO = 2;           // use only if inertial element is missing
+
+
+/** enum mjtOrientation */
+public static final int      // type of orientation specifier
+  mjORIENTATION_QUAT = 0,          // quaternion
+  mjORIENTATION_AXISANGLE = 1,         // axis and angle
+  mjORIENTATION_XYAXES = 2,            // x and y axes
+  mjORIENTATION_ZAXIS = 3,             // z axis (minimal rotation)
+  mjORIENTATION_EULER = 4;             // Euler angles
+
+/** enum mjtConflict */
+public static final int         // conflict resolution for attach
+  mjCONFLICT_WARNING = 0,          // keep parent, warn on conflict
+  mjCONFLICT_MERGE = 1,                // merge: min/max/error per field
+  mjCONFLICT_ERROR = 2;                // error on any conflict
+
+/** enum mjtScaling */
+public static final int          // physical policy of a frame's scale
+  mjSCALING_SIMILAR = 0,           // change of length and mass units: same motion in scaled gravity
+  mjSCALING_GEOMETRY = 1;              // shape and inertia only: forces and gains unchanged
+
+/** enum mjtActuator */
+public static final int         // actuator element, which owns its shortcut parameters
+  mjACTUATOR_GENERAL = 0,          // general
+  mjACTUATOR_MOTOR = 1,                // motor
+  mjACTUATOR_POSITION = 2,             // position servo
+  mjACTUATOR_VELOCITY = 3,             // velocity servo
+  mjACTUATOR_INTVELOCITY = 4,          // integrated-velocity servo
+  mjACTUATOR_DAMPER = 5,               // damper
+  mjACTUATOR_CYLINDER = 6,             // cylinder
+  mjACTUATOR_MUSCLE = 7,               // muscle
+  mjACTUATOR_ADHESION = 8,             // adhesion
+  mjACTUATOR_PID = 9,                  // pid servo
+  mjACTUATOR_ORIENTATION = 10,          // orientation servo
+  mjACTUATOR_DCMOTOR = 11;               // dc motor
+
+/** enum mjtCTimer */
+public static final int           // compiler timing categories
+  // top-level timers (wall-clock)
+  mjCTIMER_TOTAL = 0,              // total compile time
+  mjCTIMER_ASSETS = 1,                 // asset compilation
+
+  // asset sub-timers (CPU time, summed across all assets)
+  mjCTIMER_TEXTURE = 2,                // textures
+  mjCTIMER_MESH_LOAD = 3,              // mesh: file loading
+  mjCTIMER_MESH_HULL = 4,              // mesh: convex hull
+  mjCTIMER_MESH_POLYGON = 5,           // mesh: normals and polygons
+  mjCTIMER_MESH_INERTIA = 6,           // mesh: volume, CoM, inertia
+  mjCTIMER_MESH_BVH = 7,               // mesh: bounding volume hierarchy
+  mjCTIMER_MESH_OCTREE = 8,            // mesh: octree and SDF
+
+  mjNCTIMER = 9;                        // number of compiler timers
+
+
+//-------------------------------- attribute structs (mjs) -----------------------------------------
+
+public static class mjsElement extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsElement() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsElement(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsElement(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsElement position(long position) {
+        return (mjsElement)super.position(position);
+    }
+    @Override public mjsElement getPointer(long i) {
+        return new mjsElement((Pointer)this).offsetAddress(i);
+    }
+       // element type, do not modify
+  public native @Cast("mjtObj") int elemtype(); public native mjsElement elemtype(int setter);                 // element type
+  public native @Cast("uint64_t") long signature(); public native mjsElement signature(long setter);              // compilation signature
+}
+
+
+public static class mjsCompiler extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsCompiler() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsCompiler(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsCompiler(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsCompiler position(long position) {
+        return (mjsCompiler)super.position(position);
+    }
+    @Override public mjsCompiler getPointer(long i) {
+        return new mjsCompiler((Pointer)this).offsetAddress(i);
+    }
+      // compiler options
+  public native @Cast("mjtBool") boolean autolimits(); public native mjsCompiler autolimits(boolean setter);              // infer "limited" attribute based on range
+  public native double boundmass(); public native mjsCompiler boundmass(double setter);                // enforce minimum body mass
+  public native double boundinertia(); public native mjsCompiler boundinertia(double setter);             // enforce minimum body diagonal inertia
+  public native double settotalmass(); public native mjsCompiler settotalmass(double setter);             // (deprecated) rescale masses and inertias; <=0: ignore
+  public native @Cast("mjtBool") boolean balanceinertia(); public native mjsCompiler balanceinertia(boolean setter);          // automatically impose A + B >= C rule
+  public native @Cast("mjtBool") boolean fitaabb(); public native mjsCompiler fitaabb(boolean setter);                 // meshfit to aabb instead of inertia box
+  public native @Cast("mjtBool") boolean degree(); public native mjsCompiler degree(boolean setter);                  // angles in radians or degrees
+  public native @Cast("char") byte eulerseq(int i); public native mjsCompiler eulerseq(int i, byte setter);
+  @MemberGetter public native @Cast("char*") BytePointer eulerseq();                // sequence for euler rotations
+  public native @Cast("mjtBool") boolean discardvisual(); public native mjsCompiler discardvisual(boolean setter);           // discard visual geoms in parser
+  public native @Cast("mjtBool") boolean usethread(); public native mjsCompiler usethread(boolean setter);               // use multiple threads to speed up compiler
+  public native @Cast("mjtBool") boolean fusestatic(); public native mjsCompiler fusestatic(boolean setter);              // fuse static bodies with parent
+  public native @Cast("mjtInertiaFromGeom") int inertiafromgeom(); public native mjsCompiler inertiafromgeom(int setter); // use geom inertias
+  public native int inertiagrouprange(int i); public native mjsCompiler inertiagrouprange(int i, int setter);
+  @MemberGetter public native IntPointer inertiagrouprange();        // range of geom groups used to compute inertia
+  public native @Cast("mjtBool") boolean saveinertial(); public native mjsCompiler saveinertial(boolean setter);            // save explicit inertial clause for all bodies to XML
+  public native @Cast("mjtBool") boolean savecompiled(); public native mjsCompiler savecompiled(boolean setter);            // save values as compiled, not as written in the spec
+  public native @Cast("mjtBool") boolean savecanonical(); public native mjsCompiler savecanonical(boolean setter);           // save quaternions and radians, not the notation of the spec
+  public native @Cast("mjtBool") boolean alignfree(); public native mjsCompiler alignfree(boolean setter);               // align free joints with inertial frame
+  public native @Cast("mjtConflict") int conflict(); public native mjsCompiler conflict(int setter);            // conflict resolution for attach
+  public native @Cast("mjtPassthrough") int passthrough(); public native mjsCompiler passthrough(int setter);      // assets left by reference (bitmask)
+  public native @ByRef mjLROpt LRopt(); public native mjsCompiler LRopt(mjLROpt setter);                   // options for lengthrange computation               // mesh and hfield directory            // texture directory
+  public native @Cast("uint64_t") long authored(); public native mjsCompiler authored(long setter);               // bitmask of authored compiler fields
+}
+
+
+public static class mjsAuthored extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsAuthored() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsAuthored(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsAuthored(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsAuthored position(long position) {
+        return (mjsAuthored)super.position(position);
+    }
+    @Override public mjsAuthored getPointer(long i) {
+        return new mjsAuthored((Pointer)this).offsetAddress(i);
+    }
+      // authored tracking bitmasks for mjModel structs
+  public native @Cast("uint64_t") long option(); public native mjsAuthored option(long setter);                 // authored mjOption fields
+  public native int disableflags(); public native mjsAuthored disableflags(int setter);           // individual authored disable flags
+  public native int enableflags(); public native mjsAuthored enableflags(int setter);            // individual authored enable flags
+  public native int disableactuator(); public native mjsAuthored disableactuator(int setter);        // individual authored actuator groups
+  public native @Cast("uint64_t") long visual_global(); public native mjsAuthored visual_global(long setter);          // authored visual.global fields
+  public native @Cast("uint64_t") long visual_quality(); public native mjsAuthored visual_quality(long setter);         // authored visual.quality fields
+  public native @Cast("uint64_t") long visual_headlight(); public native mjsAuthored visual_headlight(long setter);       // authored visual.headlight fields
+  public native @Cast("uint64_t") long visual_map(); public native mjsAuthored visual_map(long setter);             // authored visual.map fields
+  public native @Cast("uint64_t") long visual_scale(); public native mjsAuthored visual_scale(long setter);           // authored visual.scale fields
+  public native @Cast("uint64_t") long visual_rgba(); public native mjsAuthored visual_rgba(long setter);            // authored visual.rgba fields
+}
+
+
+public static class mjSpec extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjSpec() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjSpec(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjSpec(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjSpec position(long position) {
+        return (mjSpec)super.position(position);
+    }
+    @Override public mjSpec getPointer(long i) {
+        return new mjSpec((Pointer)this).offsetAddress(i);
+    }
+           // model specification
+  public native mjsElement element(); public native mjSpec element(mjsElement setter);             // element type             // model name
+
+  // compiler data
+  public native @ByRef mjsCompiler compiler(); public native mjSpec compiler(mjsCompiler setter);            // compiler options
+  public native @Cast("mjtBool") boolean strippath(); public native mjSpec strippath(boolean setter);               // automatically strip paths from mesh files
+
+  // engine data
+  public native @ByRef mjOption option(); public native mjSpec option(mjOption setter);                 // physics options
+  public native @ByRef mjVisual visual(); public native mjSpec visual(mjVisual setter);                 // visual options
+  public native @ByRef mjStatistic stat(); public native mjSpec stat(mjStatistic setter);                // statistics override (if defined)
+
+  // sizes
+  public native @Cast("mjtSize") long memory(); public native mjSpec memory(long setter);                  // number of bytes in arena+stack memory
+  public native int nemax(); public native mjSpec nemax(int setter);                       // max number of equality constraints
+  public native int nuserdata(); public native mjSpec nuserdata(int setter);                   // number of mjtNums in userdata
+  public native int nuser_body(); public native mjSpec nuser_body(int setter);                  // number of mjtNums in body_user
+  public native int nuser_jnt(); public native mjSpec nuser_jnt(int setter);                   // number of mjtNums in jnt_user
+  public native int nuser_geom(); public native mjSpec nuser_geom(int setter);                  // number of mjtNums in geom_user
+  public native int nuser_site(); public native mjSpec nuser_site(int setter);                  // number of mjtNums in site_user
+  public native int nuser_cam(); public native mjSpec nuser_cam(int setter);                   // number of mjtNums in cam_user
+  public native int nuser_tendon(); public native mjSpec nuser_tendon(int setter);                // number of mjtNums in tendon_user
+  public native int nuser_actuator(); public native mjSpec nuser_actuator(int setter);              // number of mjtNums in actuator_user
+  public native int nuser_sensor(); public native mjSpec nuser_sensor(int setter);                // number of mjtNums in sensor_user
+  public native int nkey(); public native mjSpec nkey(int setter);                        // number of keyframes
+  public native int njmax(); public native mjSpec njmax(int setter);                       // (deprecated) max number of constraints
+  public native int nconmax(); public native mjSpec nconmax(int setter);                     // (deprecated) max number of detected contacts
+  public native @Cast("mjtSize") long nstack(); public native mjSpec nstack(long setter);                  // (deprecated) number of mjtNums in mjData stack
+
+  // global data               // comment at top of XML          // path to model file
+
+  // other
+  public native @Cast("mjtBool") boolean hasImplicitPluginElem(); public native mjSpec hasImplicitPluginElem(boolean setter);   // already encountered an implicit plugin sensor/actuator
+
+  // authored tracking bitmasks for mjModel structs
+  public native @ByRef mjsAuthored authored(); public native mjSpec authored(mjsAuthored setter);
+}
+
+
+public static class mjsOrientation extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsOrientation() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsOrientation(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsOrientation(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsOrientation position(long position) {
+        return (mjsOrientation)super.position(position);
+    }
+    @Override public mjsOrientation getPointer(long i) {
+        return new mjsOrientation((Pointer)this).offsetAddress(i);
+    }
+   // alternative orientation specifiers
+  public native @Cast("mjtOrientation") int type(); public native mjsOrientation type(int setter);             // active orientation specifier
+  public native double axisangle(int i); public native mjsOrientation axisangle(int i, double setter);
+  @MemberGetter public native DoublePointer axisangle();             // axis and angle
+  public native double xyaxes(int i); public native mjsOrientation xyaxes(int i, double setter);
+  @MemberGetter public native DoublePointer xyaxes();                // x and y axes
+  public native double zaxis(int i); public native mjsOrientation zaxis(int i, double setter);
+  @MemberGetter public native DoublePointer zaxis();                 // z axis (minimal rotation)
+  public native double euler(int i); public native mjsOrientation euler(int i, double setter);
+  @MemberGetter public native DoublePointer euler();                 // Euler angles
+}
+
+
+public static class mjsPlugin extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsPlugin() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsPlugin(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsPlugin(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsPlugin position(long position) {
+        return (mjsPlugin)super.position(position);
+    }
+    @Override public mjsPlugin getPointer(long i) {
+        return new mjsPlugin((Pointer)this).offsetAddress(i);
+    }
+        // plugin specification
+  public native mjsElement element(); public native mjsPlugin element(mjsElement setter);             // element type                  // instance name           // plugin name
+  public native @Cast("mjtBool") boolean active(); public native mjsPlugin active(boolean setter);                  // is the plugin active                  // message appended to compiler errors
+}
+
+
+public static class mjsBody extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsBody() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsBody(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsBody(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsBody position(long position) {
+        return (mjsBody)super.position(position);
+    }
+    @Override public mjsBody getPointer(long i) {
+        return new mjsBody((Pointer)this).offsetAddress(i);
+    }
+          // body specification
+  public native mjsElement element(); public native mjsBody element(mjsElement setter);             // element type            // childclass name
+
+  // body frame
+  public native double pos(int i); public native mjsBody pos(int i, double setter);
+  @MemberGetter public native DoublePointer pos();                   // frame position
+  public native double quat(int i); public native mjsBody quat(int i, double setter);
+  @MemberGetter public native DoublePointer quat();                  // frame orientation
+  public native @ByRef mjsOrientation alt(); public native mjsBody alt(mjsOrientation setter);              // frame alternative orientation
+
+  // inertial frame
+  public native double mass(); public native mjsBody mass(double setter);                     // mass
+  public native double ipos(int i); public native mjsBody ipos(int i, double setter);
+  @MemberGetter public native DoublePointer ipos();                  // inertial frame position
+  public native double iquat(int i); public native mjsBody iquat(int i, double setter);
+  @MemberGetter public native DoublePointer iquat();                 // inertial frame orientation
+  public native double inertia(int i); public native mjsBody inertia(int i, double setter);
+  @MemberGetter public native DoublePointer inertia();               // diagonal inertia (in i-frame)
+  public native @ByRef mjsOrientation ialt(); public native mjsBody ialt(mjsOrientation setter);             // inertial frame alternative orientation
+  public native double fullinertia(int i); public native mjsBody fullinertia(int i, double setter);
+  @MemberGetter public native DoublePointer fullinertia();           // non-axis-aligned inertia matrix
+
+  // other
+  public native @Cast("mjtBool") boolean mocap(); public native mjsBody mocap(boolean setter);                   // is this a mocap body
+  public native double gravcomp(); public native mjsBody gravcomp(double setter);                 // gravity compensation
+  public native @Cast("mjtSleepPolicy") int sleep(); public native mjsBody sleep(int setter);            // sleep policy
+  public native @Cast("mjtByte") byte simple(); public native mjsBody simple(byte setter);                  // simple body optimization (0: false, 1: auto)
+  public native @Cast("mjtByte") byte fuse(); public native mjsBody fuse(byte setter);                    // fuse with parent when static (0: false, 1: auto)           // user data
+  public native @Cast("mjtBool") boolean explicitinertial(); public native mjsBody explicitinertial(boolean setter);        // whether to save the body with explicit inertial clause
+  public native @ByRef mjsPlugin plugin(); public native mjsBody plugin(mjsPlugin setter);                // passive force plugin                  // message appended to compiler errors
+}
+
+
+public static class mjsFrame extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsFrame() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsFrame(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsFrame(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsFrame position(long position) {
+        return (mjsFrame)super.position(position);
+    }
+    @Override public mjsFrame getPointer(long i) {
+        return new mjsFrame((Pointer)this).offsetAddress(i);
+    }
+         // frame specification
+  public native mjsElement element(); public native mjsFrame element(mjsElement setter);             // element type            // childclass name
+  public native double pos(int i); public native mjsFrame pos(int i, double setter);
+  @MemberGetter public native DoublePointer pos();                   // position
+  public native double quat(int i); public native mjsFrame quat(int i, double setter);
+  @MemberGetter public native DoublePointer quat();                  // orientation
+  public native @ByRef mjsOrientation alt(); public native mjsFrame alt(mjsOrientation setter);              // alternative orientation
+  public native double scale(int i); public native mjsFrame scale(int i, double setter);
+  @MemberGetter public native DoublePointer scale();                 // scale of the frame's contents
+  public native @Cast("mjtScaling") int scaling(); public native mjsFrame scaling(int setter);              // physical policy of the scale
+  public native double massscale(); public native mjsFrame massscale(double setter);                // mass factor of the contents; 0: ratio of volumes                  // message appended to compiler errors
+}
+
+
+public static class mjsJoint extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsJoint() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsJoint(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsJoint(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsJoint position(long position) {
+        return (mjsJoint)super.position(position);
+    }
+    @Override public mjsJoint getPointer(long i) {
+        return new mjsJoint((Pointer)this).offsetAddress(i);
+    }
+         // joint specification
+  public native mjsElement element(); public native mjsJoint element(mjsElement setter);             // element type
+  public native @Cast("mjtJoint") int type(); public native mjsJoint type(int setter);                   // joint type
+
+  // kinematics
+  public native double pos(int i); public native mjsJoint pos(int i, double setter);
+  @MemberGetter public native DoublePointer pos();                   // anchor position
+  public native double axis(int i); public native mjsJoint axis(int i, double setter);
+  @MemberGetter public native DoublePointer axis();                  // joint axis
+  public native double ref(); public native mjsJoint ref(double setter);                      // value at reference configuration: qpos0
+  public native @Cast("mjtAlignFree") int align(); public native mjsJoint align(int setter);              // align free joint with body com
+
+  // stiffness
+  public native double stiffness(int i); public native mjsJoint stiffness(int i, double setter);
+  @MemberGetter public native DoublePointer stiffness();     // stiffness coefficients
+  public native double springref(); public native mjsJoint springref(double setter);                // spring reference value: qpos_spring
+  public native double springyield(); public native mjsJoint springyield(double setter);              // plastic yield threshold (0: elastic)
+  public native double springdamper(int i); public native mjsJoint springdamper(int i, double setter);
+  @MemberGetter public native DoublePointer springdamper();          // timeconst, dampratio
+
+  // limits
+  public native @Cast("mjtLimited") int limited(); public native mjsJoint limited(int setter);              // does joint have limits
+  public native double range(int i); public native mjsJoint range(int i, double setter);
+  @MemberGetter public native DoublePointer range();                 // joint limits
+  public native double margin(); public native mjsJoint margin(double setter);                   // margin value for joint limit detection
+  public native @Cast("mjtNum") double solref_limit(int i); public native mjsJoint solref_limit(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solref_limit();     // solver reference: joint limits
+  public native @Cast("mjtNum") double solimp_limit(int i); public native mjsJoint solimp_limit(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp_limit();     // solver impedance: joint limits
+  public native @Cast("mjtLimited") int actfrclimited(); public native mjsJoint actfrclimited(int setter);        // are actuator forces on joint limited
+  public native double actfrcrange(int i); public native mjsJoint actfrcrange(int i, double setter);
+  @MemberGetter public native DoublePointer actfrcrange();           // actuator force limits
+
+  // dof properties
+  public native double armature(); public native mjsJoint armature(double setter);                 // armature inertia (mass for slider)
+  public native double damping(int i); public native mjsJoint damping(int i, double setter);
+  @MemberGetter public native DoublePointer damping();       // damping coefficients
+  public native double frictionloss(); public native mjsJoint frictionloss(double setter);             // friction loss
+  public native @Cast("mjtNum") double solref_friction(int i); public native mjsJoint solref_friction(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solref_friction();  // solver reference: dof friction
+  public native @Cast("mjtNum") double solimp_friction(int i); public native mjsJoint solimp_friction(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp_friction();  // solver impedance: dof friction
+
+  // other
+  public native int group(); public native mjsJoint group(int setter);                       // group
+  public native @Cast("mjtBool") boolean actgravcomp(); public native mjsJoint actgravcomp(boolean setter);             // is gravcomp force applied via actuators           // user data                  // message appended to compiler errors
+}
+
+
+public static class mjsGeom extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsGeom() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsGeom(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsGeom(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsGeom position(long position) {
+        return (mjsGeom)super.position(position);
+    }
+    @Override public mjsGeom getPointer(long i) {
+        return new mjsGeom((Pointer)this).offsetAddress(i);
+    }
+          // geom specification
+  public native mjsElement element(); public native mjsGeom element(mjsElement setter);             // element type
+  public native @Cast("mjtGeom") int type(); public native mjsGeom type(int setter);                    // geom type
+
+  // frame, size
+  public native double pos(int i); public native mjsGeom pos(int i, double setter);
+  @MemberGetter public native DoublePointer pos();                   // position
+  public native double quat(int i); public native mjsGeom quat(int i, double setter);
+  @MemberGetter public native DoublePointer quat();                  // orientation
+  public native @ByRef mjsOrientation alt(); public native mjsGeom alt(mjsOrientation setter);              // alternative orientation
+  public native double fromto(int i); public native mjsGeom fromto(int i, double setter);
+  @MemberGetter public native DoublePointer fromto();                // alternative for capsule, cylinder, box, ellipsoid
+  public native double size(int i); public native mjsGeom size(int i, double setter);
+  @MemberGetter public native DoublePointer size();                  // type-specific size
+
+  // contact related
+  public native int contype(); public native mjsGeom contype(int setter);                     // contact type
+  public native int conaffinity(); public native mjsGeom conaffinity(int setter);                 // contact affinity
+  public native int condim(); public native mjsGeom condim(int setter);                      // contact dimensionality
+  public native int priority(); public native mjsGeom priority(int setter);                    // contact priority
+  public native double friction(int i); public native mjsGeom friction(int i, double setter);
+  @MemberGetter public native DoublePointer friction();              // one-sided friction coefficients: slide, roll, spin
+  public native double solmix(); public native mjsGeom solmix(double setter);                   // solver mixing for contact pairs
+  public native @Cast("mjtNum") double solref(int i); public native mjsGeom solref(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solref();           // solver reference
+  public native @Cast("mjtNum") double solimp(int i); public native mjsGeom solimp(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp();           // solver impedance
+  public native double margin(); public native mjsGeom margin(double setter);                   // margin for contact detection
+  public native double gap(); public native mjsGeom gap(double setter);                      // additional contact detection buffer
+  public native double surfacevel(int i); public native mjsGeom surfacevel(int i, double setter);
+  @MemberGetter public native DoublePointer surfacevel();            // surface velocity in local frame: linear, angular
+  public native double adhesion(); public native mjsGeom adhesion(double setter);                 // adhesive force of contacts
+
+  // inertia inference
+  public native double mass(); public native mjsGeom mass(double setter);                     // used to compute density
+  public native double density(); public native mjsGeom density(double setter);                  // used to compute mass and inertia from volume or surface
+  public native @Cast("mjtGeomInertia") int typeinertia(); public native mjsGeom typeinertia(int setter);      // selects between surface and volume inertia
+
+  // fluid forces
+  public native @Cast("mjtNum") double fluid_ellipsoid(); public native mjsGeom fluid_ellipsoid(double setter);          // whether ellipsoid-fluid model is active
+  public native @Cast("mjtNum") double fluid_coefs(int i); public native mjsGeom fluid_coefs(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer fluid_coefs();           // ellipsoid-fluid interaction coefs
+
+  // visual              // name of material
+  public native float rgba(int i); public native mjsGeom rgba(int i, float setter);
+  @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted
+  public native int group(); public native mjsGeom group(int setter);                       // group
+  public native @Cast("mjtBool") boolean castshadow(); public native mjsGeom castshadow(boolean setter);              // does geom cast shadows
+
+  // other            // heightfield attached to geom              // mesh attached to geom
+  public native double fitscale(); public native mjsGeom fitscale(double setter);                 // scale mesh uniformly           // user data
+  public native @ByRef mjsPlugin plugin(); public native mjsGeom plugin(mjsPlugin setter);                // sdf plugin                  // message appended to compiler errors
+}
+
+
+public static class mjsSite extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsSite() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsSite(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsSite(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsSite position(long position) {
+        return (mjsSite)super.position(position);
+    }
+    @Override public mjsSite getPointer(long i) {
+        return new mjsSite((Pointer)this).offsetAddress(i);
+    }
+          // site specification
+  public native mjsElement element(); public native mjsSite element(mjsElement setter);             // element type
+
+  // frame, size
+  public native double pos(int i); public native mjsSite pos(int i, double setter);
+  @MemberGetter public native DoublePointer pos();                   // position
+  public native double quat(int i); public native mjsSite quat(int i, double setter);
+  @MemberGetter public native DoublePointer quat();                  // orientation
+  public native @ByRef mjsOrientation alt(); public native mjsSite alt(mjsOrientation setter);              // alternative orientation
+  public native double fromto(int i); public native mjsSite fromto(int i, double setter);
+  @MemberGetter public native DoublePointer fromto();                // alternative for capsule, cylinder, box, ellipsoid
+  public native double size(int i); public native mjsSite size(int i, double setter);
+  @MemberGetter public native DoublePointer size();                  // geom size
+
+  // visual
+  public native @Cast("mjtGeom") int type(); public native mjsSite type(int setter);                    // geom type              // name of material
+  public native int group(); public native mjsSite group(int setter);                       // group
+  public native float rgba(int i); public native mjsSite rgba(int i, float setter);
+  @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted
+
+  // other              // mesh attached to site           // user data                  // message appended to compiler errors
+}
+
+
+public static class mjsCamera extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsCamera() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsCamera(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsCamera(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsCamera position(long position) {
+        return (mjsCamera)super.position(position);
+    }
+    @Override public mjsCamera getPointer(long i) {
+        return new mjsCamera((Pointer)this).offsetAddress(i);
+    }
+        // camera specification
+  public native mjsElement element(); public native mjsCamera element(mjsElement setter);             // element type
+
+  // extrinsics
+  public native double pos(int i); public native mjsCamera pos(int i, double setter);
+  @MemberGetter public native DoublePointer pos();                   // position
+  public native double quat(int i); public native mjsCamera quat(int i, double setter);
+  @MemberGetter public native DoublePointer quat();                  // orientation
+  public native @ByRef mjsOrientation alt(); public native mjsCamera alt(mjsOrientation setter);              // alternative orientation
+  public native @Cast("mjtCamLight") int mode(); public native mjsCamera mode(int setter);                // tracking mode            // target body for tracking/targeting
+
+  // intrinsics
+  public native @Cast("mjtProjection") int proj(); public native mjsCamera proj(int setter);              // camera projection type
+  public native int resolution(int i); public native mjsCamera resolution(int i, int setter);
+  @MemberGetter public native IntPointer resolution();               // resolution (pixel)
+  public native int output(); public native mjsCamera output(int setter);                      // bit flags for output type
+  public native double fovy(); public native mjsCamera fovy(double setter);                     // y-field of view
+  public native double ipd(); public native mjsCamera ipd(double setter);                      // inter-pupillary distance
+  public native float intrinsic(int i); public native mjsCamera intrinsic(int i, float setter);
+  @MemberGetter public native FloatPointer intrinsic();              // camera intrinsics (length)
+  public native float sensor_size(int i); public native mjsCamera sensor_size(int i, float setter);
+  @MemberGetter public native FloatPointer sensor_size();            // sensor size (length)
+  public native float focal_length(int i); public native mjsCamera focal_length(int i, float setter);
+  @MemberGetter public native FloatPointer focal_length();           // focal length (length)
+  public native float focal_pixel(int i); public native mjsCamera focal_pixel(int i, float setter);
+  @MemberGetter public native FloatPointer focal_pixel();            // focal length (pixel)
+  public native float principal_length(int i); public native mjsCamera principal_length(int i, float setter);
+  @MemberGetter public native FloatPointer principal_length();       // principal point (length)
+  public native float principal_pixel(int i); public native mjsCamera principal_pixel(int i, float setter);
+  @MemberGetter public native FloatPointer principal_pixel();        // principal point (pixel)
+
+  // other           // user data                  // message appended to compiler errors
+}
+
+
+public static class mjsLight extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsLight() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsLight(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsLight(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsLight position(long position) {
+        return (mjsLight)super.position(position);
+    }
+    @Override public mjsLight getPointer(long i) {
+        return new mjsLight((Pointer)this).offsetAddress(i);
+    }
+         // light specification
+  public native mjsElement element(); public native mjsLight element(mjsElement setter);             // element type
+
+  // frame
+  public native double pos(int i); public native mjsLight pos(int i, double setter);
+  @MemberGetter public native DoublePointer pos();                   // position
+  public native double dir(int i); public native mjsLight dir(int i, double setter);
+  @MemberGetter public native DoublePointer dir();                   // direction
+  public native @Cast("mjtCamLight") int mode(); public native mjsLight mode(int setter);                // tracking mode            // target body for targeting
+
+  // intrinsics
+  public native @Cast("mjtBool") boolean active(); public native mjsLight active(boolean setter);                  // is light active
+  public native @Cast("mjtLightType") int type(); public native mjsLight type(int setter);               // type of light               // texture name for image lights
+  public native @Cast("mjtBool") boolean castshadow(); public native mjsLight castshadow(boolean setter);              // does light cast shadows
+  public native float bulbradius(); public native mjsLight bulbradius(float setter);                // bulb radius, for soft shadows
+  public native float intensity(); public native mjsLight intensity(float setter);                 // intensity, in candelas
+  public native float range(); public native mjsLight range(float setter);                     // range of effectiveness
+  public native float attenuation(int i); public native mjsLight attenuation(int i, float setter);
+  @MemberGetter public native FloatPointer attenuation();            // OpenGL attenuation (quadratic model)
+  public native float cutoff(); public native mjsLight cutoff(float setter);                    // OpenGL cutoff
+  public native float softness(); public native mjsLight softness(float setter);                  // spotlight edge softness
+  public native float exponent(); public native mjsLight exponent(float setter);                  // OpenGL exponent
+  public native float ambient(int i); public native mjsLight ambient(int i, float setter);
+  @MemberGetter public native FloatPointer ambient();                // ambient color
+  public native float diffuse(int i); public native mjsLight diffuse(int i, float setter);
+  @MemberGetter public native FloatPointer diffuse();                // diffuse color
+  public native float specular(int i); public native mjsLight specular(int i, float setter);
+  @MemberGetter public native FloatPointer specular();               // specular color
+
+  // other                  // message appended to compiler errors
+}
+
+
+public static class mjsFlex extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsFlex() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsFlex(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsFlex(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsFlex position(long position) {
+        return (mjsFlex)super.position(position);
+    }
+    @Override public mjsFlex getPointer(long i) {
+        return new mjsFlex((Pointer)this).offsetAddress(i);
+    }
+          // flex specification
+  public native mjsElement element(); public native mjsFlex element(mjsElement setter);             // element type
+
+  // contact properties
+  public native int contype(); public native mjsFlex contype(int setter);                     // contact type
+  public native int conaffinity(); public native mjsFlex conaffinity(int setter);                 // contact affinity
+  public native int condim(); public native mjsFlex condim(int setter);                      // contact dimensionality
+  public native int priority(); public native mjsFlex priority(int setter);                    // contact priority
+  public native double friction(int i); public native mjsFlex friction(int i, double setter);
+  @MemberGetter public native DoublePointer friction();              // one-sided friction coefficients: slide, roll, spin
+  public native double solmix(); public native mjsFlex solmix(double setter);                   // solver mixing for contact pairs
+  public native @Cast("mjtNum") double solref(int i); public native mjsFlex solref(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solref();           // solver reference
+  public native @Cast("mjtNum") double solimp(int i); public native mjsFlex solimp(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp();           // solver impedance
+  public native double margin(); public native mjsFlex margin(double setter);                   // margin for contact detection
+  public native double gap(); public native mjsFlex gap(double setter);                      // additional contact detection buffer
+
+  // other properties
+  public native int dim(); public native mjsFlex dim(int setter);                         // element dimensionality
+  public native double radius(); public native mjsFlex radius(double setter);                   // radius around primitive element
+  public native double size(int i); public native mjsFlex size(int i, double setter);
+  @MemberGetter public native DoublePointer size();                  // vertex bounding box half sizes in qpos0
+  public native @Cast("mjtBool") boolean flatskin(); public native mjsFlex flatskin(boolean setter);                // render flex skin with flat shading
+  public native @Cast("mjtFlexSelf") int selfcollide(); public native mjsFlex selfcollide(int setter);         // mode for flex self collision
+  public native int passive(); public native mjsFlex passive(int setter);                     // mode for passive collisions
+  public native int activelayers(); public native mjsFlex activelayers(int setter);                // number of active element layers in 3D
+  public native int group(); public native mjsFlex group(int setter);                       // group for visualization
+  public native double edgestiffness(); public native mjsFlex edgestiffness(double setter);            // edge stiffness
+  public native double edgedamping(); public native mjsFlex edgedamping(double setter);              // edge damping
+  public native float rgba(int i); public native mjsFlex rgba(int i, float setter);
+  @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted           // name of material used for rendering
+  public native double young(); public native mjsFlex young(double setter);                    // Young's modulus
+  public native double poisson(); public native mjsFlex poisson(double setter);                  // Poisson's ratio
+  public native double shear(); public native mjsFlex shear(double setter);                    // 1D torsion shear modulus; 0: young / (2 (1 + poisson))
+  public native double damping(); public native mjsFlex damping(double setter);                  // Rayleigh's damping
+  public native double thickness(); public native mjsFlex thickness(double setter);                // thickness (2D only)
+  public native double stressyield(int i); public native mjsFlex stressyield(int i, double setter);
+  @MemberGetter public native DoublePointer stressyield();           // yield strain thresholds (stretch, bend); 0: elastic
+  public native int elastic2d(); public native mjsFlex elastic2d(int setter);                   // 2D passive forces; 0: none, 1: bending, 2: stretching, 3: both
+  public native int elastic3d(); public native mjsFlex elastic3d(int setter);  // experimental 3D material (mjSpec only); 0: Saint
+                  // Venant-Kirchhoff, 1: Stable Neo-Hookean
+  public native @Cast("mjtFlexSection") int section(); public native mjsFlex section(int setter);          // 1D cross-section (mjtFlexSection)
+  public native double sectionsize(int i); public native mjsFlex sectionsize(int i, double setter);
+  @MemberGetter public native DoublePointer sectionsize();           // 1D box cross-section half-sizes
+  public native int cellcount(int i); public native mjsFlex cellcount(int i, int setter);
+  @MemberGetter public native IntPointer cellcount();                // grid cell count for finite cell method
+  public native int order(); public native mjsFlex order(int setter);                       // interpolation order (1: trilinear, 2: quadratic)
+
+  // mesh properties           // node body names           // vertex body names               // node positions               // vertex positions                  // element vertex ids            // vertex texture coordinates          // element texture coordinates
+
+  // other                  // message appended to compiler errors
+}
+
+
+public static class mjsMesh extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsMesh() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsMesh(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsMesh(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsMesh position(long position) {
+        return (mjsMesh)super.position(position);
+    }
+    @Override public mjsMesh getPointer(long i) {
+        return new mjsMesh((Pointer)this).offsetAddress(i);
+    }
+          // mesh specification
+  public native mjsElement element(); public native mjsMesh element(mjsElement setter);             // element type          // content type of file                  // mesh file
+  public native double refpos(int i); public native mjsMesh refpos(int i, double setter);
+  @MemberGetter public native DoublePointer refpos();                // reference position
+  public native double refquat(int i); public native mjsMesh refquat(int i, double setter);
+  @MemberGetter public native DoublePointer refquat();               // reference orientation
+  public native double scale(int i); public native mjsMesh scale(int i, double setter);
+  @MemberGetter public native DoublePointer scale();                 // rescale mesh
+  public native @Cast("mjtMeshInertia") int inertia(); public native mjsMesh inertia(int setter);          // inertia type (convex, legacy, exact, shell)
+  public native @Cast("mjtBool") boolean smoothnormal(); public native mjsMesh smoothnormal(boolean setter);            // do not exclude large-angle faces from normals
+  public native @Cast("mjtBool") boolean needsdf(); public native mjsMesh needsdf(boolean setter);                 // compute sdf from mesh
+  public native int maxhullvert(); public native mjsMesh maxhullvert(int setter);                 // maximum vertex count for the convex hull            // user vertex data          // user normal data        // user texcoord data              // user vertex indices        // user face normal indices      // user texcoord indices           // user volume node coordinates               // user tetrahedral cell indices
+  public native @ByRef mjsPlugin plugin(); public native mjsMesh plugin(mjsPlugin setter);                // sdf plugin              // name of material
+  public native int octree_maxdepth(); public native mjsMesh octree_maxdepth(int setter);             // max octree depth                  // message appended to compiler errors
+}
+
+
+public static class mjsHField extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsHField() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsHField(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsHField(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsHField position(long position) {
+        return (mjsHField)super.position(position);
+    }
+    @Override public mjsHField getPointer(long i) {
+        return new mjsHField((Pointer)this).offsetAddress(i);
+    }
+        // height field specification
+  public native mjsElement element(); public native mjsHField element(mjsElement setter);             // element type          // content type of file                  // file: (nrow, ncol, [elevation data])
+  public native double size(int i); public native mjsHField size(int i, double setter);
+  @MemberGetter public native DoublePointer size();                  // hfield size (ignore referencing geom size)
+  public native int nrow(); public native mjsHField nrow(int setter);                        // number of rows
+  public native int ncol(); public native mjsHField ncol(int setter);                        // number of columns            // user-provided elevation data                  // message appended to compiler errors
+}
 
 
 
-// #endif  // MUJOCO_INCLUDE_MJTNUM_H_
+public static class mjsSkin extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsSkin() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsSkin(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsSkin(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsSkin position(long position) {
+        return (mjsSkin)super.position(position);
+    }
+    @Override public mjsSkin getPointer(long i) {
+        return new mjsSkin((Pointer)this).offsetAddress(i);
+    }
+          // skin specification
+  public native mjsElement element(); public native mjsSkin element(mjsElement setter);             // element type                  // skin file              // name of material used for rendering
+  public native float rgba(int i); public native mjsSkin rgba(int i, float setter);
+  @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted
+  public native float inflate(); public native mjsSkin inflate(float setter);                   // inflate in normal direction
+  public native int group(); public native mjsSkin group(int setter);                       // group for visualization
+
+  // mesh                // vertex positions            // texture coordinates                  // faces
+
+  // skin           // body names             // bind pos            // bind quat             // vertex ids       // vertex weights
+
+  // other                  // message appended to compiler errors
+}
+
+
+public static class mjsTexture extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsTexture() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsTexture(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsTexture(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsTexture position(long position) {
+        return (mjsTexture)super.position(position);
+    }
+    @Override public mjsTexture getPointer(long i) {
+        return new mjsTexture((Pointer)this).offsetAddress(i);
+    }
+       // texture specification
+  public native mjsElement element(); public native mjsTexture element(mjsElement setter);             // element type
+  public native @Cast("mjtTexture") int type(); public native mjsTexture type(int setter);                 // texture type
+  public native @Cast("mjtColorSpace") int colorspace(); public native mjsTexture colorspace(int setter);        // colorspace
+
+  // method 1: builtin
+  public native @Cast("mjtBuiltin") int builtin(); public native mjsTexture builtin(int setter);              // builtin type
+  public native @Cast("mjtMark") int mark(); public native mjsTexture mark(int setter);                    // mark type
+  public native double rgb1(int i); public native mjsTexture rgb1(int i, double setter);
+  @MemberGetter public native DoublePointer rgb1();                  // first color for builtin
+  public native double rgb2(int i); public native mjsTexture rgb2(int i, double setter);
+  @MemberGetter public native DoublePointer rgb2();                  // second color for builtin
+  public native double markrgb(int i); public native mjsTexture markrgb(int i, double setter);
+  @MemberGetter public native DoublePointer markrgb();               // mark color
+  public native double random(); public native mjsTexture random(double setter);                   // probability of random dots
+  public native int height(); public native mjsTexture height(int setter);                      // height in pixels (square for cube and skybox)
+  public native int width(); public native mjsTexture width(int setter);                       // width in pixels
+  public native int nchannel(); public native mjsTexture nchannel(int setter);                    // number of channels
+
+  // method 2: single file          // content type of file                  // png file to load; use for all sides of cube
+  public native int gridsize(int i); public native mjsTexture gridsize(int i, int setter);
+  @MemberGetter public native IntPointer gridsize();                 // size of grid for composite file; (1,1)-repeat
+  public native @Cast("char") byte gridlayout(int i); public native mjsTexture gridlayout(int i, byte setter);
+  @MemberGetter public native @Cast("char*") BytePointer gridlayout();             // row-major: L,R,F,B,U,D for faces; . for unused
+
+  // method 3: separate files          // different file for each side of the cube
+
+  // method 4: from buffer read by user                  // texture data
+
+  // flip options
+  public native @Cast("mjtBool") boolean hflip(); public native mjsTexture hflip(boolean setter);                   // horizontal flip
+  public native @Cast("mjtBool") boolean vflip(); public native mjsTexture vflip(boolean setter);                   // vertical flip
+
+  // payload
+  public native @Cast("mjtEmbed") int embed(); public native mjsTexture embed(int setter);                  // pixels in the model, or the file by reference
+
+  // other                  // message appended to compiler errors
+}
+
+
+public static class mjsMaterial extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsMaterial() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsMaterial(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsMaterial(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsMaterial position(long position) {
+        return (mjsMaterial)super.position(position);
+    }
+    @Override public mjsMaterial getPointer(long i) {
+        return new mjsMaterial((Pointer)this).offsetAddress(i);
+    }
+      // material specification
+  public native mjsElement element(); public native mjsMaterial element(mjsElement setter);             // element type           // names of textures (empty: none)
+  public native @Cast("mjtBool") boolean texuniform(); public native mjsMaterial texuniform(boolean setter);              // make texture cube uniform
+  public native float texrepeat(int i); public native mjsMaterial texrepeat(int i, float setter);
+  @MemberGetter public native FloatPointer texrepeat();              // texture repetition for 2D mapping
+  public native float emission(); public native mjsMaterial emission(float setter);                  // emission
+  public native float specular(); public native mjsMaterial specular(float setter);                  // specular
+  public native float shininess(); public native mjsMaterial shininess(float setter);                 // shininess
+  public native float reflectance(); public native mjsMaterial reflectance(float setter);               // reflectance
+  public native float metallic(); public native mjsMaterial metallic(float setter);                  // metallic
+  public native float roughness(); public native mjsMaterial roughness(float setter);                 // roughness
+  public native float rgba(int i); public native mjsMaterial rgba(int i, float setter);
+  @MemberGetter public native FloatPointer rgba();                   // rgba                  // message appended to compiler errors
+}
+
+
+public static class mjsPair extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsPair() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsPair(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsPair(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsPair position(long position) {
+        return (mjsPair)super.position(position);
+    }
+    @Override public mjsPair getPointer(long i) {
+        return new mjsPair((Pointer)this).offsetAddress(i);
+    }
+          // pair specification
+  public native mjsElement element(); public native mjsPair element(mjsElement setter);             // element type             // name of geom 1             // name of geom 2
+
+  // optional parameters: computed from geoms if not set by user
+  public native int condim(); public native mjsPair condim(int setter);                      // contact dimensionality
+  public native @Cast("mjtNum") double solref(int i); public native mjsPair solref(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solref();           // solver reference, normal direction
+  public native @Cast("mjtNum") double solreffriction(int i); public native mjsPair solreffriction(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solreffriction();   // solver reference, frictional directions
+  public native @Cast("mjtNum") double solimp(int i); public native mjsPair solimp(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp();           // solver impedance
+  public native double margin(); public native mjsPair margin(double setter);                   // margin for contact detection
+  public native double gap(); public native mjsPair gap(double setter);                      // additional contact detection buffer
+  public native double adhesion(); public native mjsPair adhesion(double setter);                 // adhesive force of contacts
+  public native double friction(int i); public native mjsPair friction(int i, double setter);
+  @MemberGetter public native DoublePointer friction();              // full contact friction                  // message appended to errors
+}
+
+
+public static class mjsExclude extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsExclude() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsExclude(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsExclude(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsExclude position(long position) {
+        return (mjsExclude)super.position(position);
+    }
+    @Override public mjsExclude getPointer(long i) {
+        return new mjsExclude((Pointer)this).offsetAddress(i);
+    }
+       // exclude specification
+  public native mjsElement element(); public native mjsExclude element(mjsElement setter);             // element type             // name of geom 1             // name of geom 2                  // message appended to errors
+}
+
+
+public static class mjsEquality extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsEquality() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsEquality(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsEquality(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsEquality position(long position) {
+        return (mjsEquality)super.position(position);
+    }
+    @Override public mjsEquality getPointer(long i) {
+        return new mjsEquality((Pointer)this).offsetAddress(i);
+    }
+      // equality specification
+  public native mjsElement element(); public native mjsEquality element(mjsElement setter);             // element type
+  public native @Cast("mjtEq") int type(); public native mjsEquality type(int setter);                      // constraint type
+  public native double data(int i); public native mjsEquality data(int i, double setter);
+  @MemberGetter public native DoublePointer data();          // type-dependent data
+  public native @Cast("mjtBool") boolean active(); public native mjsEquality active(boolean setter);                  // is equality initially active                 // name of object 1                 // name of object 2
+  public native @Cast("mjtObj") int objtype(); public native mjsEquality objtype(int setter);                  // type of both objects
+  public native @Cast("mjtNum") double solref(int i); public native mjsEquality solref(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solref();           // solver reference
+  public native @Cast("mjtNum") double solimp(int i); public native mjsEquality solimp(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp();           // solver impedance                  // message appended to errors
+}
+
+
+public static class mjsTendon extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsTendon() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsTendon(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsTendon(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsTendon position(long position) {
+        return (mjsTendon)super.position(position);
+    }
+    @Override public mjsTendon getPointer(long i) {
+        return new mjsTendon((Pointer)this).offsetAddress(i);
+    }
+        // tendon specification
+  public native mjsElement element(); public native mjsTendon element(mjsElement setter);             // element type
+
+  // stiffness, damping, friction, armature
+  public native double stiffness(int i); public native mjsTendon stiffness(int i, double setter);
+  @MemberGetter public native DoublePointer stiffness();     // stiffness coefficients
+  public native double springlength(int i); public native mjsTendon springlength(int i, double setter);
+  @MemberGetter public native DoublePointer springlength();          // spring resting length; {-1, -1}: use qpos_spring
+  public native double springyield(); public native mjsTendon springyield(double setter);              // plastic yield threshold (0: elastic)
+  public native double damping(int i); public native mjsTendon damping(int i, double setter);
+  @MemberGetter public native DoublePointer damping();       // damping coefficients
+  public native double frictionloss(); public native mjsTendon frictionloss(double setter);             // friction loss
+  public native @Cast("mjtNum") double solref_friction(int i); public native mjsTendon solref_friction(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solref_friction();  // solver reference: tendon friction
+  public native @Cast("mjtNum") double solimp_friction(int i); public native mjsTendon solimp_friction(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp_friction();  // solver impedance: tendon friction
+  public native double armature(); public native mjsTendon armature(double setter);                 // inertia associated with tendon velocity
+
+  // length range
+  public native @Cast("mjtLimited") int limited(); public native mjsTendon limited(int setter);              // does tendon have limits
+  public native @Cast("mjtLimited") int actfrclimited(); public native mjsTendon actfrclimited(int setter);        // does tendon have actuator force limits
+  public native double range(int i); public native mjsTendon range(int i, double setter);
+  @MemberGetter public native DoublePointer range();                 // length limits
+  public native double actfrcrange(int i); public native mjsTendon actfrcrange(int i, double setter);
+  @MemberGetter public native DoublePointer actfrcrange();           // actuator force limits
+  public native double margin(); public native mjsTendon margin(double setter);                   // margin value for tendon limit detection
+  public native @Cast("mjtNum") double solref_limit(int i); public native mjsTendon solref_limit(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solref_limit();     // solver reference: tendon limits
+  public native @Cast("mjtNum") double solimp_limit(int i); public native mjsTendon solimp_limit(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp_limit();     // solver impedance: tendon limits
+
+  // visual              // name of material for rendering
+  public native double width(); public native mjsTendon width(double setter);                    // width for rendering
+  public native float rgba(int i); public native mjsTendon rgba(int i, float setter);
+  @MemberGetter public native FloatPointer rgba();                   // rgba when material is omitted
+  public native int group(); public native mjsTendon group(int setter);                       // group
+
+  // other           // user data                  // message appended to errors
+}
+
+
+public static class mjsWrap extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsWrap() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsWrap(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsWrap(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsWrap position(long position) {
+        return (mjsWrap)super.position(position);
+    }
+    @Override public mjsWrap getPointer(long i) {
+        return new mjsWrap((Pointer)this).offsetAddress(i);
+    }
+          // wrapping object specification
+  public native mjsElement element(); public native mjsWrap element(mjsElement setter);             // element type
+  public native @Cast("mjtWrap") int type(); public native mjsWrap type(int setter);                    // wrap type                  // message appended to errors
+}
+
+
+public static class mjsActuator extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsActuator() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsActuator(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsActuator(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsActuator position(long position) {
+        return (mjsActuator)super.position(position);
+    }
+    @Override public mjsActuator getPointer(long i) {
+        return new mjsActuator((Pointer)this).offsetAddress(i);
+    }
+      // actuator specification
+  public native mjsElement element(); public native mjsActuator element(mjsElement setter);             // element type
+  public native @Cast("mjtActuator") int type(); public native mjsActuator type(int setter);                // element the actuator is written with
+
+  // gain, bias
+  public native @Cast("mjtGain") int gaintype(); public native mjsActuator gaintype(int setter);                // gain type
+  public native double gainprm(int i); public native mjsActuator gainprm(int i, double setter);
+  @MemberGetter public native DoublePointer gainprm();         // gain parameters
+  public native @Cast("mjtBias") int biastype(); public native mjsActuator biastype(int setter);                // bias type
+  public native double biasprm(int i); public native mjsActuator biasprm(int i, double setter);
+  @MemberGetter public native DoublePointer biasprm();         // bias parameters
+
+  // activation state
+  public native @Cast("mjtDyn") int dyntype(); public native mjsActuator dyntype(int setter);                  // dynamics type
+  public native double dynprm(int i); public native mjsActuator dynprm(int i, double setter);
+  @MemberGetter public native DoublePointer dynprm();           // dynamics parameters
+  public native int actdim(); public native mjsActuator actdim(int setter);                      // number of activation variables
+  public native int ctrlspec(); public native mjsActuator ctrlspec(int setter);                    // input signature, scoped by gaintype; 0: type default
+  public native double velrange(int i); public native mjsActuator velrange(int i, double setter);
+  @MemberGetter public native DoublePointer velrange();              // range of the velocity-setpoint input (pid)
+  public native double ffrange(int i); public native mjsActuator ffrange(int i, double setter);
+  @MemberGetter public native DoublePointer ffrange();               // range of the feedforward input (pid)
+  public native @Cast("mjtBool") boolean actearly(); public native mjsActuator actearly(boolean setter);                // apply next activations to qfrc
+
+  // transmission
+  public native @Cast("mjtTrn") int trntype(); public native mjsActuator trntype(int setter);                  // transmission type
+  public native double gear(int i); public native mjsActuator gear(int i, double setter);
+  @MemberGetter public native DoublePointer gear();                  // length and transmitted force scaling                // name of transmission target               // reference site, for site transmission            // site defining cylinder, for slider-crank
+  public native double cranklength(); public native mjsActuator cranklength(double setter);              // crank length, for slider-crank
+  public native double lengthrange(int i); public native mjsActuator lengthrange(int i, double setter);
+  @MemberGetter public native DoublePointer lengthrange();           // transmission length range
+  public native double inheritrange(); public native mjsActuator inheritrange(double setter);             // automatic range setting for position and intvelocity
+  public native double damping(int i); public native mjsActuator damping(int i, double setter);
+  @MemberGetter public native DoublePointer damping();       // damping coefficients
+  public native double armature(); public native mjsActuator armature(double setter);                 // armature inertia
+
+  // input/output clamping
+  public native @Cast("mjtLimited") int ctrllimited(); public native mjsActuator ctrllimited(int setter);          // are control limits defined
+  public native double ctrlrange(int i); public native mjsActuator ctrlrange(int i, double setter);
+  @MemberGetter public native DoublePointer ctrlrange();             // control range
+  public native @Cast("mjtLimited") int forcelimited(); public native mjsActuator forcelimited(int setter);         // are force limits defined
+  public native double forcerange(int i); public native mjsActuator forcerange(int i, double setter);
+  @MemberGetter public native DoublePointer forcerange();            // force range
+  public native @Cast("mjtLimited") int actlimited(); public native mjsActuator actlimited(int setter);           // are activation limits defined
+  public native double actrange(int i); public native mjsActuator actrange(int i, double setter);
+  @MemberGetter public native DoublePointer actrange();              // activation range
+
+  // other
+  public native int group(); public native mjsActuator group(int setter);                       // group
+  public native int nsample(); public native mjsActuator nsample(int setter);                     // number of samples in history buffer
+  public native int interp(); public native mjsActuator interp(int setter);                      // interpolation order (0=ZOH, 1=linear, 2=cubic)
+  public native double delay(); public native mjsActuator delay(double setter);                    // delay time in seconds; 0: no delay           // user data
+  public native @ByRef mjsPlugin plugin(); public native mjsActuator plugin(mjsPlugin setter);                // actuator plugin                  // message appended to compiler errors
+}
+
+
+public static class mjsSensor extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsSensor() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsSensor(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsSensor(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsSensor position(long position) {
+        return (mjsSensor)super.position(position);
+    }
+    @Override public mjsSensor getPointer(long i) {
+        return new mjsSensor((Pointer)this).offsetAddress(i);
+    }
+        // sensor specification
+  public native mjsElement element(); public native mjsSensor element(mjsElement setter);             // element type
+
+  // sensor definition
+  public native @Cast("mjtSensor") int type(); public native mjsSensor type(int setter);                  // type of sensor
+  public native @Cast("mjtObj") int objtype(); public native mjsSensor objtype(int setter);                  // type of sensorized object               // name of sensorized object
+  public native @Cast("mjtObj") int reftype(); public native mjsSensor reftype(int setter);                  // type of referenced object               // name of referenced object
+  public native int intprm(int i); public native mjsSensor intprm(int i, int setter);
+  @MemberGetter public native IntPointer intprm();             // integer parameters
+
+  // user-defined sensors
+  public native @Cast("mjtDataType") int datatype(); public native mjsSensor datatype(int setter);            // data type for sensor measurement
+  public native @Cast("mjtStage") int needstage(); public native mjsSensor needstage(int setter);              // compute stage needed to simulate sensor
+  public native int dim(); public native mjsSensor dim(int setter);                         // number of scalar outputs
+
+  // output post-processing
+  public native double cutoff(); public native mjsSensor cutoff(double setter);                   // cutoff for real and positive datatypes
+  public native double noise(); public native mjsSensor noise(double setter);                    // noise stdev
+
+  // history buffer
+  public native int nsample(); public native mjsSensor nsample(int setter);                     // number of samples in history buffer
+  public native int interp(); public native mjsSensor interp(int setter);                      // interpolation order (0=ZOH, 1=linear, 2=cubic)
+  public native double delay(); public native mjsSensor delay(double setter);                    // delay time in seconds
+  public native double interval(int i); public native mjsSensor interval(int i, double setter);
+  @MemberGetter public native DoublePointer interval();              // [period, time_prev] in seconds
+
+  // other           // user data
+  public native @ByRef mjsPlugin plugin(); public native mjsSensor plugin(mjsPlugin setter);                // sensor plugin                  // message appended to compiler errors
+}
+
+
+public static class mjsNumeric extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsNumeric() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsNumeric(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsNumeric(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsNumeric position(long position) {
+        return (mjsNumeric)super.position(position);
+    }
+    @Override public mjsNumeric getPointer(long i) {
+        return new mjsNumeric((Pointer)this).offsetAddress(i);
+    }
+       // custom numeric field specification
+  public native mjsElement element(); public native mjsNumeric element(mjsElement setter);             // element type               // initialization data
+  public native int size(); public native mjsNumeric size(int setter);                        // array size, can be bigger than data size                  // message appended to compiler errors
+}
+
+
+public static class mjsText extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsText() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsText(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsText(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsText position(long position) {
+        return (mjsText)super.position(position);
+    }
+    @Override public mjsText getPointer(long i) {
+        return new mjsText((Pointer)this).offsetAddress(i);
+    }
+          // custom text specification
+  public native mjsElement element(); public native mjsText element(mjsElement setter);             // element type                  // text string                  // message appended to compiler errors
+}
+
+
+public static class mjsTuple extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsTuple() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsTuple(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsTuple(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsTuple position(long position) {
+        return (mjsTuple)super.position(position);
+    }
+    @Override public mjsTuple getPointer(long i) {
+        return new mjsTuple((Pointer)this).offsetAddress(i);
+    }
+         // tuple specification
+  public native mjsElement element(); public native mjsTuple element(mjsElement setter);             // element type               // object types            // object names             // object parameters                  // message appended to compiler errors
+}
+
+
+public static class mjsKey extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsKey() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsKey(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsKey(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsKey position(long position) {
+        return (mjsKey)super.position(position);
+    }
+    @Override public mjsKey getPointer(long i) {
+        return new mjsKey((Pointer)this).offsetAddress(i);
+    }
+           // keyframe specification
+  public native mjsElement element(); public native mjsKey element(mjsElement setter);             // element type
+  public native double time(); public native mjsKey time(double setter);                     // time               // qpos               // qvel                // act               // mocap pos              // mocap quat               // ctrl            // plastic                  // message appended to compiler errors
+}
+
+
+public static class mjsDefault extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjsDefault() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjsDefault(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjsDefault(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjsDefault position(long position) {
+        return (mjsDefault)super.position(position);
+    }
+    @Override public mjsDefault getPointer(long i) {
+        return new mjsDefault((Pointer)this).offsetAddress(i);
+    }
+       // default specification
+  public native mjsElement element(); public native mjsDefault element(mjsElement setter);             // element type
+  public native mjsJoint joint(); public native mjsDefault joint(mjsJoint setter);                 // joint defaults
+  public native mjsGeom geom(); public native mjsDefault geom(mjsGeom setter);                   // geom defaults
+  public native mjsSite site(); public native mjsDefault site(mjsSite setter);                   // site defaults
+  public native mjsCamera camera(); public native mjsDefault camera(mjsCamera setter);               // camera defaults
+  public native mjsLight light(); public native mjsDefault light(mjsLight setter);                 // light defaults
+  public native mjsFlex flex(); public native mjsDefault flex(mjsFlex setter);                   // flex defaults
+  public native mjsMesh mesh(); public native mjsDefault mesh(mjsMesh setter);                   // mesh defaults
+  public native mjsTexture texture(); public native mjsDefault texture(mjsTexture setter);             // texture defaults
+  public native mjsMaterial material(); public native mjsDefault material(mjsMaterial setter);           // material defaults
+  public native mjsPair pair(); public native mjsDefault pair(mjsPair setter);                   // pair defaults
+  public native mjsEquality equality(); public native mjsDefault equality(mjsEquality setter);           // equality defaults
+  public native mjsTendon tendon(); public native mjsDefault tendon(mjsTendon setter);               // tendon defaults
+  public native mjsActuator actuator(); public native mjsDefault actuator(mjsActuator setter);           // actuator defaults
+}
+
+// #ifdef __cplusplus
+// #endif
+
+// #endif  // MUJOCO_INCLUDE_MJSPEC_H_
 
 
 // Parsed from mujoco/mjexport.h
@@ -113,15 +2165,8 @@ public class MuJoCoLib extends org.mujoco.MuJoCoConfig {
 // #ifndef MUJOCO_MUJOCO_H_
 // #define MUJOCO_MUJOCO_H_
 
-// #include <mujoco/mjexport.h>
-
-
-// this is a C-API
-// #ifdef __cplusplus
-// #endif
-
 // header version; should match the library version as returned by mj_version()
-public static final int mjVERSION_HEADER = 313;
+public static final int mjVERSION_HEADER = 4000001;
 
 // needed to define size_t, fabs and log10
 // #include <stdlib.h>
@@ -129,35 +2174,23 @@ public static final int mjVERSION_HEADER = 313;
 
 // type definitions
 // #include <mujoco/mjdata.h>
+// #include <mujoco/mjexport.h>
 // #include <mujoco/mjmodel.h>
 // #include <mujoco/mjmacro.h>
 // #include <mujoco/mjplugin.h>
 // #include <mujoco/mjrender.h>
-// #include <mujoco/mjthread.h>
-// #include <mujoco/mjtnum.h>
+// #include <mujoco/mjsan.h>
+// #include <mujoco/mjspec.h>
+// #include <mujoco/mjtype.h>
 // #include <mujoco/mjui.h>
 // #include <mujoco/mjvisualize.h>
+// #include <mujoco/mjassert.h>
 
+// this is a C-API
+// #ifdef __cplusplus
+// #endif
 
-// user error and memory handlers
-public static class Mju_user_error_BytePointer extends FunctionPointer {
-    static { Loader.load(); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public    Mju_user_error_BytePointer(Pointer p) { super(p); }
-    protected Mju_user_error_BytePointer() { allocate(); }
-    private native void allocate();
-    public native void call(@Cast("const char*") BytePointer arg0);
-}
-public static native Mju_user_error_BytePointer mju_user_error(); public static native void mju_user_error(Mju_user_error_BytePointer setter);
-public static class Mju_user_warning_BytePointer extends FunctionPointer {
-    static { Loader.load(); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public    Mju_user_warning_BytePointer(Pointer p) { super(p); }
-    protected Mju_user_warning_BytePointer() { allocate(); }
-    private native void allocate();
-    public native void call(@Cast("const char*") BytePointer arg0);
-}
-public static native Mju_user_warning_BytePointer mju_user_warning(); public static native void mju_user_warning(Mju_user_warning_BytePointer setter);
+// user memory handlers
 public static class Mju_user_malloc_long extends FunctionPointer {
     static { Loader.load(); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
@@ -176,6 +2209,26 @@ public static class Mju_user_free_Pointer extends FunctionPointer {
     public native void call(Pointer arg0);
 }
 public static native Mju_user_free_Pointer mju_user_free(); public static native void mju_user_free(Mju_user_free_Pointer setter);
+
+// legacy error/warning handlers (deprecated: prefer mju_setLogHandler)
+public static class Mju_user_error_BytePointer extends FunctionPointer {
+    static { Loader.load(); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public    Mju_user_error_BytePointer(Pointer p) { super(p); }
+    protected Mju_user_error_BytePointer() { allocate(); }
+    private native void allocate();
+    public native void call(@Cast("const char*") BytePointer arg0);
+}
+public static native Mju_user_error_BytePointer mju_user_error(); public static native void mju_user_error(Mju_user_error_BytePointer setter);
+public static class Mju_user_warning_BytePointer extends FunctionPointer {
+    static { Loader.load(); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public    Mju_user_warning_BytePointer(Pointer p) { super(p); }
+    protected Mju_user_warning_BytePointer() { allocate(); }
+    private native void allocate();
+    public native void call(@Cast("const char*") BytePointer arg0);
+}
+public static native Mju_user_warning_BytePointer mju_user_warning(); public static native void mju_user_warning(Mju_user_warning_BytePointer setter);
 
 
 // callbacks extending computation pipeline
@@ -200,41 +2253,70 @@ public static native @Cast("const char*") BytePointer mjVISSTRING(int i, int j);
 @MemberGetter public static native @Cast("const char*(*)[3]") PointerPointer mjVISSTRING();
 public static native @Cast("const char*") BytePointer mjRNDSTRING(int i, int j); public static native void mjRNDSTRING(int i, int j, BytePointer setter);
 @MemberGetter public static native @Cast("const char*(*)[3]") PointerPointer mjRNDSTRING();
+public static native @Cast("const char*") BytePointer mjTOPICSTRING(int i); public static native void mjTOPICSTRING(int i, BytePointer setter);
+@MemberGetter public static native @Cast("const char**") PointerPointer mjTOPICSTRING();
 
 
 //---------------------------------- Virtual file system -------------------------------------------
 
-// Initialize VFS to empty (no deallocation).
+// Initialize an empty VFS, mj_deleteVFS must be called to deallocate the VFS.
 public static native void mj_defaultVFS(mjVFS vfs);
 
-// Add file to VFS, return 0: success, 1: full, 2: repeated name, -1: failed to load.
+// Mount a provider to handle file operations under the given path; return 0: success,
+// 2: repeated name, -1: invalid provider.
+public static native int mj_mountVFS(mjVFS vfs, @Cast("const char*") BytePointer filepath, @Const mjpResourceProvider provider);
+public static native int mj_mountVFS(mjVFS vfs, String filepath, @Const mjpResourceProvider provider);
+
+// Unmount a previously mounted provider; return 0: success, -1: not found in VFS.
+public static native int mj_unmountVFS(mjVFS vfs, @Cast("const char*") BytePointer filename);
+public static native int mj_unmountVFS(mjVFS vfs, String filename);
+
+// Add file to VFS; return 0: success, 2: repeated name, -1: failed to load.
 public static native int mj_addFileVFS(mjVFS vfs, @Cast("const char*") BytePointer directory, @Cast("const char*") BytePointer filename);
 public static native int mj_addFileVFS(mjVFS vfs, String directory, String filename);
 
-// Add file to VFS from buffer, return 0: success, 1: full, 2: repeated name, -1: failed to load.
+// Add file to VFS from buffer; return 0: success, 2: repeated name, -1: failed to load.
 public static native int mj_addBufferVFS(mjVFS vfs, @Cast("const char*") BytePointer name, @Const Pointer buffer, int nbuffer);
 public static native int mj_addBufferVFS(mjVFS vfs, String name, @Const Pointer buffer, int nbuffer);
 
-// Return file index in VFS, or -1 if not found in VFS.
-public static native int mj_findFileVFS(@Const mjVFS vfs, @Cast("const char*") BytePointer filename);
-public static native int mj_findFileVFS(@Const mjVFS vfs, String filename);
-
-// Delete file from VFS, return 0: success, -1: not found in VFS.
+// Delete file from VFS; return 0: success, -1: not found in VFS.
 public static native int mj_deleteFileVFS(mjVFS vfs, @Cast("const char*") BytePointer filename);
 public static native int mj_deleteFileVFS(mjVFS vfs, String filename);
 
-// Delete all files from VFS.
+// Check if buffer exists in VFS; return 1: exists, 0: not found.
+public static native int mj_containsBufferVFS(mjVFS vfs, @Cast("const char*") BytePointer name);
+public static native int mj_containsBufferVFS(mjVFS vfs, String name);
+
+// Check if file exists in VFS; return 1: exists, 0: not found.
+public static native int mj_containsFileVFS(mjVFS vfs, @Cast("const char*") BytePointer directory, @Cast("const char*") BytePointer filename);
+public static native int mj_containsFileVFS(mjVFS vfs, String directory, String filename);
+
+// Delete all files from VFS and deallocates VFS internal memory.
 public static native void mj_deleteVFS(mjVFS vfs);
 
-// deprecated: use mj_copyBufferVFS.
-public static native int mj_makeEmptyFileVFS(mjVFS vfs, @Cast("const char*") BytePointer filename, int filesize);
-public static native int mj_makeEmptyFileVFS(mjVFS vfs, String filename, int filesize);
+//------------------------------------ Asset cache -------------------------------------------------
+
+// Get the current size of the asset cache in bytes.
+public static native @Cast("size_t") long mj_getCacheSize(@Const mjCache cache);
+
+// Get the capacity of the asset cache in bytes.
+public static native @Cast("size_t") long mj_getCacheCapacity(@Const mjCache cache);
+
+// Set the capacity of the asset cache in bytes (0 to disable); return the new capacity.
+public static native @Cast("size_t") long mj_setCacheCapacity(mjCache cache, @Cast("size_t") long size);
+
+// Get the internal asset cache used by the compiler.
+public static native mjCache mj_getCache();
+
+// Clear the asset cache.
+public static native void mj_clearCache(mjCache cache);
 
 //---------------------------------- Parse and compile ---------------------------------------------
 
-// Parse XML file in MJCF or URDF format, compile it, return low-level model.
+// Parse XML file in MJCF or URDF format, compile it; return low-level model.
 // If vfs is not NULL, look up files in vfs before reading from disk.
 // If error is not NULL, it must have size error_sz.
+// Nullable: vfs, error
 public static native mjModel mj_loadXML(@Cast("const char*") BytePointer filename, @Const mjVFS vfs, @Cast("char*") BytePointer error, int error_sz);
 public static native mjModel mj_loadXML(String filename, @Const mjVFS vfs, @Cast("char*") ByteBuffer error, int error_sz);
 public static native mjModel mj_loadXML(@Cast("const char*") BytePointer filename, @Const mjVFS vfs, @Cast("char*") byte[] error, int error_sz);
@@ -242,8 +2324,97 @@ public static native mjModel mj_loadXML(String filename, @Const mjVFS vfs, @Cast
 public static native mjModel mj_loadXML(@Cast("const char*") BytePointer filename, @Const mjVFS vfs, @Cast("char*") ByteBuffer error, int error_sz);
 public static native mjModel mj_loadXML(String filename, @Const mjVFS vfs, @Cast("char*") byte[] error, int error_sz);
 
-// Update XML data structures with info from low-level model, save as MJCF.
+// Parse spec from XML file.
+// Nullable: vfs, error
+public static native mjSpec mj_parseXML(@Cast("const char*") BytePointer filename, @Const mjVFS vfs, @Cast("char*") BytePointer error, int error_sz);
+public static native mjSpec mj_parseXML(String filename, @Const mjVFS vfs, @Cast("char*") ByteBuffer error, int error_sz);
+public static native mjSpec mj_parseXML(@Cast("const char*") BytePointer filename, @Const mjVFS vfs, @Cast("char*") byte[] error, int error_sz);
+public static native mjSpec mj_parseXML(String filename, @Const mjVFS vfs, @Cast("char*") BytePointer error, int error_sz);
+public static native mjSpec mj_parseXML(@Cast("const char*") BytePointer filename, @Const mjVFS vfs, @Cast("char*") ByteBuffer error, int error_sz);
+public static native mjSpec mj_parseXML(String filename, @Const mjVFS vfs, @Cast("char*") byte[] error, int error_sz);
+
+// Parse spec from XML string.
+// Nullable: vfs, error
+public static native mjSpec mj_parseXMLString(@Cast("const char*") BytePointer xml, @Const mjVFS vfs, @Cast("char*") BytePointer error, int error_sz);
+public static native mjSpec mj_parseXMLString(String xml, @Const mjVFS vfs, @Cast("char*") ByteBuffer error, int error_sz);
+public static native mjSpec mj_parseXMLString(@Cast("const char*") BytePointer xml, @Const mjVFS vfs, @Cast("char*") byte[] error, int error_sz);
+public static native mjSpec mj_parseXMLString(String xml, @Const mjVFS vfs, @Cast("char*") BytePointer error, int error_sz);
+public static native mjSpec mj_parseXMLString(@Cast("const char*") BytePointer xml, @Const mjVFS vfs, @Cast("char*") ByteBuffer error, int error_sz);
+public static native mjSpec mj_parseXMLString(String xml, @Const mjVFS vfs, @Cast("char*") byte[] error, int error_sz);
+
+// Parse spec from a file.
+// Nullable: vfs, error
+public static native mjSpec mj_parse(@Cast("const char*") BytePointer filename, @Cast("const char*") BytePointer content_type,
+                       @Const mjVFS vfs, @Cast("char*") BytePointer error, int error_sz);
+public static native mjSpec mj_parse(String filename, String content_type,
+                       @Const mjVFS vfs, @Cast("char*") ByteBuffer error, int error_sz);
+public static native mjSpec mj_parse(@Cast("const char*") BytePointer filename, @Cast("const char*") BytePointer content_type,
+                       @Const mjVFS vfs, @Cast("char*") byte[] error, int error_sz);
+public static native mjSpec mj_parse(String filename, String content_type,
+                       @Const mjVFS vfs, @Cast("char*") BytePointer error, int error_sz);
+public static native mjSpec mj_parse(@Cast("const char*") BytePointer filename, @Cast("const char*") BytePointer content_type,
+                       @Const mjVFS vfs, @Cast("char*") ByteBuffer error, int error_sz);
+public static native mjSpec mj_parse(String filename, String content_type,
+                       @Const mjVFS vfs, @Cast("char*") byte[] error, int error_sz);
+
+// Encode spec/model to a file using a registered encoder.
+// Returns the number of bytes written on success, -1 on failure.
+// Nullable: m, vfs, error
+public static native @Cast("mjtSize") long mj_encode(@Const mjSpec s, @Const mjModel m, @Cast("const char*") BytePointer filename,
+                        @Cast("const char*") BytePointer content_type, @Const mjVFS vfs, @Cast("char*") BytePointer error,
+                        int error_sz);
+public static native @Cast("mjtSize") long mj_encode(@Const mjSpec s, @Const mjModel m, String filename,
+                        String content_type, @Const mjVFS vfs, @Cast("char*") ByteBuffer error,
+                        int error_sz);
+public static native @Cast("mjtSize") long mj_encode(@Const mjSpec s, @Const mjModel m, @Cast("const char*") BytePointer filename,
+                        @Cast("const char*") BytePointer content_type, @Const mjVFS vfs, @Cast("char*") byte[] error,
+                        int error_sz);
+public static native @Cast("mjtSize") long mj_encode(@Const mjSpec s, @Const mjModel m, String filename,
+                        String content_type, @Const mjVFS vfs, @Cast("char*") BytePointer error,
+                        int error_sz);
+public static native @Cast("mjtSize") long mj_encode(@Const mjSpec s, @Const mjModel m, @Cast("const char*") BytePointer filename,
+                        @Cast("const char*") BytePointer content_type, @Const mjVFS vfs, @Cast("char*") ByteBuffer error,
+                        int error_sz);
+public static native @Cast("mjtSize") long mj_encode(@Const mjSpec s, @Const mjModel m, String filename,
+                        String content_type, @Const mjVFS vfs, @Cast("char*") byte[] error,
+                        int error_sz);
+
+// Compile spec to model.
+// Nullable: vfs
+public static native mjModel mj_compile(mjSpec s, @Const mjVFS vfs);
+
+// Copy the values which were changed in a model to the spec it was compiled from; return 1 on success.
+public static native int mj_copyBack(mjSpec s, @Const mjModel m);
+
+// Recompile spec to model, preserving the state; return 0 on success.
+// Nullable: vfs
+public static native int mj_recompile(mjSpec s, @Const mjVFS vfs, mjModel m, mjData d);
+
+// Decode texture id to raw bytes, exactly what compilation would store in tex_data, with
+// tex_nchannel channels; embedded textures are copied from the model. The buffer is allocated with
+// mju_malloc and freed by the caller; colorspace receives the resolved colorspace (mjtColorSpace).
+// Return 0 on success.
+// Nullable: width, height, colorspace, error
+public static native int mj_loadTexture(@Const mjModel m, int id, @Cast("mjtByte**") PointerPointer data, IntPointer width, IntPointer height,
+                         IntPointer colorspace, @Cast("char*") BytePointer error, int error_sz);
+public static native int mj_loadTexture(@Const mjModel m, int id, @Cast("mjtByte**") @ByPtrPtr BytePointer data, IntPointer width, IntPointer height,
+                         IntPointer colorspace, @Cast("char*") BytePointer error, int error_sz);
+public static native int mj_loadTexture(@Const mjModel m, int id, @Cast("mjtByte**") @ByPtrPtr ByteBuffer data, IntBuffer width, IntBuffer height,
+                         IntBuffer colorspace, @Cast("char*") ByteBuffer error, int error_sz);
+public static native int mj_loadTexture(@Const mjModel m, int id, @Cast("mjtByte**") @ByPtrPtr byte[] data, int[] width, int[] height,
+                         int[] colorspace, @Cast("char*") byte[] error, int error_sz);
+
+// Copy of m with every by-reference asset loaded into it, as compilation would have stored it.
+// Return NULL with error on a file that does not resolve. A hermetic MJB file of a model with
+// by-reference assets is mj_embedAssets, then mj_saveModel, then mj_deleteModel.
+// Nullable: error
+public static native mjModel mj_embedAssets(@Const mjModel m, @Cast("char*") BytePointer error, int error_sz);
+public static native mjModel mj_embedAssets(@Const mjModel m, @Cast("char*") ByteBuffer error, int error_sz);
+public static native mjModel mj_embedAssets(@Const mjModel m, @Cast("char*") byte[] error, int error_sz);
+
+// Update XML data structures with info from low-level model created with mj_loadXML, save as MJCF.
 // If error is not NULL, it must have size error_sz.
+// Nullable: error
 public static native int mj_saveLastXML(@Cast("const char*") BytePointer filename, @Const mjModel m, @Cast("char*") BytePointer error, int error_sz);
 public static native int mj_saveLastXML(String filename, @Const mjModel m, @Cast("char*") ByteBuffer error, int error_sz);
 public static native int mj_saveLastXML(@Cast("const char*") BytePointer filename, @Const mjModel m, @Cast("char*") byte[] error, int error_sz);
@@ -254,20 +2425,24 @@ public static native int mj_saveLastXML(String filename, @Const mjModel m, @Cast
 // Free last XML model if loaded. Called internally at each load.
 public static native void mj_freeLastXML();
 
-// Print internal XML schema as plain text or HTML, with style-padding or &nbsp;.
-public static native int mj_printSchema(@Cast("const char*") BytePointer filename, @Cast("char*") BytePointer buffer, int buffer_sz,
-                         int flg_html, int flg_pad);
-public static native int mj_printSchema(String filename, @Cast("char*") ByteBuffer buffer, int buffer_sz,
-                         int flg_html, int flg_pad);
-public static native int mj_printSchema(@Cast("const char*") BytePointer filename, @Cast("char*") byte[] buffer, int buffer_sz,
-                         int flg_html, int flg_pad);
-public static native int mj_printSchema(String filename, @Cast("char*") BytePointer buffer, int buffer_sz,
-                         int flg_html, int flg_pad);
-public static native int mj_printSchema(@Cast("const char*") BytePointer filename, @Cast("char*") ByteBuffer buffer, int buffer_sz,
-                         int flg_html, int flg_pad);
-public static native int mj_printSchema(String filename, @Cast("char*") byte[] buffer, int buffer_sz,
-                         int flg_html, int flg_pad);
+// Save spec to XML string; return 0 on success, -1 on failure.
+// If length of the output buffer is too small; return the required size.
+// Nullable: error
+public static native int mj_saveXMLString(@Const mjSpec s, @Cast("char*") BytePointer xml, int xml_sz, @Cast("char*") BytePointer error, int error_sz);
+public static native int mj_saveXMLString(@Const mjSpec s, @Cast("char*") ByteBuffer xml, int xml_sz, @Cast("char*") ByteBuffer error, int error_sz);
+public static native int mj_saveXMLString(@Const mjSpec s, @Cast("char*") byte[] xml, int xml_sz, @Cast("char*") byte[] error, int error_sz);
 
+// Save spec to XML file; return 0 on success, -1 otherwise.
+// Nullable: error
+public static native int mj_saveXML(@Const mjSpec s, @Cast("const char*") BytePointer filename, @Cast("char*") BytePointer error, int error_sz);
+public static native int mj_saveXML(@Const mjSpec s, String filename, @Cast("char*") ByteBuffer error, int error_sz);
+public static native int mj_saveXML(@Const mjSpec s, @Cast("const char*") BytePointer filename, @Cast("char*") byte[] error, int error_sz);
+public static native int mj_saveXML(@Const mjSpec s, String filename, @Cast("char*") BytePointer error, int error_sz);
+public static native int mj_saveXML(@Const mjSpec s, @Cast("const char*") BytePointer filename, @Cast("char*") ByteBuffer error, int error_sz);
+public static native int mj_saveXML(@Const mjSpec s, String filename, @Cast("char*") byte[] error, int error_sz);
+
+// Given MJCF filename, fills dependencies with a list of all other asset files it depends on.
+// The search is recursive, and the list includes the filename itself.
 
 //---------------------------------- Main simulation -----------------------------------------------
 
@@ -299,6 +2474,7 @@ public static native void mj_inverseSkip(@Const mjModel m, mjData d, int skipsta
 public static native void mj_defaultLROpt(mjLROpt opt);
 
 // Set solver parameters to default values.
+// Nullable: solref, solimp
 public static native void mj_defaultSolRefImp(@Cast("mjtNum*") DoublePointer solref, @Cast("mjtNum*") DoublePointer solimp);
 
 // Set physics options to default values.
@@ -308,22 +2484,28 @@ public static native void mj_defaultOption(mjOption opt);
 public static native void mj_defaultVisual(mjVisual vis);
 
 // Copy mjModel, allocate new if dest is NULL.
+// Nullable: dest
 public static native mjModel mj_copyModel(mjModel dest, @Const mjModel src);
 
 // Save model to binary MJB file or memory buffer; buffer has precedence when given.
-public static native void mj_saveModel(@Const mjModel m, @Cast("const char*") BytePointer filename, Pointer buffer, int buffer_sz);
-public static native void mj_saveModel(@Const mjModel m, String filename, Pointer buffer, int buffer_sz);
+// Nullable: filename, buffer
+public static native void mj_saveModel(@Const mjModel m, @Cast("const char*") BytePointer filename, Pointer buffer, @Cast("mjtSize") long buffer_sz);
+public static native void mj_saveModel(@Const mjModel m, String filename, Pointer buffer, @Cast("mjtSize") long buffer_sz);
 
 // Load model from binary MJB file.
 // If vfs is not NULL, look up file in vfs before reading from disk.
+// Nullable: vfs
 public static native mjModel mj_loadModel(@Cast("const char*") BytePointer filename, @Const mjVFS vfs);
 public static native mjModel mj_loadModel(String filename, @Const mjVFS vfs);
+
+// Load model from memory buffer.
+public static native mjModel mj_loadModelBuffer(@Const Pointer buffer, @Cast("mjtSize") long buffer_sz);
 
 // Free memory allocation in model.
 public static native void mj_deleteModel(mjModel m);
 
 // Return size of buffer needed to hold model.
-public static native int mj_sizeModel(@Const mjModel m);
+public static native @Cast("mjtSize") long mj_sizeModel(@Const mjModel m);
 
 // Allocate mjData corresponding to given model.
 // If the model buffer is unallocated the initial configuration will not be set.
@@ -332,6 +2514,12 @@ public static native mjData mj_makeData(@Const mjModel m);
 // Copy mjData.
 // m is only required to contain the size fields from MJMODEL_INTS.
 public static native mjData mj_copyData(mjData dest, @Const mjModel m, @Const mjData src);
+
+// Copy mjData, skip large arrays not required for visualization.
+public static native mjData mjv_copyData(mjData dest, @Const mjModel m, @Const mjData src);
+
+// Reset ctrl to neutral values: zero, except quaternion inputs which reset to the identity.
+public static native void mj_resetCtrl(@Const mjModel m, mjData d);
 
 // Reset data to defaults.
 public static native void mj_resetData(@Const mjModel m, mjData d);
@@ -342,7 +2530,7 @@ public static native void mj_resetDataDebug(@Const mjModel m, mjData d, @Cast("u
 // Reset data. If 0 <= key < nkey, set fields from specified keyframe.
 public static native void mj_resetDataKeyframe(@Const mjModel m, mjData d, int key);
 
-// #ifndef ADDRESS_SANITIZER
+// #ifndef mjUSEASAN  // Stack management functions declared in mjsan.h if ASAN is active.
 
 // Mark a new frame on the mjData stack.
 public static native void mj_markStack(mjData d);
@@ -358,10 +2546,10 @@ public static native void mj_freeStack(mjData d);
 public static native Pointer mj_stackAllocByte(mjData d, @Cast("size_t") long bytes, @Cast("size_t") long alignment);
 
 // Allocate array of mjtNums on mjData stack. Call mju_error on stack overflow.
-public static native @Cast("mjtNum*") DoublePointer mj_stackAllocNum(mjData d, int size);
+public static native @Cast("mjtNum*") DoublePointer mj_stackAllocNum(mjData d, @Cast("size_t") long size);
 
 // Allocate array of ints on mjData stack. Call mju_error on stack overflow.
-public static native IntPointer mj_stackAllocInt(mjData d, int size);
+public static native IntPointer mj_stackAllocInt(mjData d, @Cast("size_t") long size);
 
 // Free memory allocation in mjData.
 public static native void mj_deleteData(mjData d);
@@ -373,12 +2561,29 @@ public static native void mj_resetCallbacks();
 public static native void mj_setConst(mjModel m, mjData d);
 
 // Set actuator_lengthrange for specified actuator; return 1 if ok, 0 if error.
+// Nullable: error
 public static native int mj_setLengthRange(mjModel m, mjData d, int index,
                             @Const mjLROpt opt, @Cast("char*") BytePointer error, int error_sz);
 public static native int mj_setLengthRange(mjModel m, mjData d, int index,
                             @Const mjLROpt opt, @Cast("char*") ByteBuffer error, int error_sz);
 public static native int mj_setLengthRange(mjModel m, mjData d, int index,
                             @Const mjLROpt opt, @Cast("char*") byte[] error, int error_sz);
+
+// Create empty spec.
+public static native mjSpec mj_makeSpec();
+
+// Copy spec.
+public static native mjSpec mj_copySpec(@Const mjSpec s);
+
+// Free memory allocation in mjSpec.
+public static native void mj_deleteSpec(mjSpec s);
+
+// Activate plugin; return 0 on success.
+public static native int mjs_activatePlugin(mjSpec s, @Cast("const char*") BytePointer name);
+public static native int mjs_activatePlugin(mjSpec s, String name);
+
+// Turn deep copy on or off attach; return 0 on success.
+public static native int mjs_setDeepCopy(mjSpec s, int deepcopy);
 
 
 //---------------------------------- Printing ------------------------------------------------------
@@ -393,15 +2598,15 @@ public static native void mj_printModel(@Const mjModel m, @Cast("const char*") B
 public static native void mj_printModel(@Const mjModel m, String filename);
 
 // Print mjData to text file, specifying format.
-// float_format must be a valid printf-style format string for a single float value
-public static native void mj_printFormattedData(@Const mjModel m, mjData d, @Cast("const char*") BytePointer filename,
+// float_format must be a valid printf-style format string for a single float value.
+public static native void mj_printFormattedData(@Const mjModel m, @Const mjData d, @Cast("const char*") BytePointer filename,
                                  @Cast("const char*") BytePointer float_format);
-public static native void mj_printFormattedData(@Const mjModel m, mjData d, String filename,
+public static native void mj_printFormattedData(@Const mjModel m, @Const mjData d, String filename,
                                  String float_format);
 
 // Print data to text file.
-public static native void mj_printData(@Const mjModel m, mjData d, @Cast("const char*") BytePointer filename);
-public static native void mj_printData(@Const mjModel m, mjData d, String filename);
+public static native void mj_printData(@Const mjModel m, @Const mjData d, @Cast("const char*") BytePointer filename);
+public static native void mj_printData(@Const mjModel m, @Const mjData d, String filename);
 
 // Print matrix to screen.
 public static native void mju_printMat(@Cast("const mjtNum*") DoublePointer mat, int nr, int nc);
@@ -414,8 +2619,36 @@ public static native void mju_printMatSparse(@Cast("const mjtNum*") DoublePointe
 public static native void mju_printMatSparse(@Cast("const mjtNum*") DoublePointer mat, int nr,
                               @Const int[] rownnz, @Const int[] rowadr, @Const int[] colind);
 
+// Print internal XML schema as plain text or HTML, with style-padding or &nbsp;.
+public static native int mj_printSchema(@Cast("const char*") BytePointer filename, @Cast("char*") BytePointer buffer, int buffer_sz,
+                         int flg_html, int flg_pad);
+public static native int mj_printSchema(String filename, @Cast("char*") ByteBuffer buffer, int buffer_sz,
+                         int flg_html, int flg_pad);
+public static native int mj_printSchema(@Cast("const char*") BytePointer filename, @Cast("char*") byte[] buffer, int buffer_sz,
+                         int flg_html, int flg_pad);
+public static native int mj_printSchema(String filename, @Cast("char*") BytePointer buffer, int buffer_sz,
+                         int flg_html, int flg_pad);
+public static native int mj_printSchema(@Cast("const char*") BytePointer filename, @Cast("char*") ByteBuffer buffer, int buffer_sz,
+                         int flg_html, int flg_pad);
+public static native int mj_printSchema(String filename, @Cast("char*") byte[] buffer, int buffer_sz,
+                         int flg_html, int flg_pad);
+
+// Print scene to text file.
+public static native void mj_printScene(@Const mjvScene s, @Cast("const char*") BytePointer filename);
+public static native void mj_printScene(@Const mjvScene s, String filename);
+
+// Print scene to text file, specifying format.
+// float_format must be a valid printf-style format string for a single float value.
+public static native void mj_printFormattedScene(@Const mjvScene s, @Cast("const char*") BytePointer filename,
+                                  @Cast("const char*") BytePointer float_format);
+public static native void mj_printFormattedScene(@Const mjvScene s, String filename,
+                                  String float_format);
+
 
 //---------------------------------- Components ----------------------------------------------------
+
+// Run all kinematics-like computations (kinematics, comPos, camlight, flex, tendon).
+public static native void mj_fwdKinematics(@Const mjModel m, mjData d);
 
 // Run position-dependent computations.
 public static native void mj_fwdPosition(@Const mjModel m, mjData d);
@@ -501,6 +2734,9 @@ public static native void mj_transmission(@Const mjModel m, mjData d);
 // Run composite rigid body inertia algorithm (CRB).
 public static native void mj_crb(@Const mjModel m, mjData d);
 
+// Make inertia matrix.
+public static native void mj_makeM(@Const mjModel m, mjData d);
+
 // Compute sparse L'*D*L factorizaton of inertia matrix.
 public static native void mj_factorM(@Const mjModel m, mjData d);
 
@@ -508,7 +2744,8 @@ public static native void mj_factorM(@Const mjModel m, mjData d);
 public static native void mj_solveM(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer x, @Cast("const mjtNum*") DoublePointer y, int n);
 
 // Half of linear solve:  x = sqrt(inv(D))*inv(L')*y
-public static native void mj_solveM2(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer x, @Cast("const mjtNum*") DoublePointer y, int n);
+public static native void mj_solveM2(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer x, @Cast("const mjtNum*") DoublePointer y,
+                      @Cast("const mjtNum*") DoublePointer sqrtInvD, int n);
 
 // Compute cvel, cdof_dot.
 public static native void mj_comVel(@Const mjModel m, mjData d);
@@ -524,6 +2761,11 @@ public static native void mj_rne(@Const mjModel m, mjData d, int flg_acc, @Cast(
 
 // RNE with complete data: compute cacc, cfrc_ext, cfrc_int.
 public static native void mj_rnePostConstraint(@Const mjModel m, mjData d);
+
+// Return the maximum number of contacts that can be generated between two geoms.
+// If has_margin is -1, then the margin is pulled from the model, otherwise if has_margin > 0
+// indicates that the geoms have a positive margin.
+public static native int mj_maxContact(@Const mjModel m, int g1, int g2, int has_margin);
 
 // Run collision detection.
 public static native void mj_collision(@Const mjModel m, mjData d);
@@ -542,20 +2784,56 @@ public static native void mj_referenceConstraint(@Const mjModel m, mjData d);
 
 // Compute efc_state, efc_force, qfrc_constraint, and (optionally) cone Hessians.
 // If cost is not NULL, set *cost = s(jar) where jar = Jac*qacc-aref.
+// Nullable: cost
 public static native void mj_constraintUpdate(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer jar,
                                @Cast("mjtNum*") DoublePointer cost, int flg_coneHessian);
 
 
 //---------------------------------- Support -------------------------------------------------------
 
-// Return size of state specification.
-public static native int mj_stateSize(@Const mjModel m, @Cast("unsigned int") int spec);
+// Return size of state signature.
+public static native int mj_stateSize(@Const mjModel m, int sig);
 
 // Get state.
-public static native void mj_getState(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer state, @Cast("unsigned int") int spec);
+public static native void mj_getState(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer state, int sig);
+
+// Extract a subset of components from a state previously obtained via mj_getState.
+public static native void mj_extractState(@Const mjModel m, @Cast("const mjtNum*") DoublePointer src, int srcsig,
+                           @Cast("mjtNum*") DoublePointer dst, int dstsig);
 
 // Set state.
-public static native void mj_setState(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer state, @Cast("unsigned int") int spec);
+public static native void mj_setState(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer state, int sig);
+
+// Copy state from src to dst.
+public static native void mj_copyState(@Const mjModel m, @Const mjData src, mjData dst, int sig);
+
+// Read ctrl value for actuator at given time.
+// Returns pointer to ctrl (no history) or history buffer (exact match),
+// or NULL if interpolation performed (writes to result).
+// interp: 0=zero-order-hold, 1=linear, 2=cubic spline.
+public static native @Cast("const mjtNum*") DoublePointer mj_readCtrl(@Const mjModel m, @Const mjData d, int id, @Cast("mjtNum") double time,
+                                @Cast("mjtNum*") DoublePointer result, int interp);
+
+// Read sensor value from history buffer at given time.
+// Returns pointer to sensordata (no history) or history buffer (exact match),
+// or NULL if interpolation performed (writes to result).
+// interp: 0=zero-order-hold, 1=linear, 2=cubic spline.
+public static native @Cast("const mjtNum*") DoublePointer mj_readSensor(@Const mjModel m, @Const mjData d, int id, @Cast("mjtNum") double time,
+                                  @Cast("mjtNum*") DoublePointer result, int interp);
+
+// Initialize history buffer for actuator; if times is NULL, uses existing buffer timestamps.
+// Nullable: times
+public static native void mj_initCtrlHistory(@Const mjModel m, mjData d, int id,
+                              @Cast("const mjtNum*") DoublePointer times, @Cast("const mjtNum*") DoublePointer values);
+
+// Initialize history buffer for sensor; if times is NULL, uses existing buffer timestamps.
+// phase sets the user slot (last computation time for interval sensors).
+// Nullable: times
+public static native void mj_initSensorHistory(@Const mjModel m, mjData d, int id,
+                                @Cast("const mjtNum*") DoublePointer times, @Cast("const mjtNum*") DoublePointer values, @Cast("mjtNum") double phase);
+
+// Copy current state to the k-th model keyframe.
+public static native void mj_setKeyframe(mjModel m, @Const mjData d, int k);
 
 // Add contact to d->contact list; return 0 if success; 1 if buffer full.
 public static native int mj_addContact(@Const mjModel m, mjData d, @Const mjContact con);
@@ -576,40 +2854,55 @@ public static native void mj_mulJacVec(@Const mjModel m, @Const mjData d, @Cast(
 public static native void mj_mulJacTVec(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec);
 
 // Compute 3/6-by-nv end-effector Jacobian of global point attached to given body.
+// Nullable: jacp, jacr
 public static native void mj_jac(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr,
                   @Cast("const mjtNum*") DoublePointer point, int body);
 
 // Compute body frame end-effector Jacobian.
+// Nullable: jacp, jacr
 public static native void mj_jacBody(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr, int body);
 
 // Compute body center-of-mass end-effector Jacobian.
+// Nullable: jacp, jacr
 public static native void mj_jacBodyCom(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr, int body);
 
 // Compute subtree center-of-mass end-effector Jacobian.
 public static native void mj_jacSubtreeCom(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer jacp, int body);
 
 // Compute geom end-effector Jacobian.
+// Nullable: jacp, jacr
 public static native void mj_jacGeom(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr, int geom);
 
 // Compute site end-effector Jacobian.
+// Nullable: jacp, jacr
 public static native void mj_jacSite(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr, int site);
 
 // Compute translation end-effector Jacobian of point, and rotation Jacobian of axis.
+// Nullable: jacPoint, jacAxis
 public static native void mj_jacPointAxis(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer jacPoint, @Cast("mjtNum*") DoublePointer jacAxis,
                            @Cast("const mjtNum*") DoublePointer point, @Cast("const mjtNum*") DoublePointer axis, int body);
+
+// Compute 3/6-by-nv Jacobian time derivative of global point attached to given body.
+// Nullable: jacp, jacr
+public static native void mj_jacDot(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer jacp, @Cast("mjtNum*") DoublePointer jacr,
+                     @Cast("const mjtNum*") DoublePointer point, int body);
 
 // Compute subtree angular momentum matrix.
 public static native void mj_angmomMat(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer mat, int body);
 
-// Get id of object with the specified mjtObj type and name, returns -1 if id not found.
+// Get id of object with the specified mjtObj type and name; return -1 if id not found.
 public static native int mj_name2id(@Const mjModel m, int type, @Cast("const char*") BytePointer name);
 public static native int mj_name2id(@Const mjModel m, int type, String name);
 
-// Get name of object with the specified mjtObj type and id, returns NULL if name not found.
+// Get name of object with the specified mjtObj type and id; return NULL if name not found.
 public static native @Cast("const char*") BytePointer mj_id2name(@Const mjModel m, int type, int id);
 
-// Convert sparse inertia matrix M into full (i.e. dense) matrix.
-public static native void mj_fullM(@Const mjModel m, @Cast("mjtNum*") DoublePointer dst, @Cast("const mjtNum*") DoublePointer M);
+// Get name of actuator input, determined by the actuator type and input signature;
+// return NULL if the actuator type defines no input names.
+public static native @Cast("const char*") BytePointer mj_actuatorInputName(@Const mjModel m, int id, int input);
+
+// Convert sparse inertia matrix into full (i.e. dense) matrix.
+public static native void mj_fullM(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer dst);
 
 // Multiply vector by inertia matrix.
 public static native void mj_mulM(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec);
@@ -617,13 +2910,15 @@ public static native void mj_mulM(@Const mjModel m, @Const mjData d, @Cast("mjtN
 // Multiply vector by (inertia matrix)^(1/2).
 public static native void mj_mulM2(@Const mjModel m, @Const mjData d, @Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec);
 
-// Add inertia matrix to destination matrix.
-// Destination can be sparse uncompressed, or dense when all int* are NULL
+// Add inertia matrix to destination matrix (lower triangle only).
+// Destination can be sparse or dense when all int* are NULL.
+// Nullable: rownnz, rowadr, colind
 public static native void mj_addM(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer dst, IntPointer rownnz, IntPointer rowadr, IntPointer colind);
 public static native void mj_addM(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer dst, IntBuffer rownnz, IntBuffer rowadr, IntBuffer colind);
 public static native void mj_addM(@Const mjModel m, mjData d, @Cast("mjtNum*") DoublePointer dst, int[] rownnz, int[] rowadr, int[] colind);
 
 // Apply Cartesian force and torque (outside xfrc_applied mechanism).
+// Nullable: force, torque
 public static native void mj_applyFT(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer force, @Cast("const mjtNum*") DoublePointer torque,
                       @Cast("const mjtNum*") DoublePointer point, int body, @Cast("mjtNum*") DoublePointer qfrc_target);
 
@@ -634,6 +2929,14 @@ public static native void mj_objectVelocity(@Const mjModel m, @Const mjData d,
 // Compute object 6D acceleration (rot:lin) in object-centered frame, world/local orientation.
 public static native void mj_objectAcceleration(@Const mjModel m, @Const mjData d,
                                  int objtype, int objid, @Cast("mjtNum*") DoublePointer res, int flg_local);
+
+// Return smallest signed distance between two geoms and optionally segment from geom1 to geom2.
+// Nullable: fromto
+public static native @Cast("mjtNum") double mj_geomDistance(@Const mjModel m, mjData d, int geom1, int geom2, @Cast("mjtNum") double distmax,
+                             @Cast("mjtNum*") DoublePointer fromto);
+
+// Return 1 if point is inside a site (convex hull for meshes), 0 otherwise.
+public static native int mj_insideSite(@Const mjModel m, @Const mjData d, int siteid, @Cast("const mjtNum*") DoublePointer point);
 
 // Extract 6D force:torque given contact id, in the contact frame.
 public static native void mj_contactForce(@Const mjModel m, @Const mjData d, int id, @Cast("mjtNum*") DoublePointer result);
@@ -648,7 +2951,7 @@ public static native void mj_integratePos(@Const mjModel m, @Cast("mjtNum*") Dou
 // Normalize all quaternions in qpos-type vector.
 public static native void mj_normalizeQuat(@Const mjModel m, @Cast("mjtNum*") DoublePointer qpos);
 
-// Map from body local to global Cartesian coordinates.
+// Map from body local to global Cartesian coordinates, sameframe takes values from mjtSameFrame.
 public static native void mj_local2Global(mjData d, @Cast("mjtNum*") DoublePointer xpos, @Cast("mjtNum*") DoublePointer xmat, @Cast("const mjtNum*") DoublePointer pos,
                            @Cast("const mjtNum*") DoublePointer quat, int body, @Cast("mjtByte") byte sameframe);
 
@@ -669,7 +2972,8 @@ public static native void mj_loadPluginLibrary(String path);
 
 // Scan a directory and load all dynamic libraries. Dynamic libraries in the specified directory
 // are assumed to register one or more plugins. Optionally, if a callback is specified, it is called
-// for each dynamic library encountered that registers plugins.
+// for each dynamic library encountered that registers plugins. A library that fails to load is
+// skipped with a warning.
 
 // Return version number: 1.0.2 is encoded as 102.
 public static native int mj_version();
@@ -678,66 +2982,77 @@ public static native int mj_version();
 public static native @Cast("const char*") BytePointer mj_versionString();
 
 
-//---------------------------------- Ray collisions ------------------------------------------------
-
-// Intersect multiple rays emanating from a single point.
-// Similar semantics to mj_ray, but vec is an array of (nray x 3) directions.
-public static native void mj_multiRay(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
-                       @Cast("const mjtByte*") BytePointer geomgroup, @Cast("mjtByte") byte flg_static, int bodyexclude,
-                       IntPointer geomid, @Cast("mjtNum*") DoublePointer dist, int nray, @Cast("mjtNum") double cutoff);
-public static native void mj_multiRay(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
-                       @Cast("const mjtByte*") ByteBuffer geomgroup, @Cast("mjtByte") byte flg_static, int bodyexclude,
-                       IntBuffer geomid, @Cast("mjtNum*") DoublePointer dist, int nray, @Cast("mjtNum") double cutoff);
-public static native void mj_multiRay(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
-                       @Cast("const mjtByte*") byte[] geomgroup, @Cast("mjtByte") byte flg_static, int bodyexclude,
-                       int[] geomid, @Cast("mjtNum*") DoublePointer dist, int nray, @Cast("mjtNum") double cutoff);
+//---------------------------------- Ray casting ---------------------------------------------------
 
 // Intersect ray (pnt+x*vec, x>=0) with visible geoms, except geoms in bodyexclude.
-// Return distance (x) to nearest surface, or -1 if no intersection and output geomid.
+// Return distance (x) to nearest surface, or -1 if no intersection.
 // geomgroup, flg_static are as in mjvOption; geomgroup==NULL skips group exclusion.
+// Nullable: geomgroup, geomid, normal
 public static native @Cast("mjtNum") double mj_ray(@Const mjModel m, @Const mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
-                    @Cast("const mjtByte*") BytePointer geomgroup, @Cast("mjtByte") byte flg_static, int bodyexclude,
-                    IntPointer geomid);
+                    @Cast("const mjtByte*") BytePointer geomgroup, @Cast("mjtBool") boolean flg_static, int bodyexclude,
+                    IntPointer geomid, @Cast("mjtNum*") DoublePointer normal);
 public static native @Cast("mjtNum") double mj_ray(@Const mjModel m, @Const mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
-                    @Cast("const mjtByte*") ByteBuffer geomgroup, @Cast("mjtByte") byte flg_static, int bodyexclude,
-                    IntBuffer geomid);
+                    @Cast("const mjtByte*") ByteBuffer geomgroup, @Cast("mjtBool") boolean flg_static, int bodyexclude,
+                    IntBuffer geomid, @Cast("mjtNum*") DoublePointer normal);
 public static native @Cast("mjtNum") double mj_ray(@Const mjModel m, @Const mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
-                    @Cast("const mjtByte*") byte[] geomgroup, @Cast("mjtByte") byte flg_static, int bodyexclude,
-                    int[] geomid);
+                    @Cast("const mjtByte*") byte[] geomgroup, @Cast("mjtBool") boolean flg_static, int bodyexclude,
+                    int[] geomid, @Cast("mjtNum*") DoublePointer normal);
 
-// Intersect ray with hfield, return nearest distance or -1 if no intersection.
+// Intersect multiple rays emanating from a single point, compute normals if given.
+// Similar semantics to mj_ray, but vec, normal and dist are arrays.
+// Geoms further than cutoff are ignored.
+// Nullable: geomgroup, geomid, normal
+public static native void mj_multiRay(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
+                       @Cast("const mjtByte*") BytePointer geomgroup, @Cast("mjtBool") boolean flg_static, int bodyexclude,
+                       IntPointer geomid, @Cast("mjtNum*") DoublePointer dist, @Cast("mjtNum*") DoublePointer normal, int nray, @Cast("mjtNum") double cutoff);
+public static native void mj_multiRay(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
+                       @Cast("const mjtByte*") ByteBuffer geomgroup, @Cast("mjtBool") boolean flg_static, int bodyexclude,
+                       IntBuffer geomid, @Cast("mjtNum*") DoublePointer dist, @Cast("mjtNum*") DoublePointer normal, int nray, @Cast("mjtNum") double cutoff);
+public static native void mj_multiRay(@Const mjModel m, mjData d, @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec,
+                       @Cast("const mjtByte*") byte[] geomgroup, @Cast("mjtBool") boolean flg_static, int bodyexclude,
+                       int[] geomid, @Cast("mjtNum*") DoublePointer dist, @Cast("mjtNum*") DoublePointer normal, int nray, @Cast("mjtNum") double cutoff);
+
+// Intersect ray with hfield; return nearest distance or -1 if no intersection.
+// Nullable: normal
 public static native @Cast("mjtNum") double mj_rayHfield(@Const mjModel m, @Const mjData d, int geomid,
-                          @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec);
+                          @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, @Cast("mjtNum*") DoublePointer normal);
 
-// Intersect ray with mesh, return nearest distance or -1 if no intersection.
+// Intersect ray with mesh; return nearest distance or -1 if no intersection.
+// Nullable: normal
 public static native @Cast("mjtNum") double mj_rayMesh(@Const mjModel m, @Const mjData d, int geomid,
-                        @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec);
+                        @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, @Cast("mjtNum*") DoublePointer normal);
 
-// Intersect ray with pure geom, return nearest distance or -1 if no intersection.
+// Intersect ray with pure geom; return nearest distance or -1 if no intersection.
+// Nullable: normal
 public static native @Cast("mjtNum") double mju_rayGeom(@Cast("const mjtNum*") DoublePointer pos, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer size,
-                         @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, int geomtype);
+                         @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, int geomtype,
+                         @Cast("mjtNum*") DoublePointer normal);
 
-// Intersect ray with flex, return nearest distance or -1 if no intersection,
-// and also output nearest vertex id.
-public static native @Cast("mjtNum") double mju_rayFlex(@Const mjModel m, @Const mjData d, int flex_layer, @Cast("mjtByte") byte flg_vert,
-                         @Cast("mjtByte") byte flg_edge, @Cast("mjtByte") byte flg_face, @Cast("mjtByte") byte flg_skin, int flexid,
-                         @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, IntPointer vertid);
-public static native @Cast("mjtNum") double mju_rayFlex(@Const mjModel m, @Const mjData d, int flex_layer, @Cast("mjtByte") byte flg_vert,
-                         @Cast("mjtByte") byte flg_edge, @Cast("mjtByte") byte flg_face, @Cast("mjtByte") byte flg_skin, int flexid,
-                         @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, IntBuffer vertid);
-public static native @Cast("mjtNum") double mju_rayFlex(@Const mjModel m, @Const mjData d, int flex_layer, @Cast("mjtByte") byte flg_vert,
-                         @Cast("mjtByte") byte flg_edge, @Cast("mjtByte") byte flg_face, @Cast("mjtByte") byte flg_skin, int flexid,
-                         @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, int[] vertid);
+// Intersect ray with flex; return nearest distance or -1 if no intersection,
+// and also output nearest vertex id and surface normal.
+// Nullable: vertid, normal
+public static native @Cast("mjtNum") double mj_rayFlex(@Const mjModel m, @Const mjData d, int flex_layer,
+                        @Cast("mjtBool") boolean flg_vert, @Cast("mjtBool") boolean flg_edge, @Cast("mjtBool") boolean flg_face,
+                        @Cast("mjtBool") boolean flg_skin, int flexid, @Cast("const mjtNum*") DoublePointer pnt,
+                        @Cast("const mjtNum*") DoublePointer vec, IntPointer vertid, @Cast("mjtNum*") DoublePointer normal);
+public static native @Cast("mjtNum") double mj_rayFlex(@Const mjModel m, @Const mjData d, int flex_layer,
+                        @Cast("mjtBool") boolean flg_vert, @Cast("mjtBool") boolean flg_edge, @Cast("mjtBool") boolean flg_face,
+                        @Cast("mjtBool") boolean flg_skin, int flexid, @Cast("const mjtNum*") DoublePointer pnt,
+                        @Cast("const mjtNum*") DoublePointer vec, IntBuffer vertid, @Cast("mjtNum*") DoublePointer normal);
+public static native @Cast("mjtNum") double mj_rayFlex(@Const mjModel m, @Const mjData d, int flex_layer,
+                        @Cast("mjtBool") boolean flg_vert, @Cast("mjtBool") boolean flg_edge, @Cast("mjtBool") boolean flg_face,
+                        @Cast("mjtBool") boolean flg_skin, int flexid, @Cast("const mjtNum*") DoublePointer pnt,
+                        @Cast("const mjtNum*") DoublePointer vec, int[] vertid, @Cast("mjtNum*") DoublePointer normal);
 
-// Intersect ray with skin, return nearest distance or -1 if no intersection,
+// Intersect ray with skin; return nearest distance or -1 if no intersection,
 // and also output nearest vertex id.
+// Nullable: vertid
 public static native @Cast("mjtNum") double mju_raySkin(int nface, int nvert, @Const IntPointer face, @Const FloatPointer vert,
                          @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, IntPointer vertid);
 public static native @Cast("mjtNum") double mju_raySkin(int nface, int nvert, @Const IntBuffer face, @Const FloatBuffer vert,
                          @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, IntBuffer vertid);
 public static native @Cast("mjtNum") double mju_raySkin(int nface, int nvert, @Const int[] face, @Const float[] vert,
                          @Cast("const mjtNum*") DoublePointer pnt, @Cast("const mjtNum*") DoublePointer vec, int[] vertid);
-
 
 //---------------------------------- Interaction ---------------------------------------------------
 
@@ -773,22 +3088,11 @@ public static native @Cast("mjtNum") double mjv_frustumHeight(@Const mjvScene sc
 public static native void mjv_alignToCamera(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("const mjtNum*") DoublePointer forward);
 
 // Move camera with mouse; action is mjtMouse.
-public static native void mjv_moveCamera(@Const mjModel m, int action, @Cast("mjtNum") double reldx, @Cast("mjtNum") double reldy,
-                          @Const mjvScene scn, mjvCamera cam);
-
-// Move camera with mouse given a scene state; action is mjtMouse.
-public static native void mjv_moveCameraFromState(@Const mjvSceneState scnstate, int action,
-                                   @Cast("mjtNum") double reldx, @Cast("mjtNum") double reldy,
-                                   @Const mjvScene scn, mjvCamera cam);
+public static native void mjv_moveCamera(@Const mjModel m, int action, @Cast("mjtNum") double reldx, @Cast("mjtNum") double reldy, mjvCamera cam);
 
 // Move perturb object with mouse; action is mjtMouse.
 public static native void mjv_movePerturb(@Const mjModel m, @Const mjData d, int action, @Cast("mjtNum") double reldx,
                            @Cast("mjtNum") double reldy, @Const mjvScene scn, mjvPerturb pert);
-
-// Move perturb object with mouse given a scene state; action is mjtMouse.
-public static native void mjv_movePerturbFromState(@Const mjvSceneState scnstate, int action,
-                                    @Cast("mjtNum") double reldx, @Cast("mjtNum") double reldy,
-                                    @Const mjvScene scn, mjvPerturb pert);
 
 // Move model with mouse; action is mjtMouse.
 public static native void mjv_moveModel(@Const mjModel m, int action, @Cast("mjtNum") double reldx, @Cast("mjtNum") double reldy,
@@ -808,7 +3112,12 @@ public static native void mjv_applyPerturbForce(@Const mjModel m, mjData d, @Con
 // Return the average of two OpenGL cameras.
 public static native @ByVal mjvGLCamera mjv_averageCamera(@Const mjvGLCamera cam1, @Const mjvGLCamera cam2);
 
-// Select geom, flex or skin with mouse, return bodyid; -1: none selected.
+// Converts a mjvCamera to a mjvGLCamera.
+public static native @ByVal mjvGLCamera mjv_camera2GLCamera(@Const mjModel model, @Const mjData data,
+                                      @Const mjvCamera mjv_camera);
+
+// Select geom, flex or skin with mouse; return bodyid; -1: none selected.
+// Nullable: geomid, flexid, skinid
 public static native int mjv_select(@Const mjModel m, @Const mjData d, @Const mjvOption vopt,
                      @Cast("mjtNum") double aspectratio, @Cast("mjtNum") double relx, @Cast("mjtNum") double rely,
                      @Const mjvScene scn, @Cast("mjtNum*") DoublePointer selpnt,
@@ -832,20 +3141,13 @@ public static native void mjv_defaultOption(mjvOption opt);
 public static native void mjv_defaultFigure(mjvFigure fig);
 
 // Initialize given geom fields when not NULL, set the rest to their default values.
+// Nullable: size, pos, mat, rgba
 public static native void mjv_initGeom(mjvGeom geom, int type, @Cast("const mjtNum*") DoublePointer size,
                         @Cast("const mjtNum*") DoublePointer pos, @Cast("const mjtNum*") DoublePointer mat, @Const FloatPointer rgba);
 public static native void mjv_initGeom(mjvGeom geom, int type, @Cast("const mjtNum*") DoublePointer size,
                         @Cast("const mjtNum*") DoublePointer pos, @Cast("const mjtNum*") DoublePointer mat, @Const FloatBuffer rgba);
 public static native void mjv_initGeom(mjvGeom geom, int type, @Cast("const mjtNum*") DoublePointer size,
                         @Cast("const mjtNum*") DoublePointer pos, @Cast("const mjtNum*") DoublePointer mat, @Const float[] rgba);
-
-// Set (type, size, pos, mat) for connector-type geom between given points.
-// Assume that mjv_initGeom was already called to set all other properties.
-// Width of mjGEOM_LINE is denominated in pixels.
-// Deprecated: use mjv_connector.
-public static native void mjv_makeConnector(mjvGeom geom, int type, @Cast("mjtNum") double width,
-                             @Cast("mjtNum") double a0, @Cast("mjtNum") double a1, @Cast("mjtNum") double a2,
-                             @Cast("mjtNum") double b0, @Cast("mjtNum") double b1, @Cast("mjtNum") double b2);
 
 // Set (type, size, pos, mat) for connector-type geom between given points.
 // Assume that mjv_initGeom was already called to set all other properties.
@@ -866,43 +3168,48 @@ public static native void mjv_freeScene(mjvScene scn);
 public static native void mjv_updateScene(@Const mjModel m, mjData d, @Const mjvOption opt,
                            @Const mjvPerturb pert, mjvCamera cam, int catmask, mjvScene scn);
 
-// Update entire scene from a scene state, return the number of new mjWARN_VGEOMFULL warnings.
-public static native int mjv_updateSceneFromState(@Const mjvSceneState scnstate, @Const mjvOption opt,
-                                   @Const mjvPerturb pert, mjvCamera cam, int catmask,
-                                   mjvScene scn);
-
-// Set default scene state.
-public static native void mjv_defaultSceneState(mjvSceneState scnstate);
-
-// Allocate resources and initialize a scene state object.
-public static native void mjv_makeSceneState(@Const mjModel m, @Const mjData d,
-                              mjvSceneState scnstate, int maxgeom);
-
-// Free scene state.
-public static native void mjv_freeSceneState(mjvSceneState scnstate);
-
-// Update a scene state from model and data.
-public static native void mjv_updateSceneState(@Const mjModel m, mjData d, @Const mjvOption opt,
-                                mjvSceneState scnstate);
+// Copy mjModel, skip large arrays not required for abstract visualization.
+// Nullable: dest
+public static native void mjv_copyModel(mjModel dest, @Const mjModel src);
 
 // Add geoms from selected categories.
 public static native void mjv_addGeoms(@Const mjModel m, mjData d, @Const mjvOption opt,
                         @Const mjvPerturb pert, int catmask, mjvScene scn);
 
 // Make list of lights.
-public static native void mjv_makeLights(@Const mjModel m, mjData d, mjvScene scn);
+public static native void mjv_makeLights(@Const mjModel m, @Const mjData d, mjvScene scn);
 
 // Update camera.
-public static native void mjv_updateCamera(@Const mjModel m, mjData d, mjvCamera cam, mjvScene scn);
+public static native void mjv_updateCamera(@Const mjModel m, @Const mjData d, mjvCamera cam, mjvScene scn);
 
 // Update skins.
-public static native void mjv_updateSkin(@Const mjModel m, mjData d, mjvScene scn);
+public static native void mjv_updateSkin(@Const mjModel m, @Const mjData d, mjvScene scn);
+
+// Compute camera position and forward, up, and right vectors.
+// Nullable: headpos, forward, up, right
+public static native void mjv_cameraFrame(@Cast("mjtNum*") DoublePointer headpos, @Cast("mjtNum*") DoublePointer forward, @Cast("mjtNum*") DoublePointer up, @Cast("mjtNum*") DoublePointer right,
+                           @Const mjData d, @Const mjvCamera cam);
+
+// Compute camera frustum: vertical, horizontal, and clip planes.
+// Nullable: zver, zhor, zclip
+public static native void mjv_cameraFrustum(FloatPointer zver, FloatPointer zhor, FloatPointer zclip,  @Const mjModel m,
+                             @Const mjvCamera cam);
+public static native void mjv_cameraFrustum(FloatBuffer zver, FloatBuffer zhor, FloatBuffer zclip,  @Const mjModel m,
+                             @Const mjvCamera cam);
+public static native void mjv_cameraFrustum(float[] zver, float[] zhor, float[] zclip,  @Const mjModel m,
+                             @Const mjvCamera cam);
 
 
 //---------------------------------- OpenGL rendering ----------------------------------------------
 
 // Set default mjrContext.
 public static native void mjr_defaultContext(mjrContext con);
+
+// Set default mjrRendererInfo.
+public static native void mjr_defaultRendererInfo(mjrRendererInfo info);
+
+// Get active renderer information.
+public static native void mjr_getRendererInfo(mjrRendererInfo info);
 
 // Allocate resources in custom OpenGL context; fontscale is mjtFontScale.
 public static native void mjr_makeContext(@Const mjModel m, mjrContext con, int fontscale);
@@ -919,7 +3226,8 @@ public static native void mjr_freeContext(mjrContext con);
 // Resize offscreen buffers.
 public static native void mjr_resizeOffscreen(int width, int height, mjrContext con);
 
-// Upload texture to GPU, overwriting previous upload if any.
+// Upload texture to GPU, overwriting previous upload if any. A by-reference texture (tex_adr == -1)
+// is decoded with mj_loadTexture.
 public static native void mjr_uploadTexture(@Const mjModel m, @Const mjrContext con, int texid);
 
 // Upload mesh to GPU, overwriting previous upload if any.
@@ -1027,7 +3335,7 @@ public static native void mjui_resize(mjUI ui, @Const mjrContext con);
 public static native void mjui_update(int section, int item, @Const mjUI ui,
                        @Const mjuiState state, @Const mjrContext con);
 
-// Handle UI event, return pointer to changed item, NULL if no change.
+// Handle UI event; return pointer to changed item, NULL if no change.
 public static native mjuiItem mjui_event(mjUI ui, mjuiState state, @Const mjrContext con);
 
 // Copy UI image to current buffer.
@@ -1040,28 +3348,29 @@ public static native void mjui_render(mjUI ui, @Const mjuiState state, @Const mj
 public static native void mju_error(@Cast("const char*") BytePointer msg);
 public static native void mju_error(String msg);
 
-// Deprecated: use mju_error.
-public static native void mju_error_i(@Cast("const char*") BytePointer msg, int i);
-public static native void mju_error_i(String msg, int i);
-
-// Deprecated: use mju_error.
-public static native void mju_error_s(@Cast("const char*") BytePointer msg, @Cast("const char*") BytePointer text);
-public static native void mju_error_s(String msg, String text);
-
 // Main warning function; returns to caller.
 public static native void mju_warning(@Cast("const char*") BytePointer msg);
 public static native void mju_warning(String msg);
 
-// Deprecated: use mju_warning.
-public static native void mju_warning_i(@Cast("const char*") BytePointer msg, int i);
-public static native void mju_warning_i(String msg, int i);
-
-// Deprecated: use mju_warning.
-public static native void mju_warning_s(@Cast("const char*") BytePointer msg, @Cast("const char*") BytePointer text);
-public static native void mju_warning_s(String msg, String text);
-
 // Clear user error and memory handlers.
 public static native void mju_clearHandlers();
+
+// Set the active log handler; return the previous handler.
+// If handler is NULL, restore the default handler.
+public static native mjfLogHandler mju_setLogHandler(mjfLogHandler handler);
+
+// Get default handler configuration.
+public static native @ByVal mjLogConfig mju_getLogConfig();
+
+// Set default handler configuration.
+public static native void mju_setLogConfig(@ByVal mjLogConfig config);
+
+// Log an info message with optional topic filtering.
+public static native void mju_info(int topic, @Cast("const char*") BytePointer msg);
+public static native void mju_info(int topic, String msg);
+
+// Dispatch a structured log message to the active handler.
+public static native void mju_message(@Const mjLogMessage msg);
 
 // Allocate memory; byte-align on 64; pad size to multiple of 64.
 public static native Pointer mju_malloc(@Cast("size_t") long size);
@@ -1076,10 +3385,24 @@ public static native void mj_warning(mjData d, int warning, int info);
 public static native void mju_writeLog(@Cast("const char*") BytePointer type, @Cast("const char*") BytePointer msg);
 public static native void mju_writeLog(String type, String msg);
 
+// Get compiler error message from spec.
+public static native @Cast("const char*") BytePointer mjs_getError(mjSpec s);
+
+// Get compiler timing diagnostics from spec, returns pointer to array of size mjNCTIMER.
+public static native @Const DoublePointer mjs_getTimer(mjSpec s);
+
+// Return 1 if compiler error is a warning. Deprecated: use mjs_numWarnings(s) > 0.
+public static native int mjs_isWarning(mjSpec s);
+
+// Get number of warnings accumulated in the spec.
+public static native int mjs_numWarnings(@Const mjSpec spec);
+
+// Get the i-th warning message (returns nullptr if index out of bounds).
+public static native @Cast("const char*") BytePointer mjs_getWarning(@Const mjSpec spec, int index);
 
 //---------------------------------- Standard math -------------------------------------------------
 
-// #ifdef mjUSEDOUBLE
+// #if !defined(mjUSESINGLE)
 //   #define mju_sqrt    sqrt
 //   #define mju_exp     exp
 //   #define mju_sin     sin
@@ -1144,7 +3467,7 @@ public static native void mju_addToScl3(@Cast("mjtNum*") DoublePointer res, @Cas
 // Set res = vec1 + vec2*scl.
 public static native void mju_addScl3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer vec2, @Cast("mjtNum") double scl);
 
-// Normalize vector, return length before normalization.
+// Normalize vector; return length before normalization.
 public static native @Cast("mjtNum") double mju_normalize3(@Cast("mjtNum*") DoublePointer vec);
 
 // Return vector length (without normalizing the vector).
@@ -1156,11 +3479,11 @@ public static native @Cast("mjtNum") double mju_dot3(@Cast("const mjtNum*") Doub
 // Return Cartesian distance between 3D vectors pos1 and pos2.
 public static native @Cast("mjtNum") double mju_dist3(@Cast("const mjtNum*") DoublePointer pos1, @Cast("const mjtNum*") DoublePointer pos2);
 
-// Multiply vector by 3D rotation matrix: res = mat * vec.
-public static native void mju_rotVecMat(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("const mjtNum*") DoublePointer mat);
+// Multiply 3-by-3 matrix by vector: res = mat * vec.
+public static native void mju_mulMatVec3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer vec);
 
-// Multiply vector by transposed 3D rotation matrix: res = mat' * vec.
-public static native void mju_rotVecMatT(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, @Cast("const mjtNum*") DoublePointer mat);
+// Multiply transposed 3-by-3 matrix by vector: res = mat' * vec.
+public static native void mju_mulMatTVec3(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer vec);
 
 // Compute cross-product: res = cross(a, b).
 public static native void mju_cross(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer a, @Cast("const mjtNum*") DoublePointer b);
@@ -1174,7 +3497,7 @@ public static native void mju_unit4(@Cast("mjtNum*") DoublePointer res);
 // Set res = vec.
 public static native void mju_copy4(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer data);
 
-// Normalize vector, return length before normalization.
+// Normalize vector; return length before normalization.
 public static native @Cast("mjtNum") double mju_normalize4(@Cast("mjtNum*") DoublePointer vec);
 
 // Set res = 0.
@@ -1213,7 +3536,7 @@ public static native void mju_addToScl(@Cast("mjtNum*") DoublePointer res, @Cast
 // Set res = vec1 + vec2*scl.
 public static native void mju_addScl(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer vec2, @Cast("mjtNum") double scl, int n);
 
-// Normalize vector, return length before normalization.
+// Normalize vector; return length before normalization.
 public static native @Cast("mjtNum") double mju_normalize(@Cast("mjtNum*") DoublePointer res, int n);
 
 // Return vector length (without normalizing vector).
@@ -1228,7 +3551,7 @@ public static native void mju_mulMatVec(@Cast("mjtNum*") DoublePointer res, @Cas
 // Multiply transposed matrix and vector: res = mat' * vec.
 public static native void mju_mulMatTVec(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer vec, int nr, int nc);
 
-// Multiply square matrix with vectors on both sides: returns vec1' * mat * vec2.
+// Multiply square matrix with vectors on both sides: return vec1' * mat * vec2.
 public static native @Cast("mjtNum") double mju_mulVecMatVec(@Cast("const mjtNum*") DoublePointer vec1, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer vec2, int n);
 
 // Transpose matrix: res = mat'.
@@ -1257,9 +3580,38 @@ public static native void mju_sqrMatTD(@Cast("mjtNum*") DoublePointer res, @Cast
 
 // Coordinate transform of 6D motion or force vector in rotation:translation format.
 // rotnew2old is 3-by-3, NULL means no rotation; flg_force specifies force or motion type.
+// Nullable: rotnew2old
 public static native void mju_transformSpatial(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer vec, int flg_force,
                                 @Cast("const mjtNum*") DoublePointer newpos, @Cast("const mjtNum*") DoublePointer oldpos,
                                 @Cast("const mjtNum*") DoublePointer rotnew2old);
+
+
+//---------------------------------- Sparse math ---------------------------------------------------
+
+// Convert matrix from dense to sparse.
+//  nnz is size of res and colind; return 1 if too small, 0 otherwise.
+public static native int mju_dense2sparse(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int nr, int nc,
+                           IntPointer rownnz, IntPointer rowadr, IntPointer colind, int nnz);
+public static native int mju_dense2sparse(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int nr, int nc,
+                           IntBuffer rownnz, IntBuffer rowadr, IntBuffer colind, int nnz);
+public static native int mju_dense2sparse(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int nr, int nc,
+                           int[] rownnz, int[] rowadr, int[] colind, int nnz);
+
+// Convert matrix from sparse to dense.
+public static native void mju_sparse2dense(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int nr, int nc,
+                            @Const IntPointer rownnz, @Const IntPointer rowadr, @Const IntPointer colind);
+public static native void mju_sparse2dense(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int nr, int nc,
+                            @Const IntBuffer rownnz, @Const IntBuffer rowadr, @Const IntBuffer colind);
+public static native void mju_sparse2dense(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int nr, int nc,
+                            @Const int[] rownnz, @Const int[] rowadr, @Const int[] colind);
+
+// Convert lower-triangular symmetric CSR matrix to full dense matrix.
+public static native void mju_sym2dense(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int n,
+                         @Const IntPointer rownnz, @Const IntPointer rowadr, @Const IntPointer colind);
+public static native void mju_sym2dense(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int n,
+                         @Const IntBuffer rownnz, @Const IntBuffer rowadr, @Const IntBuffer colind);
+public static native void mju_sym2dense(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int n,
+                         @Const int[] rownnz, @Const int[] rowadr, @Const int[] colind);
 
 
 //---------------------------------- Quaternions ---------------------------------------------------
@@ -1300,6 +3652,15 @@ public static native void mju_quatIntegrate(@Cast("mjtNum*") DoublePointer quat,
 // Construct quaternion performing rotation from z-axis to given vector.
 public static native void mju_quatZ2Vec(@Cast("mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer vec);
 
+// Extract 3D rotation from an arbitrary 3x3 matrix by refining the input quaternion.
+// Return the number of iterations required to converge.
+public static native int mju_mat2Rot(@Cast("mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer mat);
+
+// Convert sequence of Euler angles (radians) to quaternion.
+// seq[0,1,2] must be in 'xyzXYZ', lower/upper-case mean intrinsic/extrinsic rotations.
+public static native void mju_euler2Quat(@Cast("mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer euler, @Cast("const char*") BytePointer seq);
+public static native void mju_euler2Quat(@Cast("mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer euler, String seq);
+
 
 //---------------------------------- Poses ---------------------------------------------------------
 
@@ -1329,7 +3690,7 @@ public static native void mju_cholSolve(@Cast("mjtNum*") DoublePointer res, @Cas
 public static native int mju_cholUpdate(@Cast("mjtNum*") DoublePointer mat, @Cast("mjtNum*") DoublePointer x, int n, int flg_plus);
 
 // Band-dense Cholesky decomposition.
-//  Returns minimum value in the factorized diagonal, or 0 if rank-deficient.
+//  Return minimum value in the factorized diagonal, or 0 if rank-deficient.
 //  mat has (ntotal-ndense) x nband + ndense x ntotal elements.
 //  The first (ntotal-ndense) x nband store the band part, left of diagonal, inclusive.
 //  The second ndense x ntotal store the band part as entire dense rows.
@@ -1343,14 +3704,14 @@ public static native void mju_cholSolveBand(@Cast("mjtNum*") DoublePointer res, 
 
 // Convert banded matrix to dense matrix, fill upper triangle if flg_sym>0.
 public static native void mju_band2Dense(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int ntotal, int nband, int ndense,
-                          @Cast("mjtByte") byte flg_sym);
+                          @Cast("mjtBool") boolean flg_sym);
 
 // Convert dense matrix to banded matrix.
 public static native void mju_dense2Band(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, int ntotal, int nband, int ndense);
 
 // Multiply band-diagonal matrix with nvec vectors, include upper triangle if flg_sym>0.
 public static native void mju_bandMulMatVec(@Cast("mjtNum*") DoublePointer res, @Cast("const mjtNum*") DoublePointer mat, @Cast("const mjtNum*") DoublePointer vec,
-                             int ntotal, int nband, int ndense, int nvec, @Cast("mjtByte") byte flg_sym);
+                             int ntotal, int nband, int ndense, int nvec, @Cast("mjtBool") boolean flg_sym);
 
 // Address of diagonal element i in band-dense matrix representation.
 public static native int mju_bandDiag(int i, int ntotal, int nband, int ndense);
@@ -1358,7 +3719,7 @@ public static native int mju_bandDiag(int i, int ntotal, int nband, int ndense);
 // Eigenvalue decomposition of symmetric 3x3 matrix, mat = eigvec * diag(eigval) * eigvec'.
 public static native int mju_eig3(@Cast("mjtNum*") DoublePointer eigval, @Cast("mjtNum*") DoublePointer eigvec, @Cast("mjtNum*") DoublePointer quat, @Cast("const mjtNum*") DoublePointer mat);
 
-// minimize 0.5*x'*H*x + x'*g  s.t. lower <= x <= upper, return rank or -1 if failed
+// minimize 0.5*x'*H*x + x'*g  s.t. lower <= x <= upper; return rank or -1 if failed
 //   inputs:
 //     n           - problem dimension
 //     H           - SPD matrix                n*n
@@ -1379,6 +3740,7 @@ public static native int mju_eig3(@Cast("mjtNum*") DoublePointer eigval, @Cast("
 //     index (if given) must have allocated size n, but only nfree values are used in output
 //     only the lower triangles of H and R and are read from and written to, respectively
 //     the convenience function mju_boxQPmalloc allocates the required data structures
+// Nullable: index, lower, upper
 public static native int mju_boxQP(@Cast("mjtNum*") DoublePointer res, @Cast("mjtNum*") DoublePointer R, IntPointer index, @Cast("const mjtNum*") DoublePointer H, @Cast("const mjtNum*") DoublePointer g, int n,
                     @Cast("const mjtNum*") DoublePointer lower, @Cast("const mjtNum*") DoublePointer upper);
 public static native int mju_boxQP(@Cast("mjtNum*") DoublePointer res, @Cast("mjtNum*") DoublePointer R, IntBuffer index, @Cast("const mjtNum*") DoublePointer H, @Cast("const mjtNum*") DoublePointer g, int n,
@@ -1398,7 +3760,8 @@ public static native void mju_boxQPmalloc(@Cast("mjtNum**") @ByPtrPtr DoublePoin
 public static native void mju_boxQPmalloc(@Cast("mjtNum**") @ByPtrPtr DoublePointer res, @Cast("mjtNum**") @ByPtrPtr DoublePointer R, @ByPtrPtr int[] index, @Cast("mjtNum**") @ByPtrPtr DoublePointer H, @Cast("mjtNum**") @ByPtrPtr DoublePointer g, int n,
                            @Cast("mjtNum**") @ByPtrPtr DoublePointer lower, @Cast("mjtNum**") @ByPtrPtr DoublePointer upper);
 
-//---------------------- Miscellaneous -------------------------------------------------------------
+
+//---------------------------------- Miscellaneous -------------------------------------------------
 
 // Muscle active force, prm = (range[2], force, scale, lmin, lmax, vmax, fpmax, fvmax).
 public static native @Cast("mjtNum") double mju_muscleGain(@Cast("mjtNum") double len, @Cast("mjtNum") double vel, @Cast("const mjtNum*") DoublePointer lengthrange,
@@ -1417,7 +3780,7 @@ public static native void mju_encodePyramid(@Cast("mjtNum*") DoublePointer pyram
 // Convert pyramid representation to contact force.
 public static native void mju_decodePyramid(@Cast("mjtNum*") DoublePointer force, @Cast("const mjtNum*") DoublePointer pyramid, @Cast("const mjtNum*") DoublePointer mu, int dim);
 
-// Integrate spring-damper analytically, return pos(dt).
+// Integrate spring-damper analytically; return pos(dt).
 public static native @Cast("mjtNum") double mju_springDamper(@Cast("mjtNum") double pos0, @Cast("mjtNum") double vel0, @Cast("mjtNum") double Kp, @Cast("mjtNum") double Kv, @Cast("mjtNum") double dt);
 
 // Return min(a,b) with single evaluation of a and b.
@@ -1452,7 +3815,7 @@ public static native @Cast("const char*") BytePointer mju_warningText(int warnin
 public static native int mju_isBad(@Cast("mjtNum") double x);
 
 // Return 1 if all elements are 0.
-public static native int mju_isZero(@Cast("mjtNum*") DoublePointer vec, int n);
+public static native int mju_isZero(@Cast("const mjtNum*") DoublePointer vec, int n);
 
 // Standard normal random number generator (optional second number).
 public static native @Cast("mjtNum") double mju_standardNormal(@Cast("mjtNum*") DoublePointer num2);
@@ -1500,7 +3863,20 @@ public static native @Cast("char*") byte[] mju_strncpy(@Cast("char*") byte[] dst
 public static native @Cast("mjtNum") double mju_sigmoid(@Cast("mjtNum") double x);
 
 
-//---------------------- Derivatives ---------------------------------------------------------------
+//---------------------------------- Signed Distance Functions -------------------------------------
+
+// get sdf from geom id
+public static native @Const mjpPlugin mjc_getSDF(@Const mjModel m, int id);
+
+// signed distance function
+public static native @Cast("mjtNum") double mjc_distance(@Const mjModel m, @Const mjData d, @Const mjSDF s, @Cast("const mjtNum*") DoublePointer x);
+
+// gradient of sdf
+public static native void mjc_gradient(@Const mjModel m, @Const mjData d, @Const mjSDF s, @Cast("mjtNum*") DoublePointer gradient,
+                        @Cast("const mjtNum*") DoublePointer x);
+
+
+//---------------------------------- Derivatives ---------------------------------------------------
 
 // Finite differenced transition matrices (control theory notation)
 //   d(x_next) = A*dx + B*du
@@ -1510,7 +3886,8 @@ public static native @Cast("mjtNum") double mju_sigmoid(@Cast("mjtNum") double x
 //      B: (2*nv+na x nu)
 //      D: (nsensordata x 2*nv+na)
 //      C: (nsensordata x nu)
-public static native void mjd_transitionFD(@Const mjModel m, mjData d, @Cast("mjtNum") double eps, @Cast("mjtByte") byte flg_centered,
+// Nullable: A, B, C, D
+public static native void mjd_transitionFD(@Const mjModel m, mjData d, @Cast("mjtNum") double eps, @Cast("mjtBool") boolean flg_centered,
                             @Cast("mjtNum*") DoublePointer A, @Cast("mjtNum*") DoublePointer B, @Cast("mjtNum*") DoublePointer C, @Cast("mjtNum*") DoublePointer D);
 
 // Finite differenced Jacobians of (force, sensors) = mj_inverse(state, acceleration)
@@ -1521,26 +3898,30 @@ public static native void mjd_transitionFD(@Const mjModel m, mjData d, @Cast("mj
 //     DsDq: (nv x nsensordata)
 //     DsDv: (nv x nsensordata)
 //     DsDa: (nv x nsensordata)
-//     DmDq: (nv x nM)
+//     DmDq: (nv x nC)
 //   single-letter shortcuts:
 //     inputs: q=qpos, v=qvel, a=qacc
-//     outputs: f=qfrc_inverse, s=sensordata, m=qM
+//     outputs: f=qfrc_inverse, s=sensordata, m=M
 //   notes:
 //     optionally computes mass matrix Jacobian DmDq
 //     flg_actuation specifies whether to subtract qfrc_actuator from qfrc_inverse
-public static native void mjd_inverseFD(@Const mjModel m, mjData d, @Cast("mjtNum") double eps, @Cast("mjtByte") byte flg_actuation,
+// Nullable: DfDq, DfDv, DfDa, DsDq, DsDv, DsDa, DmDq
+public static native void mjd_inverseFD(@Const mjModel m, mjData d, @Cast("mjtNum") double eps, @Cast("mjtBool") boolean flg_actuation,
                          @Cast("mjtNum*") DoublePointer DfDq, @Cast("mjtNum*") DoublePointer DfDv, @Cast("mjtNum*") DoublePointer DfDa,
                          @Cast("mjtNum*") DoublePointer DsDq, @Cast("mjtNum*") DoublePointer DsDv, @Cast("mjtNum*") DoublePointer DsDa,
                          @Cast("mjtNum*") DoublePointer DmDq);
 
 // Derivatives of mju_subQuat.
+// Nullable: Da, Db
 public static native void mjd_subQuat(@Cast("const mjtNum*") DoublePointer qa, @Cast("const mjtNum*") DoublePointer qb, @Cast("mjtNum*") DoublePointer Da, @Cast("mjtNum*") DoublePointer Db);
 
 // Derivatives of mju_quatIntegrate.
+// Nullable: Dquat, Dvel, Dscale
 public static native void mjd_quatIntegrate(@Cast("const mjtNum*") DoublePointer vel, @Cast("mjtNum") double scale,
                              @Cast("mjtNum*") DoublePointer Dquat, @Cast("mjtNum*") DoublePointer Dvel, @Cast("mjtNum*") DoublePointer Dscale);
 
-//---------------------- Plugins -------------------------------------------------------------------
+
+//---------------------------------- Plugins -------------------------------------------------------
 
 // Set default plugin definition.
 public static native void mjp_defaultPlugin(mjpPlugin plugin);
@@ -1567,64 +3948,747 @@ public static native @Const mjpPlugin mjp_getPlugin(String name, int[] slot);
 // Look up a plugin by the registered slot number that was returned by mjp_registerPlugin.
 public static native @Const mjpPlugin mjp_getPluginAtSlot(int slot);
 
-// Set default resource provider definition.
-public static native void mjp_defaultResourceProvider(mjpResourceProvider provider);
+// Set default provider definition.
+public static native void mjp_defaultProvider(mjpResourceProvider provider);
 
-// Globally register a resource provider in a thread-safe manner. The provider must have a prefix
-// that is not a sub-prefix or super-prefix of any current registered providers.  This function
-// returns a slot number > 0 on success.
-public static native int mjp_registerResourceProvider(@Const mjpResourceProvider provider);
+// Globally register a provider in a thread-safe manner. The provider must have a prefix
+// that is not a sub-prefix or super-prefix of any current registered providers.
+// Return a slot number >= 0 on success, -1 on failure.
+public static native int mjp_registerProvider(@Const mjpResourceProvider provider);
 
-// Return the number of globally registered resource providers.
-public static native int mjp_resourceProviderCount();
+// Return the number of globally registered providers.
+public static native int mjp_providerCount();
 
-// Return the resource provider with the prefix that matches against the resource name.
+// Return the provider with the prefix that matches against the resource name.
 // If no match, return NULL.
-public static native @Const mjpResourceProvider mjp_getResourceProvider(@Cast("const char*") BytePointer resource_name);
-public static native @Const mjpResourceProvider mjp_getResourceProvider(String resource_name);
+public static native @Const mjpResourceProvider mjp_findProvider(@Cast("const char*") BytePointer resource_name);
+public static native @Const mjpResourceProvider mjp_findProvider(String resource_name);
 
-// Look up a resource provider by slot number returned by mjp_registerResourceProvider.
+// Look up a provider by slot number returned by mjp_registerProvider.
 // If invalid slot number, return NULL.
-public static native @Const mjpResourceProvider mjp_getResourceProviderAtSlot(int slot);
+public static native @Const mjpResourceProvider mjp_getProviderAtSlot(int slot);
 
-//---------------------- Thread -------------------------------------------------------------------
+// Globally register a decoder. This function is thread-safe.
+// If an identical mjpDecoder is already registered, this function does nothing.
+// If a non-identical mjpDecoder with the same name is already registered, an mju_error is raised.
+public static native void mjp_registerDecoder(@Const mjpDecoder decoder);
 
-// Create a thread pool with the specified number of threads running.
-public static native mjThreadPool mju_threadPoolCreate(@Cast("size_t") long number_of_threads);
+// Set default resource decoder definition.
+public static native void mjp_defaultDecoder(mjpDecoder decoder);
 
-// Adds a thread pool to mjData and configures it for multi-threaded use.
-public static native void mju_bindThreadPool(mjData d, Pointer thread_pool);
+// Return the decoder that matches against the resource or content type.
+// If no match, return NULL.
+public static native @Const mjpDecoder mjp_findDecoder(@Const mjResource resource, @Cast("const char*") BytePointer content_type);
+public static native @Const mjpDecoder mjp_findDecoder(@Const mjResource resource, String content_type);
 
-// Enqueue a task in a thread pool.
-public static native void mju_threadPoolEnqueue(mjThreadPool thread_pool, mjTask task);
+// Globally register an encoder. This function is thread-safe.
+// If an identical mjpEncoder is already registered, this function does nothing.
+// If a non-identical mjpEncoder with the same name is already registered, an mju_error is raised.
+public static native void mjp_registerEncoder(@Const mjpEncoder encoder);
 
-// Destroy a thread pool.
-public static native void mju_threadPoolDestroy(mjThreadPool thread_pool);
+// Set default resource encoder definition.
+public static native void mjp_defaultEncoder(mjpEncoder encoder);
 
-// Initialize an mjTask.
-public static native void mju_defaultTask(mjTask task);
+// Return the encoder that matches against the content type or filename extension.
+// If no match, return NULL.
+public static native @Const mjpEncoder mjp_findEncoder(@Cast("const char*") BytePointer filename, @Cast("const char*") BytePointer content_type);
+public static native @Const mjpEncoder mjp_findEncoder(String filename, String content_type);
 
-// Wait for a task to complete.
-public static native void mju_taskJoin(mjTask task);
+// Globally register an archive provider. This function is thread-safe.
+// provider->prefix specifies the filename extension(s) (e.g. .mjz|.zip).
+public static native void mjp_registerArchiveProvider(@Const mjpResourceProvider provider);
 
-//---------------------- Sanitizer instrumentation helpers -----------------------------------------
-//
-// Most MuJoCo users can ignore these functions, the following comments are aimed primarily at
-// MuJoCo developers.
-//
-// When built and run under address sanitizer (asan), mj_markStack and mj_freeStack are instrumented
-// to detect leakage of mjData stack frames. When the compiler inlines several callees that call
-// into mark/free into the same function, this instrumentation requires that the compiler retains
-// separate mark/free calls for each original callee. The memory-clobbered asm blocks act as a
-// barrier to prevent mark/free calls from being combined under optimization.
+// Return the archive provider that matches against the resource name.
+// If no match, return NULL.
+public static native @Const mjpResourceProvider mjp_findArchiveProvider(@Cast("const char*") BytePointer resource_name);
+public static native @Const mjpResourceProvider mjp_findArchiveProvider(String resource_name);
 
-// #ifdef ADDRESS_SANITIZER
-
-
+// Return the number of globally registered archive providers.
+public static native int mjp_archiveProviderCount();
 
 
+//---------------------------------- Resources -----------------------------------------------------
 
-// #endif  // ADDRESS_SANITIZER
+// Open a resource; if the name doesn't have a prefix matching a registered provider,
+// then the OS filesystem is used.
+// Nullable: dir, vfs, error
+public static native mjResource mju_openResource(@Cast("const char*") BytePointer dir, @Cast("const char*") BytePointer name,
+                                   @Const mjVFS vfs, @Cast("char*") BytePointer error, @Cast("size_t") long nerror);
+public static native mjResource mju_openResource(String dir, String name,
+                                   @Const mjVFS vfs, @Cast("char*") ByteBuffer error, @Cast("size_t") long nerror);
+public static native mjResource mju_openResource(@Cast("const char*") BytePointer dir, @Cast("const char*") BytePointer name,
+                                   @Const mjVFS vfs, @Cast("char*") byte[] error, @Cast("size_t") long nerror);
+public static native mjResource mju_openResource(String dir, String name,
+                                   @Const mjVFS vfs, @Cast("char*") BytePointer error, @Cast("size_t") long nerror);
+public static native mjResource mju_openResource(@Cast("const char*") BytePointer dir, @Cast("const char*") BytePointer name,
+                                   @Const mjVFS vfs, @Cast("char*") ByteBuffer error, @Cast("size_t") long nerror);
+public static native mjResource mju_openResource(String dir, String name,
+                                   @Const mjVFS vfs, @Cast("char*") byte[] error, @Cast("size_t") long nerror);
+
+// Close a resource; no-op if resource is NULL.
+public static native void mju_closeResource(mjResource resource);
+
+// Set buffer to bytes read from the resource and return number of bytes in buffer;
+// return negative value if error.
+public static native int mju_readResource(mjResource resource, @Cast("const void**") PointerPointer buffer);
+public static native int mju_readResource(mjResource resource, @Cast("const void**") @ByPtrPtr Pointer buffer);
+
+// Write resource data via its provider, return bytes written or -1 on error.
+// Nullable: vfs, error
+public static native @Cast("mjtSize") long mju_writeResource(@Cast("const char*") BytePointer name, @Const Pointer buffer, @Cast("mjtSize") long nbytes,
+                                @Const mjVFS vfs, @Cast("char*") BytePointer error, @Cast("size_t") long nerror);
+public static native @Cast("mjtSize") long mju_writeResource(String name, @Const Pointer buffer, @Cast("mjtSize") long nbytes,
+                                @Const mjVFS vfs, @Cast("char*") ByteBuffer error, @Cast("size_t") long nerror);
+public static native @Cast("mjtSize") long mju_writeResource(@Cast("const char*") BytePointer name, @Const Pointer buffer, @Cast("mjtSize") long nbytes,
+                                @Const mjVFS vfs, @Cast("char*") byte[] error, @Cast("size_t") long nerror);
+public static native @Cast("mjtSize") long mju_writeResource(String name, @Const Pointer buffer, @Cast("mjtSize") long nbytes,
+                                @Const mjVFS vfs, @Cast("char*") BytePointer error, @Cast("size_t") long nerror);
+public static native @Cast("mjtSize") long mju_writeResource(@Cast("const char*") BytePointer name, @Const Pointer buffer, @Cast("mjtSize") long nbytes,
+                                @Const mjVFS vfs, @Cast("char*") ByteBuffer error, @Cast("size_t") long nerror);
+public static native @Cast("mjtSize") long mju_writeResource(String name, @Const Pointer buffer, @Cast("mjtSize") long nbytes,
+                                @Const mjVFS vfs, @Cast("char*") byte[] error, @Cast("size_t") long nerror);
+
+// For a resource with a name partitioned as {dir}{filename}, get the dir and ndir pointers.
+public static native void mju_getResourceDir(mjResource resource, @Cast("const char**") PointerPointer dir, IntPointer ndir);
+public static native void mju_getResourceDir(mjResource resource, @Cast("const char**") @ByPtrPtr BytePointer dir, IntPointer ndir);
+public static native void mju_getResourceDir(mjResource resource, @Cast("const char**") @ByPtrPtr ByteBuffer dir, IntBuffer ndir);
+public static native void mju_getResourceDir(mjResource resource, @Cast("const char**") @ByPtrPtr byte[] dir, int[] ndir);
+
+// Compare resource timestamp to provided timestamp.
+// Return 0 if timestamps match, >0 if resource is newer, <0 if resource is older.
+public static native int mju_isModifiedResource(@Const mjResource resource, @Cast("const char*") BytePointer timestamp);
+public static native int mju_isModifiedResource(@Const mjResource resource, String timestamp);
+
+// Find the decoder for a resource and return the decoded spec.
+// The caller takes ownership of the spec and is responsible for cleaning it up.
+// On failure, return NULL and write the reason to error.
+// Nullable: vfs, error
+public static native mjSpec mju_decodeResource(mjResource resource, @Cast("const char*") BytePointer content_type,
+                                 @Const mjVFS vfs, @Cast("char*") BytePointer error, int error_sz);
+public static native mjSpec mju_decodeResource(mjResource resource, String content_type,
+                                 @Const mjVFS vfs, @Cast("char*") ByteBuffer error, int error_sz);
+public static native mjSpec mju_decodeResource(mjResource resource, @Cast("const char*") BytePointer content_type,
+                                 @Const mjVFS vfs, @Cast("char*") byte[] error, int error_sz);
+public static native mjSpec mju_decodeResource(mjResource resource, String content_type,
+                                 @Const mjVFS vfs, @Cast("char*") BytePointer error, int error_sz);
+public static native mjSpec mju_decodeResource(mjResource resource, @Cast("const char*") BytePointer content_type,
+                                 @Const mjVFS vfs, @Cast("char*") ByteBuffer error, int error_sz);
+public static native mjSpec mju_decodeResource(mjResource resource, String content_type,
+                                 @Const mjVFS vfs, @Cast("char*") byte[] error, int error_sz);
+
+
+//---------------------------------- Threads -------------------------------------------------------
+
+// Create a thread pool with nthread worker threads.
+public static native void mju_threadpool(mjData d, int nthread);
+
+
+//---------------------------------- Attachment ----------------------------------------------------
+
+// Attach child to a parent; return the attached element if success or NULL otherwise.
+public static native mjsElement mjs_attach(mjsElement parent, @Const mjsElement child,
+                             @Cast("const char*") BytePointer prefix, @Cast("const char*") BytePointer suffix);
+public static native mjsElement mjs_attach(mjsElement parent, @Const mjsElement child,
+                             String prefix, String suffix);
+
+
+//---------------------------------- Tree elements -------------------------------------------------
+
+// Add child body to body; return child.
+// Nullable: def
+public static native mjsBody mjs_addBody(mjsBody body, @Const mjsDefault def);
+
+// Add site to body; return site spec.
+// Nullable: def
+public static native mjsSite mjs_addSite(mjsBody body, @Const mjsDefault def);
+
+// Add joint to body.
+// Nullable: def
+public static native mjsJoint mjs_addJoint(mjsBody body, @Const mjsDefault def);
+
+// Add freejoint to body.
+public static native mjsJoint mjs_addFreeJoint(mjsBody body);
+
+// Add geom to body.
+// Nullable: def
+public static native mjsGeom mjs_addGeom(mjsBody body, @Const mjsDefault def);
+
+// Add camera to body.
+// Nullable: def
+public static native mjsCamera mjs_addCamera(mjsBody body, @Const mjsDefault def);
+
+// Add light to body.
+// Nullable: def
+public static native mjsLight mjs_addLight(mjsBody body, @Const mjsDefault def);
+
+// Add frame to body.
+public static native mjsFrame mjs_addFrame(mjsBody body, mjsFrame parentframe);
+
+// Remove object corresponding to the given element; return 0 on success.
+public static native int mjs_delete(mjSpec spec, mjsElement element);
+
+
+//---------------------------------- Non-tree elements ---------------------------------------------
+
+// Add actuator.
+// Nullable: def
+public static native mjsActuator mjs_addActuator(mjSpec s, @Const mjsDefault def);
+
+// Add sensor.
+public static native mjsSensor mjs_addSensor(mjSpec s);
+
+// Add flex.
+public static native mjsFlex mjs_addFlex(mjSpec s);
+
+// Add flexcomp: create flex with auto-generated bodies/joints, return flex spec.
+// Nullable: type, dof, count, cellcount, spacing, scale, pos, quat, origin, file, vfs
+public static native mjsFlex mjs_makeFlex(mjsBody body, @Cast("const char*") BytePointer name, @Cast("const char*") BytePointer type, int dim,
+                            @Cast("const char*") BytePointer dof, @Const IntPointer count, @Const IntPointer cellcount,
+                            @Const DoublePointer spacing, @Const DoublePointer scale, double radius,
+                            double mass, double inertiabox, int equality, int rigid, int flatskin,
+                            int elastic2d, @Const DoublePointer pos, @Const DoublePointer quat,
+                            @Const DoublePointer origin, @Cast("const char*") BytePointer file, @Const mjVFS vfs);
+public static native mjsFlex mjs_makeFlex(mjsBody body, String name, String type, int dim,
+                            String dof, @Const IntBuffer count, @Const IntBuffer cellcount,
+                            @Const DoubleBuffer spacing, @Const DoubleBuffer scale, double radius,
+                            double mass, double inertiabox, int equality, int rigid, int flatskin,
+                            int elastic2d, @Const DoubleBuffer pos, @Const DoubleBuffer quat,
+                            @Const DoubleBuffer origin, String file, @Const mjVFS vfs);
+public static native mjsFlex mjs_makeFlex(mjsBody body, @Cast("const char*") BytePointer name, @Cast("const char*") BytePointer type, int dim,
+                            @Cast("const char*") BytePointer dof, @Const int[] count, @Const int[] cellcount,
+                            @Const double[] spacing, @Const double[] scale, double radius,
+                            double mass, double inertiabox, int equality, int rigid, int flatskin,
+                            int elastic2d, @Const double[] pos, @Const double[] quat,
+                            @Const double[] origin, @Cast("const char*") BytePointer file, @Const mjVFS vfs);
+public static native mjsFlex mjs_makeFlex(mjsBody body, String name, String type, int dim,
+                            String dof, @Const IntPointer count, @Const IntPointer cellcount,
+                            @Const DoublePointer spacing, @Const DoublePointer scale, double radius,
+                            double mass, double inertiabox, int equality, int rigid, int flatskin,
+                            int elastic2d, @Const DoublePointer pos, @Const DoublePointer quat,
+                            @Const DoublePointer origin, String file, @Const mjVFS vfs);
+public static native mjsFlex mjs_makeFlex(mjsBody body, @Cast("const char*") BytePointer name, @Cast("const char*") BytePointer type, int dim,
+                            @Cast("const char*") BytePointer dof, @Const IntBuffer count, @Const IntBuffer cellcount,
+                            @Const DoubleBuffer spacing, @Const DoubleBuffer scale, double radius,
+                            double mass, double inertiabox, int equality, int rigid, int flatskin,
+                            int elastic2d, @Const DoubleBuffer pos, @Const DoubleBuffer quat,
+                            @Const DoubleBuffer origin, @Cast("const char*") BytePointer file, @Const mjVFS vfs);
+public static native mjsFlex mjs_makeFlex(mjsBody body, String name, String type, int dim,
+                            String dof, @Const int[] count, @Const int[] cellcount,
+                            @Const double[] spacing, @Const double[] scale, double radius,
+                            double mass, double inertiabox, int equality, int rigid, int flatskin,
+                            int elastic2d, @Const double[] pos, @Const double[] quat,
+                            @Const double[] origin, String file, @Const mjVFS vfs);
+
+// Add contact pair.
+// Nullable: def
+public static native mjsPair mjs_addPair(mjSpec s, @Const mjsDefault def);
+
+// Add excluded body pair.
+public static native mjsExclude mjs_addExclude(mjSpec s);
+
+// Add equality.
+// Nullable: def
+public static native mjsEquality mjs_addEquality(mjSpec s, @Const mjsDefault def);
+
+// Add tendon.
+// Nullable: def
+public static native mjsTendon mjs_addTendon(mjSpec s, @Const mjsDefault def);
+
+// Wrap site using tendon.
+public static native mjsWrap mjs_wrapSite(mjsTendon tendon, @Cast("const char*") BytePointer name);
+public static native mjsWrap mjs_wrapSite(mjsTendon tendon, String name);
+
+// Wrap geom using tendon.
+public static native mjsWrap mjs_wrapGeom(mjsTendon tendon, @Cast("const char*") BytePointer name, @Cast("const char*") BytePointer sidesite);
+public static native mjsWrap mjs_wrapGeom(mjsTendon tendon, String name, String sidesite);
+
+// Wrap joint using tendon.
+public static native mjsWrap mjs_wrapJoint(mjsTendon tendon, @Cast("const char*") BytePointer name, double coef);
+public static native mjsWrap mjs_wrapJoint(mjsTendon tendon, String name, double coef);
+
+// Wrap pulley using tendon.
+public static native mjsWrap mjs_wrapPulley(mjsTendon tendon, double divisor);
+
+// Add numeric.
+public static native mjsNumeric mjs_addNumeric(mjSpec s);
+
+// Add text.
+public static native mjsText mjs_addText(mjSpec s);
+
+// Add tuple.
+public static native mjsTuple mjs_addTuple(mjSpec s);
+
+// Add keyframe.
+public static native mjsKey mjs_addKey(mjSpec s);
+
+// Add plugin.
+public static native mjsPlugin mjs_addPlugin(mjSpec s);
+
+// Add default.
+// Nullable: parent
+public static native mjsDefault mjs_addDefault(mjSpec s, @Cast("const char*") BytePointer classname, @Const mjsDefault parent);
+public static native mjsDefault mjs_addDefault(mjSpec s, String classname, @Const mjsDefault parent);
+
+
+//---------------------------------- Set actuator parameters ---------------------------------------
+
+// Set actuator to motor; return error if any.
+public static native @Cast("const char*") BytePointer mjs_setToMotor(mjsActuator actuator);
+
+// Set actuator to position; return error if any.
+public static native @Cast("const char*") BytePointer mjs_setToPosition(mjsActuator actuator, double kp, DoublePointer kv,
+                                    DoublePointer dampratio, DoublePointer timeconst, double inheritrange);
+public static native String mjs_setToPosition(mjsActuator actuator, double kp, DoubleBuffer kv,
+                                    DoubleBuffer dampratio, DoubleBuffer timeconst, double inheritrange);
+public static native @Cast("const char*") BytePointer mjs_setToPosition(mjsActuator actuator, double kp, double[] kv,
+                                    double[] dampratio, double[] timeconst, double inheritrange);
+
+// Set actuator to integrated velocity; return error if any.
+public static native @Cast("const char*") BytePointer mjs_setToIntVelocity(mjsActuator actuator, double kp, DoublePointer kv,
+                                       DoublePointer dampratio, DoublePointer timeconst, double inheritrange);
+public static native String mjs_setToIntVelocity(mjsActuator actuator, double kp, DoubleBuffer kv,
+                                       DoubleBuffer dampratio, DoubleBuffer timeconst, double inheritrange);
+public static native @Cast("const char*") BytePointer mjs_setToIntVelocity(mjsActuator actuator, double kp, double[] kv,
+                                       double[] dampratio, double[] timeconst, double inheritrange);
+
+// Set actuator to velocity servo; return error if any.
+public static native @Cast("const char*") BytePointer mjs_setToVelocity(mjsActuator actuator, double kv);
+
+// Set actuator to orientation servo.
+public static native @Cast("const char*") BytePointer mjs_setToOrientation(mjsActuator actuator, double kp, DoublePointer kv,
+                                       DoublePointer dampratio, int ctrlspec);
+public static native String mjs_setToOrientation(mjsActuator actuator, double kp, DoubleBuffer kv,
+                                       DoubleBuffer dampratio, int ctrlspec);
+public static native @Cast("const char*") BytePointer mjs_setToOrientation(mjsActuator actuator, double kp, double[] kv,
+                                       double[] dampratio, int ctrlspec);
+
+// Set actuator to PID controller.
+public static native @Cast("const char*") BytePointer mjs_setToPID(mjsActuator actuator, double kp, DoublePointer kv, DoublePointer dampratio,
+                               DoublePointer ki, DoublePointer imax, DoublePointer slewmax, double inheritrange,
+                               int ctrlspec);
+public static native String mjs_setToPID(mjsActuator actuator, double kp, DoubleBuffer kv, DoubleBuffer dampratio,
+                               DoubleBuffer ki, DoubleBuffer imax, DoubleBuffer slewmax, double inheritrange,
+                               int ctrlspec);
+public static native @Cast("const char*") BytePointer mjs_setToPID(mjsActuator actuator, double kp, double[] kv, double[] dampratio,
+                               double[] ki, double[] imax, double[] slewmax, double inheritrange,
+                               int ctrlspec);
+
+// Set actuator to activate damper; return error if any.
+public static native @Cast("const char*") BytePointer mjs_setToDamper(mjsActuator actuator, double kv);
+
+// Set actuator to hydraulic or pneumatic cylinder; return error if any.
+public static native @Cast("const char*") BytePointer mjs_setToCylinder(mjsActuator actuator, double timeconst,
+                                    double bias, double area, double diameter);
+
+// Set actuator to muscle; return error if any.a
+public static native @Cast("const char*") BytePointer mjs_setToMuscle(mjsActuator actuator, DoublePointer timeconst, double tausmooth,
+                                  DoublePointer range, double force, double scale, double lmin,
+                                  double lmax, double vmax, double fpmax, double fvmax);
+public static native String mjs_setToMuscle(mjsActuator actuator, DoubleBuffer timeconst, double tausmooth,
+                                  DoubleBuffer range, double force, double scale, double lmin,
+                                  double lmax, double vmax, double fpmax, double fvmax);
+public static native @Cast("const char*") BytePointer mjs_setToMuscle(mjsActuator actuator, double[] timeconst, double tausmooth,
+                                  double[] range, double force, double scale, double lmin,
+                                  double lmax, double vmax, double fpmax, double fvmax);
+
+// Set actuator to active adhesion; return error if any.
+public static native @Cast("const char*") BytePointer mjs_setToAdhesion(mjsActuator actuator, double gain);
+
+// Set actuator to DC motor; return error if any.
+// Nullable: motorconst, nominal, saturation, inductance, cogging, controller, thermal, lugre
+public static native @Cast("const char*") BytePointer mjs_setToDCMotor(mjsActuator actuator, DoublePointer motorconst, double resistance,
+                                   DoublePointer nominal, DoublePointer saturation, DoublePointer inductance,
+                                   DoublePointer cogging, DoublePointer controller, DoublePointer thermal,
+                                   DoublePointer lugre, int ctrlspec);
+public static native String mjs_setToDCMotor(mjsActuator actuator, DoubleBuffer motorconst, double resistance,
+                                   DoubleBuffer nominal, DoubleBuffer saturation, DoubleBuffer inductance,
+                                   DoubleBuffer cogging, DoubleBuffer controller, DoubleBuffer thermal,
+                                   DoubleBuffer lugre, int ctrlspec);
+public static native @Cast("const char*") BytePointer mjs_setToDCMotor(mjsActuator actuator, double[] motorconst, double resistance,
+                                   double[] nominal, double[] saturation, double[] inductance,
+                                   double[] cogging, double[] controller, double[] thermal,
+                                   double[] lugre, int ctrlspec);
+
+
+//---------------------------------- Assets --------------------------------------------------------
+
+// Add mesh.
+// Nullable: def
+public static native mjsMesh mjs_addMesh(mjSpec s, @Const mjsDefault def);
+
+// Add height field.
+public static native mjsHField mjs_addHField(mjSpec s);
+
+// Add skin.
+public static native mjsSkin mjs_addSkin(mjSpec s);
+
+// Add texture.
+// Nullable: def
+public static native mjsTexture mjs_addTexture(mjSpec s, @Const mjsDefault def);
+
+// Add material.
+// Nullable: def
+public static native mjsMaterial mjs_addMaterial(mjSpec s, @Const mjsDefault def);
+
+// Sets the vertices and normals of a mesh.
+public static native int mjs_makeMesh(mjsMesh mesh, @Cast("mjtMeshBuiltin") int builtin, DoublePointer params, int nparams);
+public static native int mjs_makeMesh(mjsMesh mesh, @Cast("mjtMeshBuiltin") int builtin, DoubleBuffer params, int nparams);
+public static native int mjs_makeMesh(mjsMesh mesh, @Cast("mjtMeshBuiltin") int builtin, double[] params, int nparams);
+
+//---------------------------------- Find and get utilities ----------------------------------------
+
+// Get spec from body.
+public static native mjSpec mjs_getSpec(@Const mjsElement element);
+
+// get spec that originally defined an element
+// contrary to mjs_getSpec, this does not change after attachment
+public static native mjSpec mjs_getOriginSpec(@Const mjsElement element);
+
+// Get compiler associated with element's origin spec.
+public static native mjsCompiler mjs_getCompiler(@Const mjsElement element);
+
+// Find spec (model asset) by name.
+public static native mjSpec mjs_findSpec(@Const mjSpec spec, @Cast("const char*") BytePointer name);
+public static native mjSpec mjs_findSpec(@Const mjSpec spec, String name);
+
+// Find body in spec by name.
+public static native mjsBody mjs_findBody(@Const mjSpec s, @Cast("const char*") BytePointer name);
+public static native mjsBody mjs_findBody(@Const mjSpec s, String name);
+
+// Find element in spec by name.
+
+
+// Find child body by name.
+public static native mjsBody mjs_findChild(@Const mjsBody body, @Cast("const char*") BytePointer name);
+public static native mjsBody mjs_findChild(@Const mjsBody body, String name);
+
+// Get parent body.
+public static native mjsBody mjs_getParent(@Const mjsElement element);
+
+// Get parent frame.
+public static native mjsFrame mjs_getFrame(@Const mjsElement element);
+
+// Find frame by name.
+public static native mjsFrame mjs_findFrame(@Const mjSpec s, @Cast("const char*") BytePointer name);
+public static native mjsFrame mjs_findFrame(@Const mjSpec s, String name);
+
+// Get default corresponding to an element.
+public static native mjsDefault mjs_getDefault(@Const mjsElement element);
+
+// Find default in model by class name.
+public static native mjsDefault mjs_findDefault(@Const mjSpec s, @Cast("const char*") BytePointer classname);
+public static native mjsDefault mjs_findDefault(@Const mjSpec s, String classname);
+
+// Get global default from model.
+public static native mjsDefault mjs_getSpecDefault(@Const mjSpec s);
+
+// Get element id.
+public static native int mjs_getId(@Const mjsElement element);
+
+// Return body's first child of given type. If recurse is nonzero, also search the body's subtree.
+
+
+// Return body's next child of the same type; return NULL if child is last.
+// If recurse is nonzero, also search the body's subtree.
+public static native mjsElement mjs_nextChild(@Const mjsBody body, @Const mjsElement child, int recurse);
+
+// Return spec's first element of selected type.
+
+
+// Return spec's next element; return NULL if element is last.
+public static native mjsElement mjs_nextElement(@Const mjSpec s, @Const mjsElement element);
+
+// Get wrapped element in tendon path.
+public static native mjsElement mjs_getWrapTarget(@Const mjsWrap wrap);
+
+// Get wrapped element side site in tendon path if it has one, nullptr otherwise.
+public static native mjsSite mjs_getWrapSideSite(@Const mjsWrap wrap);
+
+// Get divisor of mjsWrap wrapping a puller.
+public static native double mjs_getWrapDivisor(@Const mjsWrap wrap);
+
+// Get coefficient of mjsWrap wrapping a joint.
+public static native double mjs_getWrapCoef(@Const mjsWrap wrap);
+
+//---------------------------------- Attribute setters ---------------------------------------------
+
+// Set element's name; return 0 on success.
+public static native int mjs_setName(mjsElement element, @Cast("const char*") BytePointer name);
+public static native int mjs_setName(mjsElement element, String name);
+
+// Copy buffer.
+
+// Copy text to string.
+
+
+// Split text to entries and copy to string vector.
+
+// Set entry in string vector.
+
+// Append text entry to string vector.
+
+// Copy int array to vector.
+
+// Append int array to vector of arrays.
+
+// Copy float array to vector.
+
+// Append float array to vector of arrays.
+
+// Copy double array to vector.
+
+// Set plugin attributes.
+public static native void mjs_setPluginAttributes(mjsPlugin plugin, Pointer attributes);
+
+
+//---------------------------------- Attribute getters ---------------------------------------------
+
+// Get element's name.
+
+// Get string contents.
+
+
+// Get entry in string vector, or NULL if out of bounds.
+
+// Get double array contents and optionally its size.
+// Nullable: size
+
+// Get number of elements a tendon wraps.
+public static native int mjs_getWrapNum(@Const mjsTendon tendonspec);
+
+// Get mjsWrap element at position i in the tendon path.
+public static native mjsWrap mjs_getWrap(@Const mjsTendon tendonspec, int i);
+
+// Get plugin attributes.
+public static native @Const Pointer mjs_getPluginAttributes(@Const mjsPlugin plugin);
+
+
+//---------------------------------- Spec utilities ------------------------------------------------
+
+// Set element's default.
+public static native void mjs_setDefault(mjsElement element, @Const mjsDefault def);
+
+// Set element's enclosing frame; return 0 on success.
+public static native int mjs_setFrame(mjsElement dest, mjsFrame frame);
+
+// Resolve alternative orientations to quat; return error if any.
+public static native @Cast("const char*") BytePointer mjs_resolveOrientation(DoublePointer quat, @Cast("mjtByte") byte degree, @Cast("const char*") BytePointer sequence,
+                                         @Const mjsOrientation orientation);
+public static native String mjs_resolveOrientation(DoubleBuffer quat, @Cast("mjtByte") byte degree, String sequence,
+                                         @Const mjsOrientation orientation);
+public static native @Cast("const char*") BytePointer mjs_resolveOrientation(double[] quat, @Cast("mjtByte") byte degree, @Cast("const char*") BytePointer sequence,
+                                         @Const mjsOrientation orientation);
+public static native String mjs_resolveOrientation(DoublePointer quat, @Cast("mjtByte") byte degree, String sequence,
+                                         @Const mjsOrientation orientation);
+public static native @Cast("const char*") BytePointer mjs_resolveOrientation(DoubleBuffer quat, @Cast("mjtByte") byte degree, @Cast("const char*") BytePointer sequence,
+                                         @Const mjsOrientation orientation);
+public static native String mjs_resolveOrientation(double[] quat, @Cast("mjtByte") byte degree, String sequence,
+                                         @Const mjsOrientation orientation);
+
+// Fuse the static bodies of the spec with their parents; return the number fused, -1 on error.
+// Nullable: vfs
+public static native int mjs_fuseStatic(mjSpec s, @Const mjVFS vfs);
+
+// Discard the visual elements of the spec; return the number discarded, -1 on error.
+// Nullable: vfs
+public static native int mjs_discardVisual(mjSpec s, @Const mjVFS vfs);
+
+// Merge the textures and meshes of the spec which would compile to the same asset; return the number
+// merged, -1 on error.
+public static native int mjs_dedupAssets(mjSpec s);
+
+// Make the inertial which compilation infers for a body part of the spec, return 0 on success.
+// Nullable: vfs
+public static native int mjs_adoptInertial(mjsBody body, @Const mjVFS vfs);
+
+// Transform body into a frame.
+public static native mjsFrame mjs_bodyToFrame(@Cast("mjsBody**") PointerPointer body);
+public static native mjsFrame mjs_bodyToFrame(@ByPtrPtr mjsBody body);
+
+// Set user payload, overriding the existing value for the specified key if present.
+public static native void mjs_setUserValue(mjsElement element, @Cast("const char*") BytePointer key, @Const Pointer data);
+public static native void mjs_setUserValue(mjsElement element, String key, @Const Pointer data);
+
+// Set user payload, overriding the existing value for the specified key if
+// present. This version differs from mjs_setUserValue in that it takes a
+// cleanup function that will be called when the user payload is deleted.
+public static class Cleanup_Pointer extends FunctionPointer {
+    static { Loader.load(); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public    Cleanup_Pointer(Pointer p) { super(p); }
+    protected Cleanup_Pointer() { allocate(); }
+    private native void allocate();
+    public native void call(@Const Pointer arg0);
+}
+public static native void mjs_setUserValueWithCleanup(mjsElement element, @Cast("const char*") BytePointer key,
+                                       @Const Pointer data,
+                                       Cleanup_Pointer cleanup);
+public static native void mjs_setUserValueWithCleanup(mjsElement element, String key,
+                                       @Const Pointer data,
+                                       Cleanup_Pointer cleanup);
+
+// Return user payload or NULL if none found.
+public static native @Const Pointer mjs_getUserValue(mjsElement element, @Cast("const char*") BytePointer key);
+public static native @Const Pointer mjs_getUserValue(mjsElement element, String key);
+
+// Delete user payload.
+public static native void mjs_deleteUserValue(mjsElement element, @Cast("const char*") BytePointer key);
+public static native void mjs_deleteUserValue(mjsElement element, String key);
+
+// Return sensor dimension.
+public static native int mjs_sensorDim(@Const mjsSensor sensor);
+
+//---------------------------------- Element initialization  ---------------------------------------
+
+// Default spec attributes.
+public static native void mjs_defaultSpec(mjSpec spec);
+
+// Default orientation attributes.
+public static native void mjs_defaultOrientation(mjsOrientation orient);
+
+// Default body attributes.
+public static native void mjs_defaultBody(mjsBody body);
+
+// Default frame attributes.
+public static native void mjs_defaultFrame(mjsFrame frame);
+
+// Default joint attributes.
+public static native void mjs_defaultJoint(mjsJoint joint);
+
+// Default geom attributes.
+public static native void mjs_defaultGeom(mjsGeom geom);
+
+// Default site attributes.
+public static native void mjs_defaultSite(mjsSite site);
+
+// Default camera attributes.
+public static native void mjs_defaultCamera(mjsCamera camera);
+
+// Default light attributes.
+public static native void mjs_defaultLight(mjsLight light);
+
+// Default flex attributes.
+public static native void mjs_defaultFlex(mjsFlex flex);
+
+// Default mesh attributes.
+public static native void mjs_defaultMesh(mjsMesh mesh);
+
+// Default height field attributes.
+public static native void mjs_defaultHField(mjsHField hfield);
+
+// Default skin attributes.
+public static native void mjs_defaultSkin(mjsSkin skin);
+
+// Default texture attributes.
+public static native void mjs_defaultTexture(mjsTexture texture);
+
+// Default material attributes.
+public static native void mjs_defaultMaterial(mjsMaterial material);
+
+// Default pair attributes.
+public static native void mjs_defaultPair(mjsPair pair);
+
+// Default equality attributes.
+public static native void mjs_defaultEquality(mjsEquality equality);
+
+// Default tendon attributes.
+public static native void mjs_defaultTendon(mjsTendon tendon);
+
+// Default actuator attributes.
+public static native void mjs_defaultActuator(mjsActuator actuator);
+
+// Default sensor attributes.
+public static native void mjs_defaultSensor(mjsSensor sensor);
+
+// Default numeric attributes.
+public static native void mjs_defaultNumeric(mjsNumeric numeric);
+
+// Default text attributes.
+public static native void mjs_defaultText(mjsText text);
+
+// Default tuple attributes.
+public static native void mjs_defaultTuple(mjsTuple tuple);
+
+// Default keyframe attributes.
+public static native void mjs_defaultKey(mjsKey key);
+
+// Default plugin attributes.
+public static native void mjs_defaultPlugin(mjsPlugin plugin);
+
+
+//---------------------------------- Element casting -----------------------------------------------
+
+// Safely cast an element as mjsBody, or return NULL if the element is not an mjsBody.
+public static native mjsBody mjs_asBody(mjsElement element);
+
+// Safely cast an element as mjsGeom, or return NULL if the element is not an mjsGeom.
+public static native mjsGeom mjs_asGeom(mjsElement element);
+
+// Safely cast an element as mjsJoint, or return NULL if the element is not an mjsJoint.
+public static native mjsJoint mjs_asJoint(mjsElement element);
+
+// Safely cast an element as mjsSite, or return NULL if the element is not an mjsSite.
+public static native mjsSite mjs_asSite(mjsElement element);
+
+// Safely cast an element as mjsCamera, or return NULL if the element is not an mjsCamera.
+public static native mjsCamera mjs_asCamera(mjsElement element);
+
+// Safely cast an element as mjsLight, or return NULL if the element is not an mjsLight.
+public static native mjsLight mjs_asLight(mjsElement element);
+
+// Safely cast an element as mjsFrame, or return NULL if the element is not an mjsFrame.
+public static native mjsFrame mjs_asFrame(mjsElement element);
+
+// Safely cast an element as mjsActuator, or return NULL if the element is not an mjsActuator.
+public static native mjsActuator mjs_asActuator(mjsElement element);
+
+// Safely cast an element as mjsSensor, or return NULL if the element is not an mjsSensor.
+public static native mjsSensor mjs_asSensor(mjsElement element);
+
+// Safely cast an element as mjsFlex, or return NULL if the element is not an mjsFlex.
+public static native mjsFlex mjs_asFlex(mjsElement element);
+
+// Safely cast an element as mjsPair, or return NULL if the element is not an mjsPair.
+public static native mjsPair mjs_asPair(mjsElement element);
+
+// Safely cast an element as mjsEquality, or return NULL if the element is not an mjsEquality.
+public static native mjsEquality mjs_asEquality(mjsElement element);
+
+// Safely cast an element as mjsExclude, or return NULL if the element is not an mjsExclude.
+public static native mjsExclude mjs_asExclude(mjsElement element);
+
+// Safely cast an element as mjsTendon, or return NULL if the element is not an mjsTendon.
+public static native mjsTendon mjs_asTendon(mjsElement element);
+
+// Safely cast an element as mjsNumeric, or return NULL if the element is not an mjsNumeric.
+public static native mjsNumeric mjs_asNumeric(mjsElement element);
+
+// Safely cast an element as mjsText, or return NULL if the element is not an mjsText.
+public static native mjsText mjs_asText(mjsElement element);
+
+// Safely cast an element as mjsTuple, or return NULL if the element is not an mjsTuple.
+public static native mjsTuple mjs_asTuple(mjsElement element);
+
+// Safely cast an element as mjsKey, or return NULL if the element is not an mjsKey.
+public static native mjsKey mjs_asKey(mjsElement element);
+
+// Safely cast an element as mjsMesh, or return NULL if the element is not an mjsMesh.
+public static native mjsMesh mjs_asMesh(mjsElement element);
+
+// Safely cast an element as mjsHField, or return NULL if the element is not an mjsHField.
+public static native mjsHField mjs_asHField(mjsElement element);
+
+// Safely cast an element as mjsSkin, or return NULL if the element is not an mjsSkin.
+public static native mjsSkin mjs_asSkin(mjsElement element);
+
+// Safely cast an element as mjsTexture, or return NULL if the element is not an mjsTexture.
+public static native mjsTexture mjs_asTexture(mjsElement element);
+
+// Safely cast an element as mjsMaterial, or return NULL if the element is not an mjsMaterial.
+public static native mjsMaterial mjs_asMaterial(mjsElement element);
+
+// Safely cast an element as mjsPlugin, or return NULL if the element is not an mjsPlugin.
+public static native mjsPlugin mjs_asPlugin(mjsElement element);
 
 // #ifdef __cplusplus
 // #endif
@@ -1651,17 +4715,6 @@ public static native void mju_taskJoin(mjTask task);
 // #ifndef MUJOCO_MJMACRO_H_
 // #define MUJOCO_MJMACRO_H_
 
-// include asan interface header, or provide stubs for poison/unpoison macros when not using asan
-// #ifdef ADDRESS_SANITIZER
-//   #include <sanitizer/asan_interface.h>
-// #elif defined(_MSC_VER)
-//   #define ASAN_POISON_MEMORY_REGION(addr, size)
-//   #define ASAN_UNPOISON_MEMORY_REGION(addr, size)
-// #else
-//   #define ASAN_POISON_MEMORY_REGION(addr, size) ((void)(addr), (void)(size))
-//   #define ASAN_UNPOISON_MEMORY_REGION(addr, size) ((void)(addr), (void)(size))
-// #endif
-
 // max and min (use only for primitive types)
 // #define mjMAX(a, b) (((a) > (b)) ? (a) : (b))
 // #define mjMIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -1671,7 +4724,9 @@ public static native void mju_taskJoin(mjTask task);
 // #define mjENABLED(x)  (m->opt.enableflags & (x))
 
 // is actuator disabled
-// #define mjACTUATORDISABLED(i) (m->opt.disableactuator & (1 << m->actuator_group[i]))
+// #define mjACTUATORDISABLED(i)
+//   (((m->actuator_group[(i)] >= 0) && (m->actuator_group[(i)] <= 30)
+//     && (m->opt.disableactuator & (1 << m->actuator_group[(i)]))) ? 1 : 0)
 
 // annotation for functions that accept printf-like variadic arguments
 // #ifndef mjPRINTFLIKE
@@ -1683,101 +4738,6 @@ public static native void mju_taskJoin(mjTask task);
 // #endif
 
 // #endif  // MUJOCO_MJMACRO_H_
-
-
-// Parsed from mujoco/mjthread.h
-
-// Copyright 2023 DeepMind Technologies Limited
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-// #ifndef MUJOCO_INCLUDE_MJTHREAD_H_
-// #define MUJOCO_INCLUDE_MJTHREAD_H_
-
-public static final int mjMAXTHREAD = 128;        // maximum number of threads in a thread pool
-
-/** enum mjtTaskStatus */
-public static final int  // status values for mjTask
-  mjTASK_NEW = 0,              // newly created
-  mjTASK_QUEUED = 1,               // enqueued in a thread pool
-  mjTASK_COMPLETED = 2;             // completed execution
-
-// function pointer type for mjTask
-public static class mjfTask extends FunctionPointer {
-    static { Loader.load(); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public    mjfTask(Pointer p) { super(p); }
-    protected mjfTask() { allocate(); }
-    private native void allocate();
-    public native Pointer call(Pointer arg0);
-}
-
-// An opaque type representing a thread pool.
-public static class mjThreadPool_ extends Pointer {
-    static { Loader.load(); }
-    /** Default native constructor. */
-    public mjThreadPool_() { super((Pointer)null); allocate(); }
-    /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjThreadPool_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjThreadPool_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjThreadPool_ position(long position) {
-        return (mjThreadPool_)super.position(position);
-    }
-    @Override public mjThreadPool_ getPointer(long i) {
-        return new mjThreadPool_((Pointer)this).offsetAddress(i);
-    }
-
-  public native int nworker(); public native mjThreadPool_ nworker(int setter);  // number of workers in the pool
-}
-@Opaque public static class mjThreadPool extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjThreadPool() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjThreadPool(Pointer p) { super(p); }
-}
-
-public static class mjTask_ extends Pointer {
-    static { Loader.load(); }
-    /** Default native constructor. */
-    public mjTask_() { super((Pointer)null); allocate(); }
-    /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjTask_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjTask_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjTask_ position(long position) {
-        return (mjTask_)super.position(position);
-    }
-    @Override public mjTask_ getPointer(long i) {
-        return new mjTask_((Pointer)this).offsetAddress(i);
-    }
-        // a task that can be executed by a thread pool.
-  public native mjfTask func(); public native mjTask_ func(mjfTask setter);         // pointer to the function that implements the task
-  public native Pointer args(); public native mjTask_ args(Pointer setter);           // arguments to func
-  public native int status(); public native mjTask_ status(int setter);  // status of the task
-}
-@Opaque public static class mjTask extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjTask() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjTask(Pointer p) { super(p); }
-}
-
-// #endif  // MUJOCO_INCLUDE_MJTHREAD_H_
 
 
 // Parsed from mujoco/mjdata.h
@@ -1802,541 +4762,558 @@ public static class mjTask_ extends Pointer {
 // #include <stddef.h>
 // #include <stdint.h>
 
-// #include <mujoco/mjtnum.h>
+// #include <mujoco/mjtype.h>
 // #include <mujoco/mjmodel.h>
-// #include <mujoco/mjthread.h>
-
-//---------------------------------- primitive types (mjt) -----------------------------------------
-
-/** enum mjtState */
-public static final int          // state elements
-  mjSTATE_TIME          = 1<<0,   // time
-  mjSTATE_QPOS          = 1<<1,   // position
-  mjSTATE_QVEL          = 1<<2,   // velocity
-  mjSTATE_ACT           = 1<<3,   // actuator activation
-  mjSTATE_WARMSTART     = 1<<4,   // acceleration used for warmstart
-  mjSTATE_CTRL          = 1<<5,   // control
-  mjSTATE_QFRC_APPLIED  = 1<<6,   // applied generalized force
-  mjSTATE_XFRC_APPLIED  = 1<<7,   // applied Cartesian force/torque
-  mjSTATE_EQ_ACTIVE     = 1<<8,   // enable/disable constraints
-  mjSTATE_MOCAP_POS     = 1<<9,   // positions of mocap bodies
-  mjSTATE_MOCAP_QUAT    = 1<<10,  // orientations of mocap bodies
-  mjSTATE_USERDATA      = 1<<11,  // user data
-  mjSTATE_PLUGIN        = 1<<12,  // plugin state
-
-  mjNSTATE              = 13,     // number of state elements
-
-  // convenience values for commonly used state specifications
-  mjSTATE_PHYSICS       = mjSTATE_QPOS | mjSTATE_QVEL | mjSTATE_ACT,
-  mjSTATE_FULLPHYSICS   = mjSTATE_PHYSICS | mjSTATE_TIME | mjSTATE_PLUGIN,
-  mjSTATE_USER          = mjSTATE_CTRL | mjSTATE_QFRC_APPLIED | mjSTATE_XFRC_APPLIED |
-                          mjSTATE_EQ_ACTIVE | mjSTATE_MOCAP_POS | mjSTATE_MOCAP_QUAT |
-                          mjSTATE_USERDATA,
-  mjSTATE_INTEGRATION   = mjSTATE_FULLPHYSICS | mjSTATE_USER | mjSTATE_WARMSTART;
 
 
-/** enum mjtWarning */
-public static final int   // warning types
-  mjWARN_INERTIA      = 0,   // (near) singular inertia matrix
-  mjWARN_CONTACTFULL = 1,        // too many contacts in contact list
-  mjWARN_CNSTRFULL = 2,          // too many constraints
-  mjWARN_VGEOMFULL = 3,          // too many visual geoms
-  mjWARN_BADQPOS = 4,            // bad number in qpos
-  mjWARN_BADQVEL = 5,            // bad number in qvel
-  mjWARN_BADQACC = 6,            // bad number in qacc
-  mjWARN_BADCTRL = 7,            // bad number in ctrl
-
-  mjNWARNING = 8;                 // number of warnings
 
 
-/** enum mjtTimer */
-public static final int     // internal timers
-  // main api
-  mjTIMER_STEP        = 0,   // step
-  mjTIMER_FORWARD = 1,           // forward
-  mjTIMER_INVERSE = 2,           // inverse
+//------------------------------------- Contact ----------------------------------------------------
 
-  // breakdown of step/forward
-  mjTIMER_POSITION = 3,          // fwdPosition
-  mjTIMER_VELOCITY = 4,          // fwdVelocity
-  mjTIMER_ACTUATION = 5,         // fwdActuation
-  mjTIMER_CONSTRAINT = 6,        // fwdConstraint
-  mjTIMER_ADVANCE = 7,           // mj_Euler, mj_implicit
-
-  // breakdown of fwdPosition
-  mjTIMER_POS_KINEMATICS = 8,    // kinematics, com, tendon, transmission
-  mjTIMER_POS_INERTIA = 9,       // inertia computations
-  mjTIMER_POS_COLLISION = 10,     // collision detection
-  mjTIMER_POS_MAKE = 11,          // make constraints
-  mjTIMER_POS_PROJECT = 12,       // project constraints
-
-  // breakdown of mj_collision
-  mjTIMER_COL_BROAD = 13,         // broadphase
-  mjTIMER_COL_NARROW = 14,        // narrowphase
-
-  mjNTIMER = 15;                   // number of timers
-
-
-//---------------------------------- mjContact -----------------------------------------------------
-
-public static class mjContact_ extends Pointer {
+public static class mjPreContact extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjContact_() { super((Pointer)null); allocate(); }
+    public mjPreContact() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjContact_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjPreContact(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjContact_(Pointer p) { super(p); }
+    public mjPreContact(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjContact_ position(long position) {
-        return (mjContact_)super.position(position);
+    @Override public mjPreContact position(long position) {
+        return (mjPreContact)super.position(position);
     }
-    @Override public mjContact_ getPointer(long i) {
-        return new mjContact_((Pointer)this).offsetAddress(i);
+    @Override public mjPreContact getPointer(long i) {
+        return new mjPreContact((Pointer)this).offsetAddress(i);
     }
-                // result of collision detection functions
-  // contact parameters set by near-phase collision function
-  public native @Cast("mjtNum") double dist(); public native mjContact_ dist(double setter);                    // distance between nearest points; neg: penetration
-  public native @Cast("mjtNum") double pos(int i); public native mjContact_ pos(int i, double setter);
+     // contact parameters set by narrowphase collision functions
+  public native @Cast("mjtNum") double dist(); public native mjPreContact dist(double setter);
+  public native @Cast("mjtNum") double pos(int i); public native mjPreContact pos(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer pos();
+  public native @Cast("mjtNum") double normal(int i); public native mjPreContact normal(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer normal();                // contact normal of the collision
+  public native @Cast("mjtNum") double tangent(int i); public native mjPreContact tangent(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer tangent();               // first tangent direction
+}
+
+
+public static class mjContact extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjContact() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjContact(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjContact(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjContact position(long position) {
+        return (mjContact)super.position(position);
+    }
+    @Override public mjContact getPointer(long i) {
+        return new mjContact((Pointer)this).offsetAddress(i);
+    }
+        // result of collision detection functions
+  // contact parameters set by narrowphase collision function
+  public native @Cast("mjtNum") double dist(); public native mjContact dist(double setter);                    // distance between nearest points; neg: penetration
+  public native @Cast("mjtNum") double pos(int i); public native mjContact pos(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer pos();                  // position of contact point: midpoint between geoms
-  public native @Cast("mjtNum") double frame(int i); public native mjContact_ frame(int i, double setter);
+  public native @Cast("mjtNum") double frame(int i); public native mjContact frame(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer frame();                // normal is in [0-2], points from geom[0] to geom[1]
 
   // contact parameters set by mj_collideGeoms
-  public native @Cast("mjtNum") double includemargin(); public native mjContact_ includemargin(double setter);           // include if dist<includemargin=margin-gap
-  public native @Cast("mjtNum") double friction(int i); public native mjContact_ friction(int i, double setter);
+  public native @Cast("mjtNum") double includemargin(); public native mjContact includemargin(double setter);           // margin for force generation
+  public native @Cast("mjtNum") double friction(int i); public native mjContact friction(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer friction();             // tangent1, 2, spin, roll1, 2
-  public native @Cast("mjtNum") double solref(int i); public native mjContact_ solref(int i, double setter);
+  public native @Cast("mjtNum") double solref(int i); public native mjContact solref(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer solref();          // constraint solver reference, normal direction
-  public native @Cast("mjtNum") double solreffriction(int i); public native mjContact_ solreffriction(int i, double setter);
+  public native @Cast("mjtNum") double solreffriction(int i); public native mjContact solreffriction(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer solreffriction();  // constraint solver reference, friction directions
-  public native @Cast("mjtNum") double solimp(int i); public native mjContact_ solimp(int i, double setter);
+  public native @Cast("mjtNum") double solimp(int i); public native mjContact solimp(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer solimp();          // constraint solver impedance
+  public native @Cast("mjtNum") double adhesion(); public native mjContact adhesion(double setter);                // adhesive force along the contact normal
+  public native @Cast("mjtNum") double surfacevel(int i); public native mjContact surfacevel(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer surfacevel();           // surface velocity (geom[1] - geom[0]): tangent1, 2, spin
 
   // internal storage used by solver
-  public native @Cast("mjtNum") double mu(); public native mjContact_ mu(double setter);                      // friction of regularized cone, set by mj_makeConstraint
-  public native @Cast("mjtNum") double H(int i); public native mjContact_ H(int i, double setter);
-  @MemberGetter public native @Cast("mjtNum*") DoublePointer H();                   // cone Hessian, set by mj_updateConstraint
+  public native @Cast("mjtNum") double mu(); public native mjContact mu(double setter);                      // friction of regularized cone, set by mj_makeConstraint
+  public native @Cast("mjtNum") double H(int i); public native mjContact H(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer H();                   // cone Hessian, set by mj_constraintUpdate
 
   // contact descriptors set by mj_collideXXX
-  public native int dim(); public native mjContact_ dim(int setter);                     // contact space dimensionality: 1, 3, 4 or 6
-  public native int geom1(); public native mjContact_ geom1(int setter);                   // id of geom 1; deprecated, use geom[0]
-  public native int geom2(); public native mjContact_ geom2(int setter);                   // id of geom 2; deprecated, use geom[1]
-  public native int geom(int i); public native mjContact_ geom(int i, int setter);
+  public native int dim(); public native mjContact dim(int setter);                     // contact space dimensionality: 1, 3, 4 or 6
+  public native int geom1(); public native mjContact geom1(int setter);                   // id of geom 1; deprecated, use geom[0]
+  public native int geom2(); public native mjContact geom2(int setter);                   // id of geom 2; deprecated, use geom[1]
+  public native int geom(int i); public native mjContact geom(int i, int setter);
   @MemberGetter public native IntPointer geom();                 // geom ids; -1 for flex
-  public native int flex(int i); public native mjContact_ flex(int i, int setter);
+  public native int flex(int i); public native mjContact flex(int i, int setter);
   @MemberGetter public native IntPointer flex();                 // flex ids; -1 for geom
-  public native int elem(int i); public native mjContact_ elem(int i, int setter);
+  public native int elem(int i); public native mjContact elem(int i, int setter);
   @MemberGetter public native IntPointer elem();                 // element ids; -1 for geom or flex vertex
-  public native int vert(int i); public native mjContact_ vert(int i, int setter);
+  public native int vert(int i); public native mjContact vert(int i, int setter);
   @MemberGetter public native IntPointer vert();                 // vertex ids;  -1 for geom or flex element
 
   // flag set by mj_setContact or mj_instantiateContact
-  public native int exclude(); public native mjContact_ exclude(int setter);                 // 0: include, 1: in gap, 2: fused, 3: no dofs
+  public native int exclude(); public native mjContact exclude(int setter);                 // 0: include, 1: in gap, 2: fused, 3: no dofs, 4: passive
 
   // address computed by mj_instantiateContact
-  public native int efc_address(); public native mjContact_ efc_address(int setter);             // address in efc; -1: not included
-}
-@Opaque public static class mjContact extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjContact() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjContact(Pointer p) { super(p); }
+  public native int efc_address(); public native mjContact efc_address(int setter);             // address in efc; -1: not included
 }
 
 
 //---------------------------------- diagnostics ---------------------------------------------------
 
-public static class mjWarningStat_ extends Pointer {
+public static class mjWarningStat extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjWarningStat_() { super((Pointer)null); allocate(); }
+    public mjWarningStat() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjWarningStat_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjWarningStat_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjWarningStat_ position(long position) {
-        return (mjWarningStat_)super.position(position);
-    }
-    @Override public mjWarningStat_ getPointer(long i) {
-        return new mjWarningStat_((Pointer)this).offsetAddress(i);
-    }
-      // warning statistics
-  public native int lastinfo(); public native mjWarningStat_ lastinfo(int setter);          // info from last warning
-  public native int number(); public native mjWarningStat_ number(int setter);            // how many times was warning raised
-}
-@Opaque public static class mjWarningStat extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjWarningStat() { super((Pointer)null); }
+    public mjWarningStat(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjWarningStat(Pointer p) { super(p); }
-}
-
-
-public static class mjTimerStat_ extends Pointer {
-    static { Loader.load(); }
-    /** Default native constructor. */
-    public mjTimerStat_() { super((Pointer)null); allocate(); }
-    /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjTimerStat_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjTimerStat_(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjTimerStat_ position(long position) {
-        return (mjTimerStat_)super.position(position);
+    @Override public mjWarningStat position(long position) {
+        return (mjWarningStat)super.position(position);
     }
-    @Override public mjTimerStat_ getPointer(long i) {
-        return new mjTimerStat_((Pointer)this).offsetAddress(i);
+    @Override public mjWarningStat getPointer(long i) {
+        return new mjWarningStat((Pointer)this).offsetAddress(i);
     }
-        // timer statistics
-  public native @Cast("mjtNum") double duration(); public native mjTimerStat_ duration(double setter);          // cumulative duration
-  public native int number(); public native mjTimerStat_ number(int setter);            // how many times was timer called
+  // warning statistics
+  public native int lastinfo(); public native mjWarningStat lastinfo(int setter);              // info from last warning
+  public native int number(); public native mjWarningStat number(int setter);                // how many times was warning raised
 }
-@Opaque public static class mjTimerStat extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjTimerStat() { super((Pointer)null); }
+
+
+public static class mjTimerStat extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjTimerStat() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjTimerStat(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjTimerStat(Pointer p) { super(p); }
-}
-
-
-public static class mjSolverStat_ extends Pointer {
-    static { Loader.load(); }
-    /** Default native constructor. */
-    public mjSolverStat_() { super((Pointer)null); allocate(); }
-    /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjSolverStat_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjSolverStat_(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjSolverStat_ position(long position) {
-        return (mjSolverStat_)super.position(position);
+    @Override public mjTimerStat position(long position) {
+        return (mjTimerStat)super.position(position);
     }
-    @Override public mjSolverStat_ getPointer(long i) {
-        return new mjSolverStat_((Pointer)this).offsetAddress(i);
+    @Override public mjTimerStat getPointer(long i) {
+        return new mjTimerStat((Pointer)this).offsetAddress(i);
     }
-       // per-iteration solver statistics
-  public native @Cast("mjtNum") double improvement(); public native mjSolverStat_ improvement(double setter);       // cost reduction, scaled by 1/trace(M(qpos0))
-  public native @Cast("mjtNum") double gradient(); public native mjSolverStat_ gradient(double setter);          // gradient norm (primal only, scaled)
-  public native @Cast("mjtNum") double lineslope(); public native mjSolverStat_ lineslope(double setter);         // slope in linesearch
-  public native int nactive(); public native mjSolverStat_ nactive(int setter);           // number of active constraints
-  public native int nchange(); public native mjSolverStat_ nchange(int setter);           // number of constraint state changes
-  public native int neval(); public native mjSolverStat_ neval(int setter);             // number of cost evaluations in line search
-  public native int nupdate(); public native mjSolverStat_ nupdate(int setter);           // number of Cholesky updates in line search
+  // timer statistics
+  public native @Cast("mjtNum") double duration(); public native mjTimerStat duration(double setter);            // cumulative duration
+  public native int number(); public native mjTimerStat number(int setter);              // how many times was timer called
 }
-@Opaque public static class mjSolverStat extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjSolverStat() { super((Pointer)null); }
+
+
+public static class mjSolverStat extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjSolverStat() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjSolverStat(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjSolverStat(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjSolverStat position(long position) {
+        return (mjSolverStat)super.position(position);
+    }
+    @Override public mjSolverStat getPointer(long i) {
+        return new mjSolverStat((Pointer)this).offsetAddress(i);
+    }
+  // per-iteration solver statistics
+  public native @Cast("mjtNum") double improvement(); public native mjSolverStat improvement(double setter);          // cost reduction, scaled by 1/trace(M)
+  public native @Cast("mjtNum") double gradient(); public native mjSolverStat gradient(double setter);             // gradient norm (primal only, scaled)
+  public native @Cast("mjtNum") double lineslope(); public native mjSolverStat lineslope(double setter);            // slope in linesearch
+  public native int nactive(); public native mjSolverStat nactive(int setter);              // number of active constraints
+  public native int nchange(); public native mjSolverStat nchange(int setter);              // number of constraint state changes
+  public native int neval(); public native mjSolverStat neval(int setter);                // number of cost evaluations in line search
+  public native int nupdate(); public native mjSolverStat nupdate(int setter);              // number of Cholesky updates in line search
 }
 
 
 //---------------------------------- mjData --------------------------------------------------------
 
-public static class mjData_ extends Pointer {
+public static class mjData extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjData_() { super((Pointer)null); allocate(); }
+    public mjData() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjData_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjData(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjData_(Pointer p) { super(p); }
+    public mjData(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjData_ position(long position) {
-        return (mjData_)super.position(position);
+    @Override public mjData position(long position) {
+        return (mjData)super.position(position);
     }
-    @Override public mjData_ getPointer(long i) {
-        return new mjData_((Pointer)this).offsetAddress(i);
+    @Override public mjData getPointer(long i) {
+        return new mjData((Pointer)this).offsetAddress(i);
     }
 
   // constant sizes
-  public native @Cast("size_t") long narena(); public native mjData_ narena(long setter);            // size of the arena in bytes (inclusive of the stack)
-  public native @Cast("size_t") long nbuffer(); public native mjData_ nbuffer(long setter);           // size of main buffer in bytes
-  public native int nplugin(); public native mjData_ nplugin(int setter);           // number of plugin instances
+  public native @Cast("mjtSize") long narena(); public native mjData narena(long setter);            // size of the arena in bytes (inclusive of the stack)
+  public native @Cast("mjtSize") long nbuffer(); public native mjData nbuffer(long setter);           // size of main buffer in bytes
+  public native int nplugin(); public native mjData nplugin(int setter);           // number of plugin instances
 
   // stack pointer
-  public native @Cast("size_t") long pstack(); public native mjData_ pstack(long setter);            // first available mjtNum address in stack
-  public native @Cast("size_t") long pbase(); public native mjData_ pbase(long setter);             // value of pstack when mj_markStack was last called
+  public native @Cast("size_t") long pstack(); public native mjData pstack(long setter);            // first available byte in stack (mutable)
+  public native @Cast("size_t") long pbase(); public native mjData pbase(long setter);             // value of pstack when mj_markStack was last called (mutable)
 
   // arena pointer
-  public native @Cast("size_t") long parena(); public native mjData_ parena(long setter);            // first available byte in arena
+  public native @Cast("size_t") long parena(); public native mjData parena(long setter);            // first available byte in arena
 
-  // memory utilization stats
-  public native @Cast("size_t") long maxuse_stack(); public native mjData_ maxuse_stack(long setter);                      // maximum stack allocation in bytes
-  public native @Cast("size_t") long maxuse_threadstack(int i); public native mjData_ maxuse_threadstack(int i, long setter);
-  @MemberGetter public native @Cast("size_t*") SizeTPointer maxuse_threadstack();   // maximum stack allocation per thread in bytes
-  public native @Cast("size_t") long maxuse_arena(); public native mjData_ maxuse_arena(long setter);                      // maximum arena allocation in bytes
-  public native int maxuse_con(); public native mjData_ maxuse_con(int setter);                        // maximum number of contacts
-  public native int maxuse_efc(); public native mjData_ maxuse_efc(int setter);                        // maximum number of scalar constraints
+  // threading
+  public native @Cast("uintptr_t") long threadpool(); public native mjData threadpool(long setter);      // thread pool pointer
+  public native @Cast("mjtBool") boolean threadlock(); public native mjData threadlock(boolean setter);        // disable stack freeing during threaded execution
 
-  // diagnostics
-  public native @ByRef mjWarningStat warning(int i); public native mjData_ warning(int i, mjWarningStat setter);
-  @MemberGetter public native mjWarningStat warning();  // warning statistics
-  public native @ByRef mjTimerStat timer(int i); public native mjData_ timer(int i, mjTimerStat setter);
-  @MemberGetter public native mjTimerStat timer();      // timer statistics
+  // memory utilization statistics
+  public native @Cast("mjtSize") long maxuse_stack(); public native mjData maxuse_stack(long setter);                       // maximum stack allocation in bytes (mutable)
+  public native @Cast("mjtSize") long maxuse_arena(); public native mjData maxuse_arena(long setter);                       // maximum arena allocation in bytes
+  public native int maxuse_con(); public native mjData maxuse_con(int setter);                         // maximum number of contacts
+  public native int maxuse_efc(); public native mjData maxuse_efc(int setter);                         // maximum number of scalar constraints
 
   // solver statistics
-  public native @ByRef mjSolverStat solver(int i); public native mjData_ solver(int i, mjSolverStat setter);
+  public native @ByRef mjSolverStat solver(int i); public native mjData solver(int i, mjSolverStat setter);
   @MemberGetter public native mjSolverStat solver();  // solver statistics per island, per iteration
-  public native int solver_nisland(); public native mjData_ solver_nisland(int setter);           // number of islands processed by solver
-  public native int solver_niter(int i); public native mjData_ solver_niter(int i, int setter);
-  @MemberGetter public native IntPointer solver_niter();  // number of solver iterations, per island
-  public native int solver_nnz(int i); public native mjData_ solver_nnz(int i, int setter);
-  @MemberGetter public native IntPointer solver_nnz();    // number of non-zeros in Hessian or efc_AR, per island
-  public native @Cast("mjtNum") double solver_fwdinv(int i); public native mjData_ solver_fwdinv(int i, double setter);
-  @MemberGetter public native @Cast("mjtNum*") DoublePointer solver_fwdinv();         // forward-inverse comparison: qfrc, efc
+  public native int solver_niter(int i); public native mjData solver_niter(int i, int setter);
+  @MemberGetter public native IntPointer solver_niter();      // number of solver iterations, per island
+  public native int solver_nnz(int i); public native mjData solver_nnz(int i, int setter);
+  @MemberGetter public native IntPointer solver_nnz();        // number of nonzeros in solver matrix, per island
+  public native @Cast("mjtNum") double solver_fwdinv(int i); public native mjData solver_fwdinv(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer solver_fwdinv();             // forward-inverse comparison: qfrc, efc
+
+  // diagnostics
+  public native @ByRef mjWarningStat warning(int i); public native mjData warning(int i, mjWarningStat setter);
+  @MemberGetter public native mjWarningStat warning();          // warning statistics (mutable)
+  public native @ByRef mjTimerStat timer(int i); public native mjData timer(int i, mjTimerStat setter);
+  @MemberGetter public native mjTimerStat timer();              // timer statistics
 
   // variable sizes
-  public native int ne(); public native mjData_ ne(int setter);                // number of equality constraints
-  public native int nf(); public native mjData_ nf(int setter);                // number of friction constraints
-  public native int nl(); public native mjData_ nl(int setter);                // number of limit constraints
-  public native int nefc(); public native mjData_ nefc(int setter);              // number of constraints
-  public native int nnzJ(); public native mjData_ nnzJ(int setter);              // number of non-zeros in constraint Jacobian
-  public native int ncon(); public native mjData_ ncon(int setter);              // number of detected contacts
-  public native int nisland(); public native mjData_ nisland(int setter);           // number of detected constraint islands
+  public native int ncon(); public native mjData ncon(int setter);              // number of detected contacts
+  public native int ne(); public native mjData ne(int setter);                // number of equality constraints
+  public native int nf(); public native mjData nf(int setter);                // number of friction constraints
+  public native int nl(); public native mjData nl(int setter);                // number of limit constraints
+  public native int nefc(); public native mjData nefc(int setter);              // number of constraints
+  public native int nJ(); public native mjData nJ(int setter);                // number of non-zeros in constraint Jacobian
+
+  // effective metric: per-step activity flag and sizes, set by mj_effBuild
+  public native int efm_active(); public native mjData efm_active(int setter);        // effective metric M+K: 0 off, 1 on, 2 on with general flex CSR
+  public native int nefmK(); public native mjData nefmK(int setter);             // number of non-zeros in effective-stiffness CSR
+  public native int nefmcon(); public native mjData nefmcon(int setter);           // packed length of the contact rank-1 rows
+  public native int nefmT(); public native mjData nefmT(int setter);             // number of tendons with terms in the metric
+  public native int nefmA(); public native mjData nefmA(int setter);             // number of actuators with terms in the metric
+  public native int nefmdof(); public native mjData nefmdof(int setter);           // number of covered vertex triples in the effective metric
+  public native int nefmL(); public native mjData nefmL(int setter);             // size of efm_L (packed Cholesky factor or island lists)
+
+  // variable sizes, continued
+  public native int nY(); public native mjData nY(int setter);                // number of non-zeros in constraint inverse inertia square root
+  public native int nA(); public native mjData nA(int setter);                // number of non-zeros in constraint inverse inertia matrix
+  public native int nisland(); public native mjData nisland(int setter);           // number of detected constraint islands
+  public native int nidof(); public native mjData nidof(int setter);             // number of dofs in all islands
+  public native int ntree_awake(); public native mjData ntree_awake(int setter);       // number of awake trees
+  public native int nbody_awake(); public native mjData nbody_awake(int setter);       // number of awake dynamic and static bodies
+  public native int nparent_awake(); public native mjData nparent_awake(int setter);     // number of bodies with awake parents
+  public native int nv_awake(); public native mjData nv_awake(int setter);          // number of awake dofs
+
+  // flags marking lazily evaluated stages
+  public native @Cast("mjtBool") boolean flg_energypos(); public native mjData flg_energypos(boolean setter);     // has mj_energyPos been called
+  public native @Cast("mjtBool") boolean flg_energyvel(); public native mjData flg_energyvel(boolean setter);     // has mj_energyVel been called
+  public native @Cast("mjtBool") boolean flg_subtreevel(); public native mjData flg_subtreevel(boolean setter);    // has mj_subtreeVel been called
+  public native @Cast("mjtBool") boolean flg_rnepost(); public native mjData flg_rnepost(boolean setter);       // has mj_rnePostConstraint been called
 
   // global properties
-  public native @Cast("mjtNum") double time(); public native mjData_ time(double setter);              // simulation time
-  public native @Cast("mjtNum") double energy(int i); public native mjData_ energy(int i, double setter);
+  public native @Cast("mjtNum") double time(); public native mjData time(double setter);              // simulation time
+  public native @Cast("mjtNum") double energy(int i); public native mjData energy(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer energy();         // potential, kinetic energy
 
   //-------------------- end of info header
 
   // buffers
-  public native Pointer buffer(); public native mjData_ buffer(Pointer setter);            // main buffer; all pointers point in it                (nbuffer bytes)
-  public native Pointer arena(); public native mjData_ arena(Pointer setter);             // arena+stack buffer                     (nstack*sizeof(mjtNum) bytes)
+  public native Pointer buffer(); public native mjData buffer(Pointer setter);            // main buffer; all pointers point in it            (nbuffer bytes)
+  public native Pointer arena(); public native mjData arena(Pointer setter);             // arena+stack buffer                               (narena bytes)
 
   //-------------------- main inputs and outputs of the computation
 
   // state
-  public native @Cast("mjtNum*") DoublePointer qpos(); public native mjData_ qpos(DoublePointer setter);              // position                                         (nq x 1)
-  public native @Cast("mjtNum*") DoublePointer qvel(); public native mjData_ qvel(DoublePointer setter);              // velocity                                         (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer act(); public native mjData_ act(DoublePointer setter);               // actuator activation                              (na x 1)
-  public native @Cast("mjtNum*") DoublePointer qacc_warmstart(); public native mjData_ qacc_warmstart(DoublePointer setter);    // acceleration used for warmstart                  (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer plugin_state(); public native mjData_ plugin_state(DoublePointer setter);      // plugin state                                     (npluginstate x 1)
+  public native @Cast("mjtNum*") DoublePointer qpos(); public native mjData qpos(DoublePointer setter);              // position                                         (nq x 1)
+  public native @Cast("mjtNum*") DoublePointer qvel(); public native mjData qvel(DoublePointer setter);              // velocity                                         (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer act(); public native mjData act(DoublePointer setter);               // actuator activation                              (na x 1)
+  public native @Cast("mjtNum*") DoublePointer history(); public native mjData history(DoublePointer setter);           // history buffer                                   (nhistory x 1)
+  public native @Cast("mjtNum*") DoublePointer plastic(); public native mjData plastic(DoublePointer setter);           // plastic state                                    (nplastic x 1)
+  public native @Cast("mjtNum*") DoublePointer qacc_warmstart(); public native mjData qacc_warmstart(DoublePointer setter);    // acceleration used for warmstart                  (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer plugin_state(); public native mjData plugin_state(DoublePointer setter);      // plugin state                                     (npluginstate x 1)
 
   // control
-  public native @Cast("mjtNum*") DoublePointer ctrl(); public native mjData_ ctrl(DoublePointer setter);              // control                                          (nu x 1)
-  public native @Cast("mjtNum*") DoublePointer qfrc_applied(); public native mjData_ qfrc_applied(DoublePointer setter);      // applied generalized force                        (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer xfrc_applied(); public native mjData_ xfrc_applied(DoublePointer setter);      // applied Cartesian force/torque                   (nbody x 6)
-  public native @Cast("mjtByte*") BytePointer eq_active(); public native mjData_ eq_active(BytePointer setter);        // enable/disable constraints                       (neq x 1)
+  public native @Cast("mjtNum*") DoublePointer ctrl(); public native mjData ctrl(DoublePointer setter);              // control                                          (nu x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_applied(); public native mjData qfrc_applied(DoublePointer setter);      // applied generalized force                        (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer xfrc_applied(); public native mjData xfrc_applied(DoublePointer setter);      // applied Cartesian force/torque                   (nbody x 6)
+  public native @Cast("mjtBool*") BoolPointer eq_active(); public native mjData eq_active(BoolPointer setter);        // enable/disable constraints                       (neq x 1)
 
   // mocap data
-  public native @Cast("mjtNum*") DoublePointer mocap_pos(); public native mjData_ mocap_pos(DoublePointer setter);         // positions of mocap bodies                        (nmocap x 3)
-  public native @Cast("mjtNum*") DoublePointer mocap_quat(); public native mjData_ mocap_quat(DoublePointer setter);        // orientations of mocap bodies                     (nmocap x 4)
+  public native @Cast("mjtNum*") DoublePointer mocap_pos(); public native mjData mocap_pos(DoublePointer setter);         // positions of mocap bodies                        (nmocap x 3)
+  public native @Cast("mjtNum*") DoublePointer mocap_quat(); public native mjData mocap_quat(DoublePointer setter);        // orientations of mocap bodies                     (nmocap x 4)
 
   // dynamics
-  public native @Cast("mjtNum*") DoublePointer qacc(); public native mjData_ qacc(DoublePointer setter);              // acceleration                                     (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer act_dot(); public native mjData_ act_dot(DoublePointer setter);           // time-derivative of actuator activation           (na x 1)
+  public native @Cast("mjtNum*") DoublePointer qacc(); public native mjData qacc(DoublePointer setter);              // acceleration                                     (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer act_dot(); public native mjData act_dot(DoublePointer setter);           // time-derivative of actuator activation           (na x 1)
 
   // user data
-  public native @Cast("mjtNum*") DoublePointer userdata(); public native mjData_ userdata(DoublePointer setter);          // user data, not touched by engine                 (nuserdata x 1)
+  public native @Cast("mjtNum*") DoublePointer userdata(); public native mjData userdata(DoublePointer setter);          // user data, not touched by engine                 (nuserdata x 1)
 
   // sensors
-  public native @Cast("mjtNum*") DoublePointer sensordata(); public native mjData_ sensordata(DoublePointer setter);        // sensor data array                                (nsensordata x 1)
+  public native @Cast("mjtNum*") DoublePointer sensordata(); public native mjData sensordata(DoublePointer setter);        // sensor data array                                (nsensordata x 1)
+
+  // sleep state
+  public native IntPointer tree_asleep(); public native mjData tree_asleep(IntPointer setter);       // <0: awake; >=0: index cycle of sleeping trees    (ntree x 1)
 
   // plugins
-  public native IntPointer plugin(); public native mjData_ plugin(IntPointer setter);         // copy of m->plugin, required for deletion         (nplugin x 1)
-  public native @Cast("uintptr_t*") SizeTPointer plugin_data(); public native mjData_ plugin_data(SizeTPointer setter);    // pointer to plugin-managed data structure         (nplugin x 1)
+  public native IntPointer plugin(); public native mjData plugin(IntPointer setter);         // copy of m->plugin, required for deletion         (nplugin x 1)
+  public native @Cast("uintptr_t*") SizeTPointer plugin_data(); public native mjData plugin_data(SizeTPointer setter);    // pointer to plugin-managed data structure         (nplugin x 1)
 
   //-------------------- POSITION dependent
 
   // computed by mj_fwdPosition/mj_kinematics
-  public native @Cast("mjtNum*") DoublePointer xpos(); public native mjData_ xpos(DoublePointer setter);              // Cartesian position of body frame                 (nbody x 3)
-  public native @Cast("mjtNum*") DoublePointer xquat(); public native mjData_ xquat(DoublePointer setter);             // Cartesian orientation of body frame              (nbody x 4)
-  public native @Cast("mjtNum*") DoublePointer xmat(); public native mjData_ xmat(DoublePointer setter);              // Cartesian orientation of body frame              (nbody x 9)
-  public native @Cast("mjtNum*") DoublePointer xipos(); public native mjData_ xipos(DoublePointer setter);             // Cartesian position of body com                   (nbody x 3)
-  public native @Cast("mjtNum*") DoublePointer ximat(); public native mjData_ ximat(DoublePointer setter);             // Cartesian orientation of body inertia            (nbody x 9)
-  public native @Cast("mjtNum*") DoublePointer xanchor(); public native mjData_ xanchor(DoublePointer setter);           // Cartesian position of joint anchor               (njnt x 3)
-  public native @Cast("mjtNum*") DoublePointer xaxis(); public native mjData_ xaxis(DoublePointer setter);             // Cartesian joint axis                             (njnt x 3)
-  public native @Cast("mjtNum*") DoublePointer geom_xpos(); public native mjData_ geom_xpos(DoublePointer setter);         // Cartesian geom position                          (ngeom x 3)
-  public native @Cast("mjtNum*") DoublePointer geom_xmat(); public native mjData_ geom_xmat(DoublePointer setter);         // Cartesian geom orientation                       (ngeom x 9)
-  public native @Cast("mjtNum*") DoublePointer site_xpos(); public native mjData_ site_xpos(DoublePointer setter);         // Cartesian site position                          (nsite x 3)
-  public native @Cast("mjtNum*") DoublePointer site_xmat(); public native mjData_ site_xmat(DoublePointer setter);         // Cartesian site orientation                       (nsite x 9)
-  public native @Cast("mjtNum*") DoublePointer cam_xpos(); public native mjData_ cam_xpos(DoublePointer setter);          // Cartesian camera position                        (ncam x 3)
-  public native @Cast("mjtNum*") DoublePointer cam_xmat(); public native mjData_ cam_xmat(DoublePointer setter);          // Cartesian camera orientation                     (ncam x 9)
-  public native @Cast("mjtNum*") DoublePointer light_xpos(); public native mjData_ light_xpos(DoublePointer setter);        // Cartesian light position                         (nlight x 3)
-  public native @Cast("mjtNum*") DoublePointer light_xdir(); public native mjData_ light_xdir(DoublePointer setter);        // Cartesian light direction                        (nlight x 3)
+  public native @Cast("mjtNum*") DoublePointer xpos(); public native mjData xpos(DoublePointer setter);              // Cartesian position of body frame                 (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer xquat(); public native mjData xquat(DoublePointer setter);             // Cartesian orientation of body frame              (nbody x 4)
+  public native @Cast("mjtNum*") DoublePointer xmat(); public native mjData xmat(DoublePointer setter);              // Cartesian orientation of body frame              (nbody x 9)
+  public native @Cast("mjtNum*") DoublePointer xipos(); public native mjData xipos(DoublePointer setter);             // Cartesian position of body com                   (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer xiquat(); public native mjData xiquat(DoublePointer setter);            // Cartesian orientation of body inertia            (nbody x 4)
+  public native @Cast("mjtNum*") DoublePointer ximat(); public native mjData ximat(DoublePointer setter);             // Cartesian orientation of body inertia            (nbody x 9)
+  public native @Cast("mjtNum*") DoublePointer xanchor(); public native mjData xanchor(DoublePointer setter);           // Cartesian position of joint anchor               (njnt x 3)
+  public native @Cast("mjtNum*") DoublePointer xaxis(); public native mjData xaxis(DoublePointer setter);             // Cartesian joint axis                             (njnt x 3)
+  public native @Cast("mjtNum*") DoublePointer geom_xpos(); public native mjData geom_xpos(DoublePointer setter);         // Cartesian geom position                          (ngeom x 3)
+  public native @Cast("mjtNum*") DoublePointer geom_xquat(); public native mjData geom_xquat(DoublePointer setter);        // Cartesian geom orientation                       (ngeom x 4)
+  public native @Cast("mjtNum*") DoublePointer geom_xmat(); public native mjData geom_xmat(DoublePointer setter);         // Cartesian geom orientation                       (ngeom x 9)
+  public native @Cast("mjtNum*") DoublePointer site_xpos(); public native mjData site_xpos(DoublePointer setter);         // Cartesian site position                          (nsite x 3)
+  public native @Cast("mjtNum*") DoublePointer site_xquat(); public native mjData site_xquat(DoublePointer setter);        // Cartesian site orientation                       (nsite x 4)
+  public native @Cast("mjtNum*") DoublePointer site_xmat(); public native mjData site_xmat(DoublePointer setter);         // Cartesian site orientation                       (nsite x 9)
+  public native @Cast("mjtNum*") DoublePointer cam_xpos(); public native mjData cam_xpos(DoublePointer setter);          // Cartesian camera position                        (ncam x 3)
+  public native @Cast("mjtNum*") DoublePointer cam_xmat(); public native mjData cam_xmat(DoublePointer setter);          // Cartesian camera orientation                     (ncam x 9)
+  public native @Cast("mjtNum*") DoublePointer light_xpos(); public native mjData light_xpos(DoublePointer setter);        // Cartesian light position                         (nlight x 3)
+  public native @Cast("mjtNum*") DoublePointer light_xdir(); public native mjData light_xdir(DoublePointer setter);        // Cartesian light direction                        (nlight x 3)
 
   // computed by mj_fwdPosition/mj_comPos
-  public native @Cast("mjtNum*") DoublePointer subtree_com(); public native mjData_ subtree_com(DoublePointer setter);       // center of mass of each subtree                   (nbody x 3)
-  public native @Cast("mjtNum*") DoublePointer cdof(); public native mjData_ cdof(DoublePointer setter);              // com-based motion axis of each dof (rot:lin)      (nv x 6)
-  public native @Cast("mjtNum*") DoublePointer cinert(); public native mjData_ cinert(DoublePointer setter);            // com-based body inertia and mass                  (nbody x 10)
+  public native @Cast("mjtNum*") DoublePointer subtree_com(); public native mjData subtree_com(DoublePointer setter);       // center of mass of each subtree                   (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer cdof(); public native mjData cdof(DoublePointer setter);              // com-based motion axis of each dof (rot:lin)      (nv x 6)
+  public native @Cast("mjtNum*") DoublePointer cinert(); public native mjData cinert(DoublePointer setter);            // com-based body inertia and mass                  (nbody x 10)
 
   // computed by mj_fwdPosition/mj_flex
-  public native @Cast("mjtNum*") DoublePointer flexvert_xpos(); public native mjData_ flexvert_xpos(DoublePointer setter);     // Cartesian flex vertex positions                  (nflexvert x 3)
-  public native @Cast("mjtNum*") DoublePointer flexelem_aabb(); public native mjData_ flexelem_aabb(DoublePointer setter);     // flex element bounding boxes (center, size)       (nflexelem x 6)
-  public native IntPointer flexedge_J_rownnz(); public native mjData_ flexedge_J_rownnz(IntPointer setter); // number of non-zeros in Jacobian row              (nflexedge x 1)
-  public native IntPointer flexedge_J_rowadr(); public native mjData_ flexedge_J_rowadr(IntPointer setter); // row start address in colind array                (nflexedge x 1)
-  public native IntPointer flexedge_J_colind(); public native mjData_ flexedge_J_colind(IntPointer setter); // column indices in sparse Jacobian                (nflexedge x nv)
-  public native @Cast("mjtNum*") DoublePointer flexedge_J(); public native mjData_ flexedge_J(DoublePointer setter);        // flex edge Jacobian                               (nflexedge x nv)
-  public native @Cast("mjtNum*") DoublePointer flexedge_length(); public native mjData_ flexedge_length(DoublePointer setter);   // flex edge lengths                                (nflexedge x 1)
+  public native @Cast("mjtNum*") DoublePointer flexvert_xpos(); public native mjData flexvert_xpos(DoublePointer setter);      // Cartesian flex vertex positions                (nflexvert x 3)
+  public native @Cast("mjtNum*") DoublePointer flexelem_aabb(); public native mjData flexelem_aabb(DoublePointer setter);      // flex element bounding boxes (center, size)     (nflexelem x 6)
+  public native @Cast("mjtNum*") DoublePointer flexelem_krot(); public native mjData flexelem_krot(DoublePointer setter);      // corotated element stiffness (implicit only)    (nflexstiffness x 1)
+  public native @Cast("mjtBool*") BoolPointer flex_hessian_valid(); public native mjData flex_hessian_valid(BoolPointer setter); // Cartesian stretch Hessian cache is current     (nflex x 1)
+  public native @Cast("mjtNum*") DoublePointer flexvert_hessian(); public native mjData flexvert_hessian(DoublePointer setter);   // symmetric diagonal Hessian blocks              (nflexvert x 6)
+  public native @Cast("mjtNum*") DoublePointer flexedge_hessian(); public native mjData flexedge_hessian(DoublePointer setter);   // oriented off-diagonal Hessian blocks           (nflexedge x 9)
+  public native @Cast("mjtNum*") DoublePointer flexedge_J(); public native mjData flexedge_J(DoublePointer setter);         // flex edge Jacobian                             (nJfe x 1)
+  public native @Cast("mjtNum*") DoublePointer flexedge_length(); public native mjData flexedge_length(DoublePointer setter);    // flex edge lengths                              (nflexedge x 1)
+  public native @Cast("mjtNum*") DoublePointer bvh_aabb_dyn(); public native mjData bvh_aabb_dyn(DoublePointer setter);       // global bounding box (center, size)             (nbvhdynamic x 6)
+
+  // AL contact state carried across steps (flag ipc, not in mjtState)
+  public native @Cast("mjtNum*") DoublePointer flexvert_lambda(); public native mjData flexvert_lambda(DoublePointer setter);    // flex contact multiplier                        (nflexvert x 1)
+  public native IntPointer flexvert_conage(); public native mjData flexvert_conage(IntPointer setter);    // flex contact age: <0 loaded, >0 steps since    (nflexvert x 1)
 
   // computed by mj_fwdPosition/mj_tendon
-  public native IntPointer ten_wrapadr(); public native mjData_ ten_wrapadr(IntPointer setter);       // start address of tendon's path                   (ntendon x 1)
-  public native IntPointer ten_wrapnum(); public native mjData_ ten_wrapnum(IntPointer setter);       // number of wrap points in path                    (ntendon x 1)
-  public native IntPointer ten_J_rownnz(); public native mjData_ ten_J_rownnz(IntPointer setter);      // number of non-zeros in Jacobian row              (ntendon x 1)
-  public native IntPointer ten_J_rowadr(); public native mjData_ ten_J_rowadr(IntPointer setter);      // row start address in colind array                (ntendon x 1)
-  public native IntPointer ten_J_colind(); public native mjData_ ten_J_colind(IntPointer setter);      // column indices in sparse Jacobian                (ntendon x nv)
-  public native @Cast("mjtNum*") DoublePointer ten_J(); public native mjData_ ten_J(DoublePointer setter);             // tendon Jacobian                                  (ntendon x nv)
-  public native @Cast("mjtNum*") DoublePointer ten_length(); public native mjData_ ten_length(DoublePointer setter);        // tendon lengths                                   (ntendon x 1)
-  public native IntPointer wrap_obj(); public native mjData_ wrap_obj(IntPointer setter);          // geom id; -1: site; -2: pulley                    (nwrap*2 x 1)
-  public native @Cast("mjtNum*") DoublePointer wrap_xpos(); public native mjData_ wrap_xpos(DoublePointer setter);         // Cartesian 3D points in all path                  (nwrap*2 x 3)
+  public native IntPointer ten_wrapadr(); public native mjData ten_wrapadr(IntPointer setter);       // start address of tendon's path                   (ntendon x 1)
+  public native IntPointer ten_wrapnum(); public native mjData ten_wrapnum(IntPointer setter);       // number of wrap points in path                    (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer ten_J(); public native mjData ten_J(DoublePointer setter);             // tendon Jacobian                                  (nJten x 1)
+  public native @Cast("mjtNum*") DoublePointer ten_length(); public native mjData ten_length(DoublePointer setter);        // tendon lengths                                   (ntendon x 1)
+  public native IntPointer wrap_obj(); public native mjData wrap_obj(IntPointer setter);          // geom id; -1: site; -2: pulley                    (nwrap x 2)
+  public native @Cast("mjtNum*") DoublePointer wrap_xpos(); public native mjData wrap_xpos(DoublePointer setter);         // Cartesian 3D points in all paths                 (nwrap x 6)
 
   // computed by mj_fwdPosition/mj_transmission
-  public native @Cast("mjtNum*") DoublePointer actuator_length(); public native mjData_ actuator_length(DoublePointer setter);   // actuator lengths                                 (nu x 1)
-  public native @Cast("mjtNum*") DoublePointer actuator_moment(); public native mjData_ actuator_moment(DoublePointer setter);   // actuator moments                                 (nu x nv)
+  public native @Cast("mjtNum*") DoublePointer actuator_length(); public native mjData actuator_length(DoublePointer setter);   // actuator lengths, one per force output           (nout x 1)
+  public native IntPointer moment_rownnz(); public native mjData moment_rownnz(IntPointer setter);     // number of non-zeros in actuator_moment row       (nout x 1)
+  public native IntPointer moment_rowadr(); public native mjData moment_rowadr(IntPointer setter);     // row start address in colind array                (nout x 1)
+  public native IntPointer moment_colind(); public native mjData moment_colind(IntPointer setter);     // column indices in sparse Jacobian                (nJmom x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_moment(); public native mjData actuator_moment(DoublePointer setter);   // actuator moments                                 (nJmom x 1)
 
-  // computed by mj_fwdPosition/mj_crb
-  public native @Cast("mjtNum*") DoublePointer crb(); public native mjData_ crb(DoublePointer setter);               // com-based composite inertia and mass             (nbody x 10)
-  public native @Cast("mjtNum*") DoublePointer qM(); public native mjData_ qM(DoublePointer setter);                // total inertia (sparse)                           (nM x 1)
+  // computed by mj_fwdPosition/mj_makeM
+  public native @Cast("mjtNum*") DoublePointer crb(); public native mjData crb(DoublePointer setter);               // com-based composite inertia and mass             (nbody x 10)
+  public native @Cast("mjtNum*") DoublePointer M(); public native mjData M(DoublePointer setter);                 // inertia (sparse)                                 (nC x 1)
 
   // computed by mj_fwdPosition/mj_factorM
-  public native @Cast("mjtNum*") DoublePointer qLD(); public native mjData_ qLD(DoublePointer setter);               // L'*D*L factorization of M (sparse)               (nM x 1)
-  public native @Cast("mjtNum*") DoublePointer qLDiagInv(); public native mjData_ qLDiagInv(DoublePointer setter);         // 1/diag(D)                                        (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer qLDiagSqrtInv(); public native mjData_ qLDiagSqrtInv(DoublePointer setter);     // 1/sqrt(diag(D))                                  (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qLD(); public native mjData qLD(DoublePointer setter);               // L'*D*L factorization of M (sparse)               (nC x 1)
+  public native @Cast("mjtNum*") DoublePointer qLDiagInv(); public native mjData qLDiagInv(DoublePointer setter);         // 1/diag(D)                                        (nv x 1)
 
-  // computed by mj_collisionTree
-  public native @Cast("mjtNum*") DoublePointer bvh_aabb_dyn(); public native mjData_ bvh_aabb_dyn(DoublePointer setter);     // global bounding box (center, size)               (nbvhdynamic x 6)
-  public native @Cast("mjtByte*") BytePointer bvh_active(); public native mjData_ bvh_active(BytePointer setter);       // volume has been added to collisions              (nbvh x 1)
+  // computed by mj_collision/mj_collideTree
+  public native @Cast("mjtBool*") BoolPointer bvh_active(); public native mjData bvh_active(BoolPointer setter);       // was bounding volume checked for collision        (nbvh x 1)
+
+  // computed by mj_updateSleep
+  public native IntPointer tree_awake(); public native mjData tree_awake(IntPointer setter);        // is tree awake; 0: asleep; 1: awake               (ntree x 1)
+  public native IntPointer body_awake(); public native mjData body_awake(IntPointer setter);        // body sleep state (mjtSleepState)                 (nbody x 1)
+  public native IntPointer body_awake_ind(); public native mjData body_awake_ind(IntPointer setter);    // indices of awake and static bodies               (nbody x 1)
+  public native IntPointer parent_awake_ind(); public native mjData parent_awake_ind(IntPointer setter);  // indices of bodies with awake or static parents   (nbody x 1)
+  public native IntPointer dof_awake_ind(); public native mjData dof_awake_ind(IntPointer setter);     // indices of awake dofs                            (nv x 1)
 
   //-------------------- POSITION, VELOCITY dependent
 
   // computed by mj_fwdVelocity
-  public native @Cast("mjtNum*") DoublePointer flexedge_velocity(); public native mjData_ flexedge_velocity(DoublePointer setter); // flex edge velocities                             (nflexedge x 1)
-  public native @Cast("mjtNum*") DoublePointer ten_velocity(); public native mjData_ ten_velocity(DoublePointer setter);      // tendon velocities                                (ntendon x 1)
-  public native @Cast("mjtNum*") DoublePointer actuator_velocity(); public native mjData_ actuator_velocity(DoublePointer setter); // actuator velocities                              (nu x 1)
+  public native @Cast("mjtNum*") DoublePointer flexedge_velocity(); public native mjData flexedge_velocity(DoublePointer setter); // flex edge velocities                             (nflexedge x 1)
+  public native @Cast("mjtNum*") DoublePointer ten_velocity(); public native mjData ten_velocity(DoublePointer setter);      // tendon velocities                                (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_velocity(); public native mjData actuator_velocity(DoublePointer setter); // actuator velocities, one per force output        (nout x 1)
 
   // computed by mj_fwdVelocity/mj_comVel
-  public native @Cast("mjtNum*") DoublePointer cvel(); public native mjData_ cvel(DoublePointer setter);              // com-based velocity (rot:lin)                     (nbody x 6)
-  public native @Cast("mjtNum*") DoublePointer cdof_dot(); public native mjData_ cdof_dot(DoublePointer setter);          // time-derivative of cdof (rot:lin)                (nv x 6)
+  public native @Cast("mjtNum*") DoublePointer cvel(); public native mjData cvel(DoublePointer setter);              // com-based velocity (rot:lin)                     (nbody x 6)
+  public native @Cast("mjtNum*") DoublePointer cdof_dot(); public native mjData cdof_dot(DoublePointer setter);          // time-derivative of cdof (rot:lin)                (nv x 6)
 
   // computed by mj_fwdVelocity/mj_rne (without acceleration)
-  public native @Cast("mjtNum*") DoublePointer qfrc_bias(); public native mjData_ qfrc_bias(DoublePointer setter);         // C(qpos,qvel)                                     (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_bias(); public native mjData qfrc_bias(DoublePointer setter);         // C(qpos,qvel)                                     (nv x 1)
 
   // computed by mj_fwdVelocity/mj_passive
-  public native @Cast("mjtNum*") DoublePointer qfrc_spring(); public native mjData_ qfrc_spring(DoublePointer setter);       // passive spring force                             (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer qfrc_damper(); public native mjData_ qfrc_damper(DoublePointer setter);       // passive damper force                             (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer qfrc_gravcomp(); public native mjData_ qfrc_gravcomp(DoublePointer setter);     // passive gravity compensation force               (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer qfrc_fluid(); public native mjData_ qfrc_fluid(DoublePointer setter);        // passive fluid force                              (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer qfrc_passive(); public native mjData_ qfrc_passive(DoublePointer setter);      // total passive force                              (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_spring(); public native mjData qfrc_spring(DoublePointer setter);       // passive spring force                             (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_damper(); public native mjData qfrc_damper(DoublePointer setter);       // passive damper force                             (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_gravcomp(); public native mjData qfrc_gravcomp(DoublePointer setter);     // passive gravity compensation force               (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_fluid(); public native mjData qfrc_fluid(DoublePointer setter);        // passive fluid force                              (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_adhesion(); public native mjData qfrc_adhesion(DoublePointer setter);     // passive contact adhesion force                   (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_passive(); public native mjData qfrc_passive(DoublePointer setter);      // total passive force                              (nv x 1)
 
   // computed by mj_sensorVel/mj_subtreeVel if needed
-  public native @Cast("mjtNum*") DoublePointer subtree_linvel(); public native mjData_ subtree_linvel(DoublePointer setter);    // linear velocity of subtree com                   (nbody x 3)
-  public native @Cast("mjtNum*") DoublePointer subtree_angmom(); public native mjData_ subtree_angmom(DoublePointer setter);    // angular momentum about subtree com               (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer subtree_linvel(); public native mjData subtree_linvel(DoublePointer setter);    // linear velocity of subtree com                   (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer subtree_angmom(); public native mjData subtree_angmom(DoublePointer setter);    // angular momentum about subtree com               (nbody x 3)
 
   // computed by mj_Euler or mj_implicit
-  public native @Cast("mjtNum*") DoublePointer qH(); public native mjData_ qH(DoublePointer setter);                // L'*D*L factorization of modified M               (nM x 1)
-  public native @Cast("mjtNum*") DoublePointer qHDiagInv(); public native mjData_ qHDiagInv(DoublePointer setter);         // 1/diag(D) of modified M                          (nv x 1)
-
-  // computed by mj_resetData
-  public native IntPointer D_rownnz(); public native mjData_ D_rownnz(IntPointer setter);          // non-zeros in each row                            (nv x 1)
-  public native IntPointer D_rowadr(); public native mjData_ D_rowadr(IntPointer setter);          // address of each row in D_colind                  (nv x 1)
-  public native IntPointer D_colind(); public native mjData_ D_colind(IntPointer setter);          // column indices of non-zeros                      (nD x 1)
-  public native IntPointer B_rownnz(); public native mjData_ B_rownnz(IntPointer setter);          // non-zeros in each row                            (nbody x 1)
-  public native IntPointer B_rowadr(); public native mjData_ B_rowadr(IntPointer setter);          // address of each row in B_colind                  (nbody x 1)
-  public native IntPointer B_colind(); public native mjData_ B_colind(IntPointer setter);          // column indices of non-zeros                      (nB x 1)
+  public native @Cast("mjtNum*") DoublePointer qH(); public native mjData qH(DoublePointer setter);                // L'*D*L factorization of modified M               (nC x 1)
+  public native @Cast("mjtNum*") DoublePointer qHDiagInv(); public native mjData qHDiagInv(DoublePointer setter);         // 1/diag(D) of modified M                          (nv x 1)
 
   // computed by mj_implicit/mj_derivative
-  public native @Cast("mjtNum*") DoublePointer qDeriv(); public native mjData_ qDeriv(DoublePointer setter);            // d (passive + actuator - bias) / d qvel           (nD x 1)
+  public native @Cast("mjtNum*") DoublePointer qDeriv(); public native mjData qDeriv(DoublePointer setter);            // d (passive + actuator - bias) / d qvel           (nD x 1)
 
   // computed by mj_implicit/mju_factorLUSparse
-  public native @Cast("mjtNum*") DoublePointer qLU(); public native mjData_ qLU(DoublePointer setter);               // sparse LU of (qM - dt*qDeriv)                    (nD x 1)
+  public native @Cast("mjtNum*") DoublePointer qLU(); public native mjData qLU(DoublePointer setter);               // sparse LU of (M - dt*qDeriv)                     (nD x 1)
 
   //-------------------- POSITION, VELOCITY, CONTROL/ACCELERATION dependent
 
   // computed by mj_fwdActuation
-  public native @Cast("mjtNum*") DoublePointer actuator_force(); public native mjData_ actuator_force(DoublePointer setter);    // actuator force in actuation space                (nu x 1)
-  public native @Cast("mjtNum*") DoublePointer qfrc_actuator(); public native mjData_ qfrc_actuator(DoublePointer setter);     // actuator force                                   (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_force(); public native mjData actuator_force(DoublePointer setter);    // actuator force in actuation space                (nout x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_actuator(); public native mjData qfrc_actuator(DoublePointer setter);     // actuator force in joint space                    (nv x 1)
 
   // computed by mj_fwdAcceleration
-  public native @Cast("mjtNum*") DoublePointer qfrc_smooth(); public native mjData_ qfrc_smooth(DoublePointer setter);       // net unconstrained force                          (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer qacc_smooth(); public native mjData_ qacc_smooth(DoublePointer setter);       // unconstrained acceleration                       (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_smooth(); public native mjData qfrc_smooth(DoublePointer setter);       // net unconstrained force                          (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qacc_smooth(); public native mjData qacc_smooth(DoublePointer setter);       // unconstrained acceleration                       (nv x 1)
 
   // computed by mj_fwdConstraint/mj_inverse
-  public native @Cast("mjtNum*") DoublePointer qfrc_constraint(); public native mjData_ qfrc_constraint(DoublePointer setter);   // constraint force                                 (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer qfrc_constraint(); public native mjData qfrc_constraint(DoublePointer setter);   // constraint force (flag ipc: incl. flex contact)  (nv x 1)
 
   // computed by mj_inverse
-  public native @Cast("mjtNum*") DoublePointer qfrc_inverse(); public native mjData_ qfrc_inverse(DoublePointer setter);      // net external force; should equal:                (nv x 1)
-                             // qfrc_applied + J'*xfrc_applied + qfrc_actuator
+  public native @Cast("mjtNum*") DoublePointer qfrc_inverse(); public native mjData qfrc_inverse(DoublePointer setter);      // net external force; should equal:
+                             // qfrc_applied + J'*xfrc_applied + qfrc_actuator   (nv x 1)
 
   // computed by mj_sensorAcc/mj_rnePostConstraint if needed; rotation:translation format
-  public native @Cast("mjtNum*") DoublePointer cacc(); public native mjData_ cacc(DoublePointer setter);              // com-based acceleration                           (nbody x 6)
-  public native @Cast("mjtNum*") DoublePointer cfrc_int(); public native mjData_ cfrc_int(DoublePointer setter);          // com-based interaction force with parent          (nbody x 6)
-  public native @Cast("mjtNum*") DoublePointer cfrc_ext(); public native mjData_ cfrc_ext(DoublePointer setter);          // com-based external force on body                 (nbody x 6)
+  public native @Cast("mjtNum*") DoublePointer cacc(); public native mjData cacc(DoublePointer setter);              // com-based acceleration                           (nbody x 6)
+  public native @Cast("mjtNum*") DoublePointer cfrc_int(); public native mjData cfrc_int(DoublePointer setter);          // com-based interaction force with parent          (nbody x 6)
+  public native @Cast("mjtNum*") DoublePointer cfrc_ext(); public native mjData cfrc_ext(DoublePointer setter);          // com-based external force on body                 (nbody x 6)
 
   //-------------------- arena-allocated: POSITION dependent
 
   // computed by mj_collision
-  public native mjContact contact(); public native mjData_ contact(mjContact setter);        // list of all detected contacts                    (ncon x 1)
+  public native mjContact contact(); public native mjData contact(mjContact setter);        // array of all detected contacts                   (ncon x 1)
 
   // computed by mj_makeConstraint
-  public native IntPointer efc_type(); public native mjData_ efc_type(IntPointer setter);          // constraint type (mjtConstraint)                  (nefc x 1)
-  public native IntPointer efc_id(); public native mjData_ efc_id(IntPointer setter);            // id of object of specified type                   (nefc x 1)
-  public native IntPointer efc_J_rownnz(); public native mjData_ efc_J_rownnz(IntPointer setter);      // number of non-zeros in constraint Jacobian row   (nefc x 1)
-  public native IntPointer efc_J_rowadr(); public native mjData_ efc_J_rowadr(IntPointer setter);      // row start address in colind array                (nefc x 1)
-  public native IntPointer efc_J_rowsuper(); public native mjData_ efc_J_rowsuper(IntPointer setter);    // number of subsequent rows in supernode           (nefc x 1)
-  public native IntPointer efc_J_colind(); public native mjData_ efc_J_colind(IntPointer setter);      // column indices in constraint Jacobian            (nnzJ x 1)
-  public native IntPointer efc_JT_rownnz(); public native mjData_ efc_JT_rownnz(IntPointer setter);     // number of non-zeros in constraint Jacobian row T (nv x 1)
-  public native IntPointer efc_JT_rowadr(); public native mjData_ efc_JT_rowadr(IntPointer setter);     // row start address in colind array              T (nv x 1)
-  public native IntPointer efc_JT_rowsuper(); public native mjData_ efc_JT_rowsuper(IntPointer setter);   // number of subsequent rows in supernode         T (nv x 1)
-  public native IntPointer efc_JT_colind(); public native mjData_ efc_JT_colind(IntPointer setter);     // column indices in constraint Jacobian          T (nnzJ x 1)
-  public native @Cast("mjtNum*") DoublePointer efc_J(); public native mjData_ efc_J(DoublePointer setter);             // constraint Jacobian                              (nnzJ x 1)
-  public native @Cast("mjtNum*") DoublePointer efc_JT(); public native mjData_ efc_JT(DoublePointer setter);            // constraint Jacobian transposed                   (nnzJ x 1)
-  public native @Cast("mjtNum*") DoublePointer efc_pos(); public native mjData_ efc_pos(DoublePointer setter);           // constraint position (equality, contact)          (nefc x 1)
-  public native @Cast("mjtNum*") DoublePointer efc_margin(); public native mjData_ efc_margin(DoublePointer setter);        // inclusion margin (contact)                       (nefc x 1)
-  public native @Cast("mjtNum*") DoublePointer efc_frictionloss(); public native mjData_ efc_frictionloss(DoublePointer setter);  // frictionloss (friction)                          (nefc x 1)
-  public native @Cast("mjtNum*") DoublePointer efc_diagApprox(); public native mjData_ efc_diagApprox(DoublePointer setter);    // approximation to diagonal of A                   (nefc x 1)
-  public native @Cast("mjtNum*") DoublePointer efc_KBIP(); public native mjData_ efc_KBIP(DoublePointer setter);          // stiffness, damping, impedance, imp'              (nefc x 4)
-  public native @Cast("mjtNum*") DoublePointer efc_D(); public native mjData_ efc_D(DoublePointer setter);             // constraint mass                                  (nefc x 1)
-  public native @Cast("mjtNum*") DoublePointer efc_R(); public native mjData_ efc_R(DoublePointer setter);             // inverse constraint mass                          (nefc x 1)
-  public native IntPointer tendon_efcadr(); public native mjData_ tendon_efcadr(IntPointer setter);     // first efc address involving tendon; -1: none     (ntendon x 1)
+  public native IntPointer efc_type(); public native mjData efc_type(IntPointer setter);          // constraint type (mjtConstraint)                  (nefc x 1)
+  public native IntPointer efc_id(); public native mjData efc_id(IntPointer setter);            // id of object of specified type                   (nefc x 1)
+  public native IntPointer efc_J_rownnz(); public native mjData efc_J_rownnz(IntPointer setter);      // number of non-zeros in constraint Jacobian row   (nefc x 1)
+  public native IntPointer efc_J_rowadr(); public native mjData efc_J_rowadr(IntPointer setter);      // row start address in colind array                (nefc x 1)
+  public native IntPointer efc_J_rowsuper(); public native mjData efc_J_rowsuper(IntPointer setter);    // number of subsequent rows in supernode           (nefc x 1)
+  public native IntPointer efc_J_colind(); public native mjData efc_J_colind(IntPointer setter);      // column indices in constraint Jacobian            (nJ x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_J(); public native mjData efc_J(DoublePointer setter);             // constraint Jacobian                              (nJ x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_pos(); public native mjData efc_pos(DoublePointer setter);           // constraint position (equality, contact)          (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_margin(); public native mjData efc_margin(DoublePointer setter);        // inclusion margin (contact)                       (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_frictionloss(); public native mjData efc_frictionloss(DoublePointer setter);  // frictionloss (friction)                          (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_diagA(); public native mjData efc_diagA(DoublePointer setter);         // diagonal of A matrix, approximate or exact       (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_KBIP(); public native mjData efc_KBIP(DoublePointer setter);          // stiffness, damping, impedance, imp'              (nefc x 4)
+  public native @Cast("mjtNum*") DoublePointer efc_D(); public native mjData efc_D(DoublePointer setter);             // constraint mass                                  (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_R(); public native mjData efc_R(DoublePointer setter);             // inverse constraint mass                          (nefc x 1)
+  public native IntPointer tendon_efcadr(); public native mjData tendon_efcadr(IntPointer setter);     // first efc address involving tendon; -1: none     (ntendon x 1)
 
-  // computed by mj_island
-  public native IntPointer dof_island(); public native mjData_ dof_island(IntPointer setter);        // island id of this dof; -1: none                  (nv x 1)
-  public native IntPointer island_dofnum(); public native mjData_ island_dofnum(IntPointer setter);     // number of dofs in island                         (nisland x 1)
-  public native IntPointer island_dofadr(); public native mjData_ island_dofadr(IntPointer setter);     // start address in island_dofind                   (nisland x 1)
-  public native IntPointer island_dofind(); public native mjData_ island_dofind(IntPointer setter);     // island dof indices; -1: none                     (nv x 1)
-  public native IntPointer dof_islandind(); public native mjData_ dof_islandind(IntPointer setter);     // dof island indices; -1: none                     (nv x 1)
-  public native IntPointer efc_island(); public native mjData_ efc_island(IntPointer setter);        // island id of this constraint                     (nefc x 1)
-  public native IntPointer island_efcnum(); public native mjData_ island_efcnum(IntPointer setter);     // number of constraints in island                  (nisland x 1)
-  public native IntPointer island_efcadr(); public native mjData_ island_efcadr(IntPointer setter);     // start address in island_efcind                   (nisland x 1)
-  public native IntPointer island_efcind(); public native mjData_ island_efcind(IntPointer setter);     // island constraint indices                        (nefc x 1)
+  // computed by mj_island (island tree structure)
+  public native IntPointer tree_island(); public native mjData tree_island(IntPointer setter);       // island id of this tree; -1: none                 (ntree x 1)
+  public native IntPointer island_ntree(); public native mjData island_ntree(IntPointer setter);      // number of trees in this island                   (nisland x 1)
+  public native IntPointer island_itreeadr(); public native mjData island_itreeadr(IntPointer setter);   // island start address in itree vector             (nisland x 1)
+  public native IntPointer map_itree2tree(); public native mjData map_itree2tree(IntPointer setter);    // map from itree to tree                           (ntree x 1)
 
-  // computed by mj_projectConstraint (dual solver)
-  public native IntPointer efc_AR_rownnz(); public native mjData_ efc_AR_rownnz(IntPointer setter);     // number of non-zeros in AR                        (nefc x 1)
-  public native IntPointer efc_AR_rowadr(); public native mjData_ efc_AR_rowadr(IntPointer setter);     // row start address in colind array                (nefc x 1)
-  public native IntPointer efc_AR_colind(); public native mjData_ efc_AR_colind(IntPointer setter);     // column indices in sparse AR                      (nefc x nefc)
-  public native @Cast("mjtNum*") DoublePointer efc_AR(); public native mjData_ efc_AR(DoublePointer setter);            // J*inv(M)*J' + R                                  (nefc x nefc)
+  // computed by mj_island (island dof structure)
+  public native IntPointer dof_island(); public native mjData dof_island(IntPointer setter);        // island id of this dof; -1: none                  (nv x 1)
+  public native IntPointer island_nv(); public native mjData island_nv(IntPointer setter);         // number of dofs in this island                    (nisland x 1)
+  public native IntPointer island_idofadr(); public native mjData island_idofadr(IntPointer setter);    // island start address in idof vector              (nisland x 1)
+  public native IntPointer island_dofadr(); public native mjData island_dofadr(IntPointer setter);     // island start address in dof vector               (nisland x 1)
+  public native IntPointer map_dof2idof(); public native mjData map_dof2idof(IntPointer setter);      // map from dof to idof                             (nv x 1)
+  public native IntPointer map_idof2dof(); public native mjData map_idof2dof(IntPointer setter);      // map from idof to dof;  >= nidof: unconstrained   (nv x 1)
+
+  // computed by mj_island (dofs sorted by island)
+  public native @Cast("mjtNum*") DoublePointer ifrc_smooth(); public native mjData ifrc_smooth(DoublePointer setter);       // net unconstrained force                          (nidof x 1)
+  public native @Cast("mjtNum*") DoublePointer iacc_smooth(); public native mjData iacc_smooth(DoublePointer setter);       // unconstrained acceleration                       (nidof x 1)
+  public native @Cast("mjtNum*") DoublePointer iacc(); public native mjData iacc(DoublePointer setter);              // acceleration                                     (nidof x 1)
+
+  // computed by mj_island (island constraint structure)
+  public native IntPointer efc_island(); public native mjData efc_island(IntPointer setter);        // island id of this constraint                     (nefc x 1)
+  public native IntPointer island_ne(); public native mjData island_ne(IntPointer setter);         // number of equality constraints in island         (nisland x 1)
+  public native IntPointer island_nf(); public native mjData island_nf(IntPointer setter);         // number of friction constraints in island         (nisland x 1)
+  public native IntPointer island_nefc(); public native mjData island_nefc(IntPointer setter);       // number of constraints in island                  (nisland x 1)
+  public native IntPointer island_iefcadr(); public native mjData island_iefcadr(IntPointer setter);    // start address in iefc vector                     (nisland x 1)
+  public native IntPointer map_efc2iefc(); public native mjData map_efc2iefc(IntPointer setter);      // map from efc to iefc                             (nefc x 1)
+  public native IntPointer map_iefc2efc(); public native mjData map_iefc2efc(IntPointer setter);      // map from iefc to efc                             (nefc x 1)
+
+  // computed by mj_island (constraints sorted by island)
+  public native IntPointer iefc_type(); public native mjData iefc_type(IntPointer setter);         // constraint type (mjtConstraint)                  (nefc x 1)
+  public native IntPointer iefc_id(); public native mjData iefc_id(IntPointer setter);           // id of object of specified type                   (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer iefc_frictionloss(); public native mjData iefc_frictionloss(DoublePointer setter); // frictionloss (friction)                          (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer iefc_D(); public native mjData iefc_D(DoublePointer setter);            // constraint mass                                  (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer iefc_R(); public native mjData iefc_R(DoublePointer setter);            // inverse constraint mass                          (nefc x 1)
+
+  // computed by mj_projectConstraint (PGS solver)
+  public native IntPointer efc_Y_rownnz(); public native mjData efc_Y_rownnz(IntPointer setter);      // number of non-zeros in Y row                     (nefc x 1)
+  public native IntPointer efc_Y_rowadr(); public native mjData efc_Y_rowadr(IntPointer setter);      // row start address in Y colind array              (nefc x 1)
+  public native IntPointer efc_Y_colind(); public native mjData efc_Y_colind(IntPointer setter);      // column indices in sparse Y                       (nY x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_Y(); public native mjData efc_Y(DoublePointer setter);             // whitened Jacobian Y = J*M^(-1/2)                 (nY x 1)
+  public native IntPointer efc_AR_rownnz(); public native mjData efc_AR_rownnz(IntPointer setter);     // number of non-zeros in AR                        (nefc x 1)
+  public native IntPointer efc_AR_rowadr(); public native mjData efc_AR_rowadr(IntPointer setter);     // row start address in AR colind array             (nefc x 1)
+  public native IntPointer efc_AR_colind(); public native mjData efc_AR_colind(IntPointer setter);     // column indices in sparse AR                      (nA x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_AR(); public native mjData efc_AR(DoublePointer setter);            // J*inv(M)*J' + R                                  (nA x 1)
 
   //-------------------- arena-allocated: POSITION, VELOCITY dependent
 
   // computed by mj_fwdVelocity/mj_referenceConstraint
-  public native @Cast("mjtNum*") DoublePointer efc_vel(); public native mjData_ efc_vel(DoublePointer setter);           // velocity in constraint space: J*qvel             (nefc x 1)
-  public native @Cast("mjtNum*") DoublePointer efc_aref(); public native mjData_ efc_aref(DoublePointer setter);          // reference pseudo-acceleration                    (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_vel(); public native mjData efc_vel(DoublePointer setter);           // velocity in constraint space: J*qvel             (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_aref(); public native mjData efc_aref(DoublePointer setter);          // reference pseudo-acceleration                    (nefc x 1)
+
+  // computed when the implicit effective metric M+K is active
+  public native @Cast("mjtNum*") DoublePointer efm_c(); public native mjData efm_c(DoublePointer setter);             // smooth-force shift h*K*qvel                      (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_diag(); public native mjData efm_diag(DoublePointer setter);          // effective-metric diagonal h*D + h^2*K            (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_ck(); public native mjData efm_ck(DoublePointer setter);            // diagonal stiffness h*k, for the smooth shift     (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_sdiag(); public native mjData efm_sdiag(DoublePointer setter);         // diagonal additions to M in the backbone          (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_fluid(); public native mjData efm_fluid(DoublePointer setter);         // fluid drag blocks in M's sparsity pattern        (nC x 1)
+  public native IntPointer efm_tid(); public native mjData efm_tid(IntPointer setter);           // ids of tendons with terms in the metric          (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_ts(); public native mjData efm_ts(DoublePointer setter);            // tendon metric scale h^2*k + h*b, tid indexed     (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_tk(); public native mjData efm_tk(DoublePointer setter);            // tendon stiffness h*k for shift, tid indexed      (ntendon x 1)
+  public native IntPointer efm_aid(); public native mjData efm_aid(IntPointer setter);           // ids of actuators with terms in the metric        (nactuator x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_as(); public native mjData efm_as(DoublePointer setter);            // actuator metric scale h^2*gp + h*gv, aid indexed (nactuator x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_ak(); public native mjData efm_ak(DoublePointer setter);            // actuator stiffness h*gp, aid indexed             (nactuator x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_ca(); public native mjData efm_ca(DoublePointer setter);            // actuation-stage smooth-force shift               (nv x 1)
+  public native IntPointer efm_K_rownnz(); public native mjData efm_K_rownnz(IntPointer setter);      // effective-stiffness CSR row nonzeros             (nv x 1)
+  public native IntPointer efm_K_rowadr(); public native mjData efm_K_rowadr(IntPointer setter);      // effective-stiffness CSR row addresses            (nv x 1)
+  public native IntPointer efm_K_colind(); public native mjData efm_K_colind(IntPointer setter);      // effective-stiffness CSR column indices           (nefmK x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_K_val(); public native mjData efm_K_val(DoublePointer setter);         // effective-stiffness CSR values                   (nefmK x 1)
+  public native IntPointer efm_dofid(); public native mjData efm_dofid(IntPointer setter);         // block k -> dof address of its vertex triple      (nefmdof x 1)
+  public native IntPointer efm_con_ind(); public native mjData efm_con_ind(IntPointer setter);       // contact rows, packed [nnz, conid, colind...]     (nefmcon x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_con_val(); public native mjData efm_con_val(DoublePointer setter);       // contact rows, packed [scale, force, val...]      (nefmcon x 1)
+  public native @Cast("mjtNum*") DoublePointer efm_L(); public native mjData efm_L(DoublePointer setter);             // packed Cholesky factor of M+K or island lists    (nefmL x 1)
 
   //-------------------- arena-allocated: POSITION, VELOCITY, CONTROL/ACCELERATION dependent
 
   // computed by mj_fwdConstraint/mj_inverse
-  public native @Cast("mjtNum*") DoublePointer efc_b(); public native mjData_ efc_b(DoublePointer setter);            // linear cost term: J*qacc_smooth - aref            (nefc x 1)
-  public native @Cast("mjtNum*") DoublePointer efc_force(); public native mjData_ efc_force(DoublePointer setter);        // constraint force in constraint space              (nefc x 1)
-  public native IntPointer efc_state(); public native mjData_ efc_state(IntPointer setter);        // constraint state (mjtConstraintState)             (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_b(); public native mjData efc_b(DoublePointer setter);             // linear cost term: J*qacc_smooth - aref           (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer iefc_aref(); public native mjData iefc_aref(DoublePointer setter);         // reference pseudo-acceleration                    (nefc x 1)
+  public native IntPointer iefc_state(); public native mjData iefc_state(IntPointer setter);        // constraint state (mjtConstraintState)            (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer iefc_force(); public native mjData iefc_force(DoublePointer setter);        // constraint force in constraint space             (nefc x 1)
+  public native IntPointer efc_state(); public native mjData efc_state(IntPointer setter);         // constraint state (mjtConstraintState)            (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer efc_force(); public native mjData efc_force(DoublePointer setter);         // constraint force in constraint space             (nefc x 1)
+  public native @Cast("mjtNum*") DoublePointer ifrc_constraint(); public native mjData ifrc_constraint(DoublePointer setter);   // constraint force                                 (nidof x 1)
 
-  // ThreadPool for multithreaded operations
-  public native @Cast("uintptr_t") long threadpool(); public native mjData_ threadpool(long setter);
-}
-@Opaque public static class mjData extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjData() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjData(Pointer p) { super(p); }
+  // compilation signature
+  public native @Cast("uint64_t") long signature(); public native mjData signature(long setter);       // also held by the mjSpec that compiled the model
 }
 
 
@@ -2379,1228 +5356,1041 @@ public static class mjData_ extends Pointer {
 // #include <stddef.h>
 // #include <stdint.h>
 
-
-// #include <mujoco/mjtnum.h>
+// #include <mujoco/mjtype.h>
 
 // global constants
-public static final double mjPI =            3.14159265358979323846;
-public static final double mjMAXVAL =        1E+10;     // maximum value in qpos, qvel, qacc
 public static final double mjMINMU =         1E-5;      // minimum friction coefficient
 public static final double mjMINIMP =        0.0001;    // minimum constraint impedance
 public static final double mjMAXIMP =        0.9999;    // maximum constraint impedance
 public static final int mjMAXCONPAIR =    50;        // maximum number of contacts per geom pair
 public static final int mjMAXTREEDEPTH =  50;        // maximum bounding volume hierarchy depth
-public static final int mjMAXVFS =        2000;      // maximum number of files in virtual file system
-public static final int mjMAXVFSNAME =    1000;      // maximum filename size in virtual file system
+public static final int mjMAXFLEXNODES =  27;        // maximum number of flex nodes
+public static final int mjMINAWAKE =      10;        // minimum number of timesteps before sleeping
 
 
 //---------------------------------- sizes ---------------------------------------------------------
 
-public static final int mjNEQDATA =       11;        // number of eq_data fields
+public static final int mjNEQDATA =       12;        // number of eq_data fields
 public static final int mjNDYN =          10;        // number of actuator dynamics parameters
 public static final int mjNGAIN =         10;        // number of actuator gain parameters
 public static final int mjNBIAS =         10;        // number of actuator bias parameters
 public static final int mjNFLUID =        12;        // number of fluid interaction parameters
 public static final int mjNREF =          2;         // number of solver reference parameters
 public static final int mjNIMP =          5;         // number of solver impedance parameters
+public static final int mjNPOLY =         2;         // number of high-order polynomial coefficients
+public static final int mjNSENS =         3;         // number of sensor parameters
 public static final int mjNSOLVER =       200;       // size of one mjData.solver array
 public static final int mjNISLAND =       20;        // number of mjData.solver arrays
 
 
-//---------------------------------- enum types (mjt) ----------------------------------------------
-
-/** enum mjtDisableBit */
-public static final int     // disable default feature bitflags
-  mjDSBL_CONSTRAINT   = 1<<0,     // entire constraint solver
-  mjDSBL_EQUALITY     = 1<<1,     // equality constraints
-  mjDSBL_FRICTIONLOSS = 1<<2,     // joint and tendon frictionloss constraints
-  mjDSBL_LIMIT        = 1<<3,     // joint and tendon limit constraints
-  mjDSBL_CONTACT      = 1<<4,     // contact constraints
-  mjDSBL_PASSIVE      = 1<<5,     // passive forces
-  mjDSBL_GRAVITY      = 1<<6,     // gravitational forces
-  mjDSBL_CLAMPCTRL    = 1<<7,     // clamp control to specified range
-  mjDSBL_WARMSTART    = 1<<8,     // warmstart constraint solver
-  mjDSBL_FILTERPARENT = 1<<9,     // remove collisions with parent body
-  mjDSBL_ACTUATION    = 1<<10,    // apply actuation forces
-  mjDSBL_REFSAFE      = 1<<11,    // integrator safety: make ref[0]>=2*timestep
-  mjDSBL_SENSOR       = 1<<12,    // sensors
-  mjDSBL_MIDPHASE     = 1<<13,    // mid-phase collision filtering
-  mjDSBL_EULERDAMP    = 1<<14,    // implicit integration of joint damping in Euler integrator
-
-  mjNDISABLE          = 15;        // number of disable flags
-
-
-/** enum mjtEnableBit */
-public static final int      // enable optional feature bitflags
-  mjENBL_OVERRIDE     = 1<<0,     // override contact parameters
-  mjENBL_ENERGY       = 1<<1,     // energy computation
-  mjENBL_FWDINV       = 1<<2,     // record solver statistics
-  mjENBL_INVDISCRETE  = 1<<3,     // discrete-time inverse dynamics
-  mjENBL_SENSORNOISE  = 1<<4,     // add noise to sensor data
-                                  // experimental features:
-  mjENBL_MULTICCD     = 1<<5,     // multi-point convex collision detection
-  mjENBL_ISLAND       = 1<<6,     // constraint island discovery
-
-  mjNENABLE           = 7;         // number of enable flags
-
-
-/** enum mjtJoint */
-public static final int          // type of degree of freedom
-  mjJNT_FREE          = 0,        // global position and orientation (quat)       (7)
-  mjJNT_BALL = 1,                     // orientation (quat) relative to parent        (4)
-  mjJNT_SLIDE = 2,                    // sliding distance along body-fixed axis       (1)
-  mjJNT_HINGE = 3;                     // rotation angle (rad) around body-fixed axis  (1)
-
-
-/** enum mjtGeom */
-public static final int           // type of geometric shape
-  // regular geom types
-  mjGEOM_PLANE        = 0,        // plane
-  mjGEOM_HFIELD = 1,                  // height field
-  mjGEOM_SPHERE = 2,                  // sphere
-  mjGEOM_CAPSULE = 3,                 // capsule
-  mjGEOM_ELLIPSOID = 4,               // ellipsoid
-  mjGEOM_CYLINDER = 5,                // cylinder
-  mjGEOM_BOX = 6,                     // box
-  mjGEOM_MESH = 7,                    // mesh
-  mjGEOM_SDF = 8,                     // signed distance field
-
-  mjNGEOMTYPES = 9,                   // number of regular geom types
-
-  // rendering-only geom types: not used in mjModel, not counted in mjNGEOMTYPES
-  mjGEOM_ARROW        = 100,      // arrow
-  mjGEOM_ARROW1 = 101,                  // arrow without wedges
-  mjGEOM_ARROW2 = 102,                  // arrow in both directions
-  mjGEOM_LINE = 103,                    // line
-  mjGEOM_LINEBOX = 104,                 // box with line edges
-  mjGEOM_FLEX = 105,                    // flex
-  mjGEOM_SKIN = 106,                    // skin
-  mjGEOM_LABEL = 107,                   // text label
-  mjGEOM_TRIANGLE = 108,                // triangle
-
-  mjGEOM_NONE         = 1001;      // missing geom type
-
-
-/** enum mjtCamLight */
-public static final int       // tracking mode for camera and light
-  mjCAMLIGHT_FIXED    = 0,        // pos and rot fixed in body
-  mjCAMLIGHT_TRACK = 1,               // pos tracks body, rot fixed in global
-  mjCAMLIGHT_TRACKCOM = 2,            // pos tracks subtree com, rot fixed in body
-  mjCAMLIGHT_TARGETBODY = 3,          // pos fixed in body, rot tracks target body
-  mjCAMLIGHT_TARGETBODYCOM = 4;        // pos fixed in body, rot tracks target subtree com
-
-
-/** enum mjtTexture */
-public static final int        // type of texture
-  mjTEXTURE_2D        = 0,        // 2d texture, suitable for planes and hfields
-  mjTEXTURE_CUBE = 1,                 // cube texture, suitable for all other geom types
-  mjTEXTURE_SKYBOX = 2;                // cube texture used as skybox
-
-
-/** enum mjtIntegrator */
-public static final int     // integrator mode
-  mjINT_EULER         = 0,        // semi-implicit Euler
-  mjINT_RK4 = 1,                      // 4th-order Runge Kutta
-  mjINT_IMPLICIT = 2,                 // implicit in velocity
-  mjINT_IMPLICITFAST = 3;              // implicit in velocity, no rne derivative
-
-
-/** enum mjtCone */
-public static final int           // type of friction cone
-  mjCONE_PYRAMIDAL     = 0,       // pyramidal
-  mjCONE_ELLIPTIC = 1;                 // elliptic
-
-
-/** enum mjtJacobian */
-public static final int       // type of constraint Jacobian
-  mjJAC_DENSE          = 0,       // dense
-  mjJAC_SPARSE = 1,                   // sparse
-  mjJAC_AUTO = 2;                      // dense if nv<60, sparse otherwise
-
-
-/** enum mjtSolver */
-public static final int         // constraint solver algorithm
-  mjSOL_PGS            = 0,       // PGS    (dual)
-  mjSOL_CG = 1,                       // CG     (primal)
-  mjSOL_NEWTON = 2;                    // Newton (primal)
-
-
-/** enum mjtEq */
-public static final int             // type of equality constraint
-  mjEQ_CONNECT        = 0,        // connect two bodies at a point (ball joint)
-  mjEQ_WELD = 1,                      // fix relative position and orientation of two bodies
-  mjEQ_JOINT = 2,                     // couple the values of two scalar joints with cubic
-  mjEQ_TENDON = 3,                    // couple the lengths of two tendons with cubic
-  mjEQ_FLEX = 4,                      // fix all edge lengths of a flex
-  mjEQ_DISTANCE = 5;                   // unsupported, will cause an error if used
-
-
-/** enum mjtWrap */
-public static final int           // type of tendon wrap object
-  mjWRAP_NONE         = 0,        // null object
-  mjWRAP_JOINT = 1,                   // constant moment arm
-  mjWRAP_PULLEY = 2,                  // pulley used to split tendon
-  mjWRAP_SITE = 3,                    // pass through site
-  mjWRAP_SPHERE = 4,                  // wrap around sphere
-  mjWRAP_CYLINDER = 5;                 // wrap around (infinite) cylinder
-
-
-/** enum mjtTrn */
-public static final int            // type of actuator transmission
-  mjTRN_JOINT         = 0,        // force on joint
-  mjTRN_JOINTINPARENT = 1,            // force on joint, expressed in parent frame
-  mjTRN_SLIDERCRANK = 2,              // force via slider-crank linkage
-  mjTRN_TENDON = 3,                   // force on tendon
-  mjTRN_SITE = 4,                     // force on site
-  mjTRN_BODY = 5,                     // adhesion force on a body's geoms
-
-  mjTRN_UNDEFINED     = 1000;      // undefined transmission type
-
-
-/** enum mjtDyn */
-public static final int            // type of actuator dynamics
-  mjDYN_NONE          = 0,        // no internal dynamics; ctrl specifies force
-  mjDYN_INTEGRATOR = 1,               // integrator: da/dt = u
-  mjDYN_FILTER = 2,                   // linear filter: da/dt = (u-a) / tau
-  mjDYN_FILTEREXACT = 3,              // linear filter: da/dt = (u-a) / tau, with exact integration
-  mjDYN_MUSCLE = 4,                   // piece-wise linear filter with two time constants
-  mjDYN_USER = 5;                      // user-defined dynamics type
-
-
-/** enum mjtGain */
-public static final int           // type of actuator gain
-  mjGAIN_FIXED        = 0,        // fixed gain
-  mjGAIN_AFFINE = 1,                  // const + kp*length + kv*velocity
-  mjGAIN_MUSCLE = 2,                  // muscle FLV curve computed by mju_muscleGain()
-  mjGAIN_USER = 3;                     // user-defined gain type
-
-
-/** enum mjtBias */
-public static final int           // type of actuator bias
-  mjBIAS_NONE         = 0,        // no bias
-  mjBIAS_AFFINE = 1,                  // const + kp*length + kv*velocity
-  mjBIAS_MUSCLE = 2,                  // muscle passive force computed by mju_muscleBias()
-  mjBIAS_USER = 3;                     // user-defined bias type
-
-
-/** enum mjtObj */
-public static final int            // type of MujoCo object
-  mjOBJ_UNKNOWN       = 0,        // unknown object type
-  mjOBJ_BODY = 1,                     // body
-  mjOBJ_XBODY = 2,                    // body, used to access regular frame instead of i-frame
-  mjOBJ_JOINT = 3,                    // joint
-  mjOBJ_DOF = 4,                      // dof
-  mjOBJ_GEOM = 5,                     // geom
-  mjOBJ_SITE = 6,                     // site
-  mjOBJ_CAMERA = 7,                   // camera
-  mjOBJ_LIGHT = 8,                    // light
-  mjOBJ_FLEX = 9,                     // flex
-  mjOBJ_MESH = 10,                     // mesh
-  mjOBJ_SKIN = 11,                     // skin
-  mjOBJ_HFIELD = 12,                   // heightfield
-  mjOBJ_TEXTURE = 13,                  // texture
-  mjOBJ_MATERIAL = 14,                 // material for rendering
-  mjOBJ_PAIR = 15,                     // geom pair to include
-  mjOBJ_EXCLUDE = 16,                  // body pair to exclude
-  mjOBJ_EQUALITY = 17,                 // equality constraint
-  mjOBJ_TENDON = 18,                   // tendon
-  mjOBJ_ACTUATOR = 19,                 // actuator
-  mjOBJ_SENSOR = 20,                   // sensor
-  mjOBJ_NUMERIC = 21,                  // numeric
-  mjOBJ_TEXT = 22,                     // text
-  mjOBJ_TUPLE = 23,                    // tuple
-  mjOBJ_KEY = 24,                      // keyframe
-  mjOBJ_PLUGIN = 25,                   // plugin instance
-
-  mjNOBJECT = 26;                       // number of object types
-
-
-/** enum mjtConstraint */
-public static final int     // type of constraint
-  mjCNSTR_EQUALITY    = 0,        // equality constraint
-  mjCNSTR_FRICTION_DOF = 1,           // dof friction
-  mjCNSTR_FRICTION_TENDON = 2,        // tendon friction
-  mjCNSTR_LIMIT_JOINT = 3,            // joint limit
-  mjCNSTR_LIMIT_TENDON = 4,           // tendon limit
-  mjCNSTR_CONTACT_FRICTIONLESS = 5,   // frictionless contact
-  mjCNSTR_CONTACT_PYRAMIDAL = 6,      // frictional contact, pyramidal friction cone
-  mjCNSTR_CONTACT_ELLIPTIC = 7;        // frictional contact, elliptic friction cone
-
-
-/** enum mjtConstraintState */
-public static final int  // constraint state
-  mjCNSTRSTATE_SATISFIED = 0,       // constraint satisfied, zero cost (limit, contact)
-  mjCNSTRSTATE_QUADRATIC = 1,           // quadratic cost (equality, friction, limit, contact)
-  mjCNSTRSTATE_LINEARNEG = 2,           // linear cost, negative side (friction)
-  mjCNSTRSTATE_LINEARPOS = 3,           // linear cost, positive side (friction)
-  mjCNSTRSTATE_CONE = 4;                 // squared distance to cone cost (elliptic contact)
-
-
-/** enum mjtSensor */
-public static final int         // type of sensor
-  // common robotic sensors, attached to a site
-  mjSENS_TOUCH        = 0,        // scalar contact normal forces summed over sensor zone
-  mjSENS_ACCELEROMETER = 1,           // 3D linear acceleration, in local frame
-  mjSENS_VELOCIMETER = 2,             // 3D linear velocity, in local frame
-  mjSENS_GYRO = 3,                    // 3D angular velocity, in local frame
-  mjSENS_FORCE = 4,                   // 3D force between site's body and its parent body
-  mjSENS_TORQUE = 5,                  // 3D torque between site's body and its parent body
-  mjSENS_MAGNETOMETER = 6,            // 3D magnetometer
-  mjSENS_RANGEFINDER = 7,             // scalar distance to nearest geom or site along z-axis
-  mjSENS_CAMPROJECTION = 8,           // pixel coordinates of a site in the camera image
-
-  // sensors related to scalar joints, tendons, actuators
-  mjSENS_JOINTPOS = 9,                // scalar joint position (hinge and slide only)
-  mjSENS_JOINTVEL = 10,                // scalar joint velocity (hinge and slide only)
-  mjSENS_TENDONPOS = 11,               // scalar tendon position
-  mjSENS_TENDONVEL = 12,               // scalar tendon velocity
-  mjSENS_ACTUATORPOS = 13,             // scalar actuator position
-  mjSENS_ACTUATORVEL = 14,             // scalar actuator velocity
-  mjSENS_ACTUATORFRC = 15,             // scalar actuator force
-  mjSENS_JOINTACTFRC = 16,             // scalar actuator force, measured at the joint
-
-  // sensors related to ball joints
-  mjSENS_BALLQUAT = 17,                // 4D ball joint quaternion
-  mjSENS_BALLANGVEL = 18,              // 3D ball joint angular velocity
-
-  // joint and tendon limit sensors, in constraint space
-  mjSENS_JOINTLIMITPOS = 19,           // joint limit distance-margin
-  mjSENS_JOINTLIMITVEL = 20,           // joint limit velocity
-  mjSENS_JOINTLIMITFRC = 21,           // joint limit force
-  mjSENS_TENDONLIMITPOS = 22,          // tendon limit distance-margin
-  mjSENS_TENDONLIMITVEL = 23,          // tendon limit velocity
-  mjSENS_TENDONLIMITFRC = 24,          // tendon limit force
-
-  // sensors attached to an object with spatial frame: (x)body, geom, site, camera
-  mjSENS_FRAMEPOS = 25,                // 3D position
-  mjSENS_FRAMEQUAT = 26,               // 4D unit quaternion orientation
-  mjSENS_FRAMEXAXIS = 27,              // 3D unit vector: x-axis of object's frame
-  mjSENS_FRAMEYAXIS = 28,              // 3D unit vector: y-axis of object's frame
-  mjSENS_FRAMEZAXIS = 29,              // 3D unit vector: z-axis of object's frame
-  mjSENS_FRAMELINVEL = 30,             // 3D linear velocity
-  mjSENS_FRAMEANGVEL = 31,             // 3D angular velocity
-  mjSENS_FRAMELINACC = 32,             // 3D linear acceleration
-  mjSENS_FRAMEANGACC = 33,             // 3D angular acceleration
-
-  // sensors related to kinematic subtrees; attached to a body (which is the subtree root)
-  mjSENS_SUBTREECOM = 34,              // 3D center of mass of subtree
-  mjSENS_SUBTREELINVEL = 35,           // 3D linear velocity of subtree
-  mjSENS_SUBTREEANGMOM = 36,           // 3D angular momentum of subtree
-
-  // global sensors
-  mjSENS_CLOCK = 37,                   // simulation time
-
-  // plugin-controlled sensors
-  mjSENS_PLUGIN = 38,                  // plugin-controlled
-
-  // user-defined sensor
-  mjSENS_USER = 39;                     // sensor data provided by mjcb_sensor callback
-
-
-/** enum mjtStage */
-public static final int          // computation stage
-  mjSTAGE_NONE        = 0,        // no computations
-  mjSTAGE_POS = 1,                    // position-dependent computations
-  mjSTAGE_VEL = 2,                    // velocity-dependent computations
-  mjSTAGE_ACC = 3;                     // acceleration/force-dependent computations
-
-
-/** enum mjtDataType */
-public static final int       // data type for sensors
-  mjDATATYPE_REAL     = 0,        // real values, no constraints
-  mjDATATYPE_POSITIVE = 1,            // positive values; 0 or negative: inactive
-  mjDATATYPE_AXIS = 2,                // 3D unit vector
-  mjDATATYPE_QUATERNION = 3;           // unit quaternion
-
-
-/** enum mjtLRMode */
-public static final int         // mode for actuator length range computation
-  mjLRMODE_NONE   = 0,            // do not process any actuators
-  mjLRMODE_MUSCLE = 1,                // process muscle actuators
-  mjLRMODE_MUSCLEUSER = 2,            // process muscle and user actuators
-  mjLRMODE_ALL = 3;                    // process all actuators
-
-
-/** enum mjtFlexSelf */
-public static final int       // mode for flex selfcollide
-  mjFLEXSELF_NONE   = 0,          // no self-collisions
-  mjFLEXSELF_NARROW = 1,              // skip midphase, go directly to narrowphase
-  mjFLEXSELF_BVH = 2,                 // use BVH in midphase (if midphase enabled)
-  mjFLEXSELF_SAP = 3,                 // use SAP in midphase
-  mjFLEXSELF_AUTO = 4;                 // choose between BVH and SAP automatically
-
 
 //---------------------------------- mjLROpt -------------------------------------------------------
 
-public static class mjLROpt_ extends Pointer {
+public static class mjLROpt extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjLROpt_() { super((Pointer)null); allocate(); }
+    public mjLROpt() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjLROpt_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjLROpt_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjLROpt_ position(long position) {
-        return (mjLROpt_)super.position(position);
-    }
-    @Override public mjLROpt_ getPointer(long i) {
-        return new mjLROpt_((Pointer)this).offsetAddress(i);
-    }
-                 // options for mj_setLengthRange()
-  // flags
-  public native int mode(); public native mjLROpt_ mode(int setter);                       // which actuators to process (mjtLRMode)
-  public native int useexisting(); public native mjLROpt_ useexisting(int setter);                // use existing length range if available
-  public native int uselimit(); public native mjLROpt_ uselimit(int setter);                   // use joint and tendon limits if available
-
-  // algorithm parameters
-  public native @Cast("mjtNum") double accel(); public native mjLROpt_ accel(double setter);                   // target acceleration used to compute force
-  public native @Cast("mjtNum") double maxforce(); public native mjLROpt_ maxforce(double setter);                // maximum force; 0: no limit
-  public native @Cast("mjtNum") double timeconst(); public native mjLROpt_ timeconst(double setter);               // time constant for velocity reduction; min 0.01
-  public native @Cast("mjtNum") double timestep(); public native mjLROpt_ timestep(double setter);                // simulation timestep; 0: use mjOption.timestep
-  public native @Cast("mjtNum") double inttotal(); public native mjLROpt_ inttotal(double setter);                // total simulation time interval
-  public native @Cast("mjtNum") double interval(); public native mjLROpt_ interval(double setter);                // evaluation time interval (at the end)
-  public native @Cast("mjtNum") double tolrange(); public native mjLROpt_ tolrange(double setter);                // convergence tolerance (relative to range)
-}
-@Opaque public static class mjLROpt extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjLROpt() { super((Pointer)null); }
+    public mjLROpt(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjLROpt(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjLROpt position(long position) {
+        return (mjLROpt)super.position(position);
+    }
+    @Override public mjLROpt getPointer(long i) {
+        return new mjLROpt((Pointer)this).offsetAddress(i);
+    }
+         // options for mj_setLengthRange()
+  // flags
+  public native int mode(); public native mjLROpt mode(int setter);                       // which actuators to process (mjtLRMode)
+  public native int useexisting(); public native mjLROpt useexisting(int setter);                // use existing length range if available
+  public native int uselimit(); public native mjLROpt uselimit(int setter);                   // use joint and tendon limits if available
+
+  // algorithm parameters
+  public native @Cast("mjtNum") double accel(); public native mjLROpt accel(double setter);                   // target acceleration used to compute force
+  public native @Cast("mjtNum") double maxforce(); public native mjLROpt maxforce(double setter);                // maximum force; 0: no limit
+  public native @Cast("mjtNum") double timeconst(); public native mjLROpt timeconst(double setter);               // time constant for velocity reduction; min 0.01
+  public native @Cast("mjtNum") double timestep(); public native mjLROpt timestep(double setter);                // simulation timestep; 0: use mjOption.timestep
+  public native @Cast("mjtNum") double inttotal(); public native mjLROpt inttotal(double setter);                // total simulation time interval
+  public native @Cast("mjtNum") double interval(); public native mjLROpt interval(double setter);                // evaluation time interval (at the end)
+  public native @Cast("mjtNum") double tolrange(); public native mjLROpt tolrange(double setter);                // convergence tolerance (relative to range)
 }
 
+//---------------------------------- mjCache -------------------------------------------------------
+
+public static class mjCache extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjCache() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjCache(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjCache(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjCache position(long position) {
+        return (mjCache)super.position(position);
+    }
+    @Override public mjCache getPointer(long i) {
+        return new mjCache((Pointer)this).offsetAddress(i);
+    }
+         // asset cache used by the compiler
+  public native Pointer impl_(); public native mjCache impl_(Pointer setter);                    // internal pointer to cache
+}
 
 //---------------------------------- mjVFS ---------------------------------------------------------
 
-public static class mjVFS_ extends Pointer {
+public static class mjVFS extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjVFS_() { super((Pointer)null); allocate(); }
+    public mjVFS() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjVFS_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjVFS_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjVFS_ position(long position) {
-        return (mjVFS_)super.position(position);
-    }
-    @Override public mjVFS_ getPointer(long i) {
-        return new mjVFS_((Pointer)this).offsetAddress(i);
-    }
-                               // virtual file system for loading from memory
-  public native int nfile(); public native mjVFS_ nfile(int setter);                             // number of files present
-  public native @Cast("char") byte filename(int i, int j); public native mjVFS_ filename(int i, int j, byte setter);
-  @MemberGetter public native @Cast("char*") BytePointer filename();  // file name without path
-  public native @Cast("size_t") long filesize(int i); public native mjVFS_ filesize(int i, long setter);
-  @MemberGetter public native @Cast("size_t*") SizeTPointer filesize();                // file size in bytes
-  public native Pointer filedata(int i); public native mjVFS_ filedata(int i, Pointer setter);
-  @MemberGetter public native @Cast("void**") PointerPointer filedata();                // buffer with file data
-  public native @Cast("uint64_t") long filestamp(int i); public native mjVFS_ filestamp(int i, long setter);
-  @MemberGetter public native @Cast("uint64_t*") LongPointer filestamp();               // checksum of the file data
-}
-@Opaque public static class mjVFS extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjVFS() { super((Pointer)null); }
+    public mjVFS(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjVFS(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjVFS position(long position) {
+        return (mjVFS)super.position(position);
+    }
+    @Override public mjVFS getPointer(long i) {
+        return new mjVFS((Pointer)this).offsetAddress(i);
+    }
+           // virtual file system for loading from memory
+  public native Pointer impl_(); public native mjVFS impl_(Pointer setter);                    // internal pointer to VFS memory
 }
 
 //---------------------------------- mjOption ------------------------------------------------------
 
-public static class mjOption_ extends Pointer {
+public static class mjOption extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjOption_() { super((Pointer)null); allocate(); }
+    public mjOption() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjOption_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjOption(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjOption_(Pointer p) { super(p); }
+    public mjOption(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjOption_ position(long position) {
-        return (mjOption_)super.position(position);
+    @Override public mjOption position(long position) {
+        return (mjOption)super.position(position);
     }
-    @Override public mjOption_ getPointer(long i) {
-        return new mjOption_((Pointer)this).offsetAddress(i);
+    @Override public mjOption getPointer(long i) {
+        return new mjOption((Pointer)this).offsetAddress(i);
     }
-                // physics options
+        // physics options
   // timing parameters
-  public native @Cast("mjtNum") double timestep(); public native mjOption_ timestep(double setter);                // timestep
-  public native @Cast("mjtNum") double apirate(); public native mjOption_ apirate(double setter);                 // update rate for remote API (Hz)
+  public native @Cast("mjtNum") double timestep(); public native mjOption timestep(double setter);                // timestep
 
   // solver parameters
-  public native @Cast("mjtNum") double impratio(); public native mjOption_ impratio(double setter);                // ratio of friction-to-normal contact impedance
-  public native @Cast("mjtNum") double tolerance(); public native mjOption_ tolerance(double setter);               // main solver tolerance
-  public native @Cast("mjtNum") double ls_tolerance(); public native mjOption_ ls_tolerance(double setter);            // CG/Newton linesearch tolerance
-  public native @Cast("mjtNum") double noslip_tolerance(); public native mjOption_ noslip_tolerance(double setter);        // noslip solver tolerance
-  public native @Cast("mjtNum") double mpr_tolerance(); public native mjOption_ mpr_tolerance(double setter);           // MPR solver tolerance
+  public native @Cast("mjtNum") double impratio(); public native mjOption impratio(double setter);                // ratio of friction-to-normal contact impedance
+  public native @Cast("mjtNum") double tolerance(); public native mjOption tolerance(double setter);               // main solver tolerance
+  public native @Cast("mjtNum") double ls_tolerance(); public native mjOption ls_tolerance(double setter);            // CG/Newton linesearch tolerance
+  public native @Cast("mjtNum") double noslip_tolerance(); public native mjOption noslip_tolerance(double setter);        // noslip solver tolerance
+  public native @Cast("mjtNum") double ccd_tolerance(); public native mjOption ccd_tolerance(double setter);           // convex collision solver tolerance
+
+  // sleep settings
+  public native @Cast("mjtNum") double sleep_tolerance(); public native mjOption sleep_tolerance(double setter);         // sleep velocity tolerance
 
   // physical constants
-  public native @Cast("mjtNum") double gravity(int i); public native mjOption_ gravity(int i, double setter);
+  public native @Cast("mjtNum") double gravity(int i); public native mjOption gravity(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer gravity();              // gravitational acceleration
-  public native @Cast("mjtNum") double wind(int i); public native mjOption_ wind(int i, double setter);
+  public native @Cast("mjtNum") double wind(int i); public native mjOption wind(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer wind();                 // wind (for lift, drag and viscosity)
-  public native @Cast("mjtNum") double magnetic(int i); public native mjOption_ magnetic(int i, double setter);
+  public native @Cast("mjtNum") double magnetic(int i); public native mjOption magnetic(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer magnetic();             // global magnetic flux
-  public native @Cast("mjtNum") double density(); public native mjOption_ density(double setter);                 // density of medium
-  public native @Cast("mjtNum") double viscosity(); public native mjOption_ viscosity(double setter);               // viscosity of medium
+  public native @Cast("mjtNum") double density(); public native mjOption density(double setter);                 // density of medium
+  public native @Cast("mjtNum") double viscosity(); public native mjOption viscosity(double setter);               // viscosity of medium
 
   // override contact solver parameters (if enabled)
-  public native @Cast("mjtNum") double o_margin(); public native mjOption_ o_margin(double setter);                // margin
-  public native @Cast("mjtNum") double o_solref(int i); public native mjOption_ o_solref(int i, double setter);
+  public native @Cast("mjtNum") double o_margin(); public native mjOption o_margin(double setter);                // margin
+  public native @Cast("mjtNum") double o_solref(int i); public native mjOption o_solref(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer o_solref();        // solref
-  public native @Cast("mjtNum") double o_solimp(int i); public native mjOption_ o_solimp(int i, double setter);
+  public native @Cast("mjtNum") double o_solimp(int i); public native mjOption o_solimp(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer o_solimp();        // solimp
-  public native @Cast("mjtNum") double o_friction(int i); public native mjOption_ o_friction(int i, double setter);
+  public native @Cast("mjtNum") double o_friction(int i); public native mjOption o_friction(int i, double setter);
   @MemberGetter public native @Cast("mjtNum*") DoublePointer o_friction();           // friction
 
   // discrete settings
-  public native int integrator(); public native mjOption_ integrator(int setter);                 // integration mode (mjtIntegrator)
-  public native int cone(); public native mjOption_ cone(int setter);                       // type of friction cone (mjtCone)
-  public native int jacobian(); public native mjOption_ jacobian(int setter);                   // type of Jacobian (mjtJacobian)
-  public native int solver(); public native mjOption_ solver(int setter);                     // solver algorithm (mjtSolver)
-  public native int iterations(); public native mjOption_ iterations(int setter);                 // maximum number of main solver iterations
-  public native int ls_iterations(); public native mjOption_ ls_iterations(int setter);              // maximum number of CG/Newton linesearch iterations
-  public native int noslip_iterations(); public native mjOption_ noslip_iterations(int setter);          // maximum number of noslip solver iterations
-  public native int mpr_iterations(); public native mjOption_ mpr_iterations(int setter);             // maximum number of MPR solver iterations
-  public native int disableflags(); public native mjOption_ disableflags(int setter);               // bit flags for disabling standard features
-  public native int enableflags(); public native mjOption_ enableflags(int setter);                // bit flags for enabling optional features
-  public native int disableactuator(); public native mjOption_ disableactuator(int setter);            // bit flags for disabling actuators by group id
+  public native int integrator(); public native mjOption integrator(int setter);                 // integration mode (mjtIntegrator)
+  public native int cone(); public native mjOption cone(int setter);                       // type of friction cone (mjtCone)
+  public native int jacobian(); public native mjOption jacobian(int setter);                   // type of Jacobian (mjtJacobian)
+  public native int solver(); public native mjOption solver(int setter);                     // solver algorithm (mjtSolver)
+  public native int iterations(); public native mjOption iterations(int setter);                 // maximum number of main solver iterations
+  public native int ls_iterations(); public native mjOption ls_iterations(int setter);              // maximum number of CG/Newton linesearch iterations
+  public native int noslip_iterations(); public native mjOption noslip_iterations(int setter);          // maximum number of noslip solver iterations
+  public native int ccd_iterations(); public native mjOption ccd_iterations(int setter);             // maximum number of convex collision solver iterations
+  public native int disableflags(); public native mjOption disableflags(int setter);               // bit flags for disabling standard features
+  public native int enableflags(); public native mjOption enableflags(int setter);                // bit flags for enabling optional features
+  public native int disableactuator(); public native mjOption disableactuator(int setter);            // bit flags for disabling actuators by group id
 
   // sdf collision settings
-  public native int sdf_initpoints(); public native mjOption_ sdf_initpoints(int setter);             // number of starting points for gradient descent
-  public native int sdf_iterations(); public native mjOption_ sdf_iterations(int setter);             // max number of iterations for gradient descent
-}
-@Opaque public static class mjOption extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjOption() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjOption(Pointer p) { super(p); }
+  public native int sdf_initpoints(); public native mjOption sdf_initpoints(int setter);             // number of starting points for gradient descent
+  public native int sdf_iterations(); public native mjOption sdf_iterations(int setter);             // max number of iterations for gradient descent
 }
 
 
 //---------------------------------- mjVisual ------------------------------------------------------
 
-public static class mjVisual_ extends Pointer {
+public static class mjVisual extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjVisual_() { super((Pointer)null); allocate(); }
+    public mjVisual() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjVisual_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjVisual_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjVisual_ position(long position) {
-        return (mjVisual_)super.position(position);
-    }
-    @Override public mjVisual_ getPointer(long i) {
-        return new mjVisual_((Pointer)this).offsetAddress(i);
-    }
-                // visualization options                        // global parameters
-    @Name("global.fovy") public native float global_fovy(); public native mjVisual_ global_fovy(float setter);                   // y-field of view for free camera (degrees)
-    @Name("global.ipd") public native float global_ipd(); public native mjVisual_ global_ipd(float setter);                    // inter-pupilary distance for free camera
-    @Name("global.azimuth") public native float global_azimuth(); public native mjVisual_ global_azimuth(float setter);                // initial azimuth of free camera (degrees)
-    @Name("global.elevation") public native float global_elevation(); public native mjVisual_ global_elevation(float setter);              // initial elevation of free camera (degrees)
-    @Name("global.linewidth") public native float global_linewidth(); public native mjVisual_ global_linewidth(float setter);              // line width for wireframe and ray rendering
-    @Name("global.glow") public native float global_glow(); public native mjVisual_ global_glow(float setter);                   // glow coefficient for selected body
-    @Name("global.realtime") public native float global_realtime(); public native mjVisual_ global_realtime(float setter);               // initial real-time factor (1: real time)
-    @Name("global.offwidth") public native int global_offwidth(); public native mjVisual_ global_offwidth(int setter);               // width of offscreen buffer
-    @Name("global.offheight") public native int global_offheight(); public native mjVisual_ global_offheight(int setter);              // height of offscreen buffer
-    @Name("global.ellipsoidinertia") public native int global_ellipsoidinertia(); public native mjVisual_ global_ellipsoidinertia(int setter);       // geom for inertia visualization (0: box, 1: ellipsoid)
-    @Name("global.bvactive") public native int global_bvactive(); public native mjVisual_ global_bvactive(int setter);               // visualize active bounding volumes (0: no, 1: yes)
-                        // rendering quality
-    @Name("quality.shadowsize") public native int quality_shadowsize(); public native mjVisual_ quality_shadowsize(int setter);             // size of shadowmap texture
-    @Name("quality.offsamples") public native int quality_offsamples(); public native mjVisual_ quality_offsamples(int setter);             // number of multisamples for offscreen rendering
-    @Name("quality.numslices") public native int quality_numslices(); public native mjVisual_ quality_numslices(int setter);              // number of slices for builtin geom drawing
-    @Name("quality.numstacks") public native int quality_numstacks(); public native mjVisual_ quality_numstacks(int setter);              // number of stacks for builtin geom drawing
-    @Name("quality.numquads") public native int quality_numquads(); public native mjVisual_ quality_numquads(int setter);               // number of quads for box rendering
-                        // head light
-    @Name("headlight.ambient") public native float headlight_ambient(int i); public native mjVisual_ headlight_ambient(int i, float setter);
-    @Name("headlight.ambient") @MemberGetter public native FloatPointer headlight_ambient();             // ambient rgb (alpha=1)
-    @Name("headlight.diffuse") public native float headlight_diffuse(int i); public native mjVisual_ headlight_diffuse(int i, float setter);
-    @Name("headlight.diffuse") @MemberGetter public native FloatPointer headlight_diffuse();             // diffuse rgb (alpha=1)
-    @Name("headlight.specular") public native float headlight_specular(int i); public native mjVisual_ headlight_specular(int i, float setter);
-    @Name("headlight.specular") @MemberGetter public native FloatPointer headlight_specular();            // specular rgb (alpha=1)
-    @Name("headlight.active") public native int headlight_active(); public native mjVisual_ headlight_active(int setter);                 // is headlight active
-                        // mapping
-    @Name("map.stiffness") public native float map_stiffness(); public native mjVisual_ map_stiffness(float setter);              // mouse perturbation stiffness (space->force)
-    @Name("map.stiffnessrot") public native float map_stiffnessrot(); public native mjVisual_ map_stiffnessrot(float setter);           // mouse perturbation stiffness (space->torque)
-    @Name("map.force") public native float map_force(); public native mjVisual_ map_force(float setter);                  // from force units to space units
-    @Name("map.torque") public native float map_torque(); public native mjVisual_ map_torque(float setter);                 // from torque units to space units
-    @Name("map.alpha") public native float map_alpha(); public native mjVisual_ map_alpha(float setter);                  // scale geom alphas when transparency is enabled
-    @Name("map.fogstart") public native float map_fogstart(); public native mjVisual_ map_fogstart(float setter);               // OpenGL fog starts at fogstart * mjModel.stat.extent
-    @Name("map.fogend") public native float map_fogend(); public native mjVisual_ map_fogend(float setter);                 // OpenGL fog ends at fogend * mjModel.stat.extent
-    @Name("map.znear") public native float map_znear(); public native mjVisual_ map_znear(float setter);                  // near clipping plane = znear * mjModel.stat.extent
-    @Name("map.zfar") public native float map_zfar(); public native mjVisual_ map_zfar(float setter);                   // far clipping plane = zfar * mjModel.stat.extent
-    @Name("map.haze") public native float map_haze(); public native mjVisual_ map_haze(float setter);                   // haze ratio
-    @Name("map.shadowclip") public native float map_shadowclip(); public native mjVisual_ map_shadowclip(float setter);             // directional light: shadowclip * mjModel.stat.extent
-    @Name("map.shadowscale") public native float map_shadowscale(); public native mjVisual_ map_shadowscale(float setter);            // spot light: shadowscale * light.cutoff
-    @Name("map.actuatortendon") public native float map_actuatortendon(); public native mjVisual_ map_actuatortendon(float setter);         // scale tendon width
-                        // scale of decor elements relative to mean body size
-    @Name("scale.forcewidth") public native float scale_forcewidth(); public native mjVisual_ scale_forcewidth(float setter);             // width of force arrow
-    @Name("scale.contactwidth") public native float scale_contactwidth(); public native mjVisual_ scale_contactwidth(float setter);           // contact width
-    @Name("scale.contactheight") public native float scale_contactheight(); public native mjVisual_ scale_contactheight(float setter);          // contact height
-    @Name("scale.connect") public native float scale_connect(); public native mjVisual_ scale_connect(float setter);                // autoconnect capsule width
-    @Name("scale.com") public native float scale_com(); public native mjVisual_ scale_com(float setter);                    // com radius
-    @Name("scale.camera") public native float scale_camera(); public native mjVisual_ scale_camera(float setter);                 // camera object
-    @Name("scale.light") public native float scale_light(); public native mjVisual_ scale_light(float setter);                  // light object
-    @Name("scale.selectpoint") public native float scale_selectpoint(); public native mjVisual_ scale_selectpoint(float setter);            // selection point
-    @Name("scale.jointlength") public native float scale_jointlength(); public native mjVisual_ scale_jointlength(float setter);            // joint length
-    @Name("scale.jointwidth") public native float scale_jointwidth(); public native mjVisual_ scale_jointwidth(float setter);             // joint width
-    @Name("scale.actuatorlength") public native float scale_actuatorlength(); public native mjVisual_ scale_actuatorlength(float setter);         // actuator length
-    @Name("scale.actuatorwidth") public native float scale_actuatorwidth(); public native mjVisual_ scale_actuatorwidth(float setter);          // actuator width
-    @Name("scale.framelength") public native float scale_framelength(); public native mjVisual_ scale_framelength(float setter);            // bodyframe axis length
-    @Name("scale.framewidth") public native float scale_framewidth(); public native mjVisual_ scale_framewidth(float setter);             // bodyframe axis width
-    @Name("scale.constraint") public native float scale_constraint(); public native mjVisual_ scale_constraint(float setter);             // constraint width
-    @Name("scale.slidercrank") public native float scale_slidercrank(); public native mjVisual_ scale_slidercrank(float setter);            // slidercrank width
-    @Name("scale.frustum") public native float scale_frustum(); public native mjVisual_ scale_frustum(float setter);                // frustum zfar plane
-                        // color of decor elements
-    @Name("rgba.fog") public native float rgba_fog(int i); public native mjVisual_ rgba_fog(int i, float setter);
-    @Name("rgba.fog") @MemberGetter public native FloatPointer rgba_fog();                 // fog
-    @Name("rgba.haze") public native float rgba_haze(int i); public native mjVisual_ rgba_haze(int i, float setter);
-    @Name("rgba.haze") @MemberGetter public native FloatPointer rgba_haze();                // haze
-    @Name("rgba.force") public native float rgba_force(int i); public native mjVisual_ rgba_force(int i, float setter);
-    @Name("rgba.force") @MemberGetter public native FloatPointer rgba_force();               // external force
-    @Name("rgba.inertia") public native float rgba_inertia(int i); public native mjVisual_ rgba_inertia(int i, float setter);
-    @Name("rgba.inertia") @MemberGetter public native FloatPointer rgba_inertia();             // inertia box
-    @Name("rgba.joint") public native float rgba_joint(int i); public native mjVisual_ rgba_joint(int i, float setter);
-    @Name("rgba.joint") @MemberGetter public native FloatPointer rgba_joint();               // joint
-    @Name("rgba.actuator") public native float rgba_actuator(int i); public native mjVisual_ rgba_actuator(int i, float setter);
-    @Name("rgba.actuator") @MemberGetter public native FloatPointer rgba_actuator();            // actuator, neutral
-    @Name("rgba.actuatornegative") public native float rgba_actuatornegative(int i); public native mjVisual_ rgba_actuatornegative(int i, float setter);
-    @Name("rgba.actuatornegative") @MemberGetter public native FloatPointer rgba_actuatornegative();    // actuator, negative limit
-    @Name("rgba.actuatorpositive") public native float rgba_actuatorpositive(int i); public native mjVisual_ rgba_actuatorpositive(int i, float setter);
-    @Name("rgba.actuatorpositive") @MemberGetter public native FloatPointer rgba_actuatorpositive();    // actuator, positive limit
-    @Name("rgba.com") public native float rgba_com(int i); public native mjVisual_ rgba_com(int i, float setter);
-    @Name("rgba.com") @MemberGetter public native FloatPointer rgba_com();                 // center of mass
-    @Name("rgba.camera") public native float rgba_camera(int i); public native mjVisual_ rgba_camera(int i, float setter);
-    @Name("rgba.camera") @MemberGetter public native FloatPointer rgba_camera();              // camera object
-    @Name("rgba.light") public native float rgba_light(int i); public native mjVisual_ rgba_light(int i, float setter);
-    @Name("rgba.light") @MemberGetter public native FloatPointer rgba_light();               // light object
-    @Name("rgba.selectpoint") public native float rgba_selectpoint(int i); public native mjVisual_ rgba_selectpoint(int i, float setter);
-    @Name("rgba.selectpoint") @MemberGetter public native FloatPointer rgba_selectpoint();         // selection point
-    @Name("rgba.connect") public native float rgba_connect(int i); public native mjVisual_ rgba_connect(int i, float setter);
-    @Name("rgba.connect") @MemberGetter public native FloatPointer rgba_connect();             // auto connect
-    @Name("rgba.contactpoint") public native float rgba_contactpoint(int i); public native mjVisual_ rgba_contactpoint(int i, float setter);
-    @Name("rgba.contactpoint") @MemberGetter public native FloatPointer rgba_contactpoint();        // contact point
-    @Name("rgba.contactforce") public native float rgba_contactforce(int i); public native mjVisual_ rgba_contactforce(int i, float setter);
-    @Name("rgba.contactforce") @MemberGetter public native FloatPointer rgba_contactforce();        // contact force
-    @Name("rgba.contactfriction") public native float rgba_contactfriction(int i); public native mjVisual_ rgba_contactfriction(int i, float setter);
-    @Name("rgba.contactfriction") @MemberGetter public native FloatPointer rgba_contactfriction();     // contact friction force
-    @Name("rgba.contacttorque") public native float rgba_contacttorque(int i); public native mjVisual_ rgba_contacttorque(int i, float setter);
-    @Name("rgba.contacttorque") @MemberGetter public native FloatPointer rgba_contacttorque();       // contact torque
-    @Name("rgba.contactgap") public native float rgba_contactgap(int i); public native mjVisual_ rgba_contactgap(int i, float setter);
-    @Name("rgba.contactgap") @MemberGetter public native FloatPointer rgba_contactgap();          // contact point in gap
-    @Name("rgba.rangefinder") public native float rgba_rangefinder(int i); public native mjVisual_ rgba_rangefinder(int i, float setter);
-    @Name("rgba.rangefinder") @MemberGetter public native FloatPointer rgba_rangefinder();         // rangefinder ray
-    @Name("rgba.constraint") public native float rgba_constraint(int i); public native mjVisual_ rgba_constraint(int i, float setter);
-    @Name("rgba.constraint") @MemberGetter public native FloatPointer rgba_constraint();          // constraint
-    @Name("rgba.slidercrank") public native float rgba_slidercrank(int i); public native mjVisual_ rgba_slidercrank(int i, float setter);
-    @Name("rgba.slidercrank") @MemberGetter public native FloatPointer rgba_slidercrank();         // slidercrank
-    @Name("rgba.crankbroken") public native float rgba_crankbroken(int i); public native mjVisual_ rgba_crankbroken(int i, float setter);
-    @Name("rgba.crankbroken") @MemberGetter public native FloatPointer rgba_crankbroken();         // used when crank must be stretched/broken
-    @Name("rgba.frustum") public native float rgba_frustum(int i); public native mjVisual_ rgba_frustum(int i, float setter);
-    @Name("rgba.frustum") @MemberGetter public native FloatPointer rgba_frustum();             // camera frustum
-    @Name("rgba.bv") public native float rgba_bv(int i); public native mjVisual_ rgba_bv(int i, float setter);
-    @Name("rgba.bv") @MemberGetter public native FloatPointer rgba_bv();                  // bounding volume
-    @Name("rgba.bvactive") public native float rgba_bvactive(int i); public native mjVisual_ rgba_bvactive(int i, float setter);
-    @Name("rgba.bvactive") @MemberGetter public native FloatPointer rgba_bvactive();            // active bounding volume
-}
-@Opaque public static class mjVisual extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjVisual() { super((Pointer)null); }
+    public mjVisual(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjVisual(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjVisual position(long position) {
+        return (mjVisual)super.position(position);
+    }
+    @Override public mjVisual getPointer(long i) {
+        return new mjVisual((Pointer)this).offsetAddress(i);
+    }
+        // visualization options                        // global parameters
+    @Name("global.cameraid") public native int global_cameraid(); public native mjVisual global_cameraid(int setter);               // initial camera id (-1: free)
+    @Name("global.orthographic") public native int global_orthographic(); public native mjVisual global_orthographic(int setter);           // is the free camera orthographic (0: no, 1: yes)
+    @Name("global.fovy") public native float global_fovy(); public native mjVisual global_fovy(float setter);                   // y field-of-view of free camera (orthographic ? length : degree)
+    @Name("global.ipd") public native float global_ipd(); public native mjVisual global_ipd(float setter);                    // inter-pupilary distance for free camera
+    @Name("global.azimuth") public native float global_azimuth(); public native mjVisual global_azimuth(float setter);                // initial azimuth of free camera (degrees)
+    @Name("global.elevation") public native float global_elevation(); public native mjVisual global_elevation(float setter);              // initial elevation of free camera (degrees)
+    @Name("global.linewidth") public native float global_linewidth(); public native mjVisual global_linewidth(float setter);              // line width for wireframe and ray rendering
+    @Name("global.glow") public native float global_glow(); public native mjVisual global_glow(float setter);                   // glow coefficient for selected body
+    @Name("global.realtime") public native float global_realtime(); public native mjVisual global_realtime(float setter);               // initial real-time factor (1: real time)
+    @Name("global.offwidth") public native int global_offwidth(); public native mjVisual global_offwidth(int setter);               // width of offscreen buffer
+    @Name("global.offheight") public native int global_offheight(); public native mjVisual global_offheight(int setter);              // height of offscreen buffer
+    @Name("global.ellipsoidinertia") public native int global_ellipsoidinertia(); public native mjVisual global_ellipsoidinertia(int setter);       // geom for inertia visualization (0: box, 1: ellipsoid)
+    @Name("global.bvactive") public native int global_bvactive(); public native mjVisual global_bvactive(int setter);               // visualize active bounding volumes (0: no, 1: yes)
+                        // rendering quality
+    @Name("quality.shadowsize") public native int quality_shadowsize(); public native mjVisual quality_shadowsize(int setter);             // size of shadowmap texture
+    @Name("quality.offsamples") public native int quality_offsamples(); public native mjVisual quality_offsamples(int setter);             // number of multisamples for offscreen rendering
+    @Name("quality.numslices") public native int quality_numslices(); public native mjVisual quality_numslices(int setter);              // number of slices for builtin geom drawing
+    @Name("quality.numstacks") public native int quality_numstacks(); public native mjVisual quality_numstacks(int setter);              // number of stacks for builtin geom drawing
+    @Name("quality.numquads") public native int quality_numquads(); public native mjVisual quality_numquads(int setter);               // number of quads for box rendering
+                        // head light
+    @Name("headlight.ambient") public native float headlight_ambient(int i); public native mjVisual headlight_ambient(int i, float setter);
+    @Name("headlight.ambient") @MemberGetter public native FloatPointer headlight_ambient();             // ambient rgb (alpha=1)
+    @Name("headlight.diffuse") public native float headlight_diffuse(int i); public native mjVisual headlight_diffuse(int i, float setter);
+    @Name("headlight.diffuse") @MemberGetter public native FloatPointer headlight_diffuse();             // diffuse rgb (alpha=1)
+    @Name("headlight.specular") public native float headlight_specular(int i); public native mjVisual headlight_specular(int i, float setter);
+    @Name("headlight.specular") @MemberGetter public native FloatPointer headlight_specular();            // specular rgb (alpha=1)
+    @Name("headlight.active") public native int headlight_active(); public native mjVisual headlight_active(int setter);                 // is headlight active (0: no, 1: yes, 2: auto)
+                        // mapping
+    @Name("map.stiffness") public native float map_stiffness(); public native mjVisual map_stiffness(float setter);              // mouse perturbation stiffness (space->force)
+    @Name("map.stiffnessrot") public native float map_stiffnessrot(); public native mjVisual map_stiffnessrot(float setter);           // mouse perturbation stiffness (space->torque)
+    @Name("map.force") public native float map_force(); public native mjVisual map_force(float setter);                  // from force units to space units
+    @Name("map.torque") public native float map_torque(); public native mjVisual map_torque(float setter);                 // from torque units to space units
+    @Name("map.alpha") public native float map_alpha(); public native mjVisual map_alpha(float setter);                  // scale geom alphas when transparency is enabled
+    @Name("map.fogstart") public native float map_fogstart(); public native mjVisual map_fogstart(float setter);               // OpenGL fog starts at fogstart * mjModel.stat.extent
+    @Name("map.fogend") public native float map_fogend(); public native mjVisual map_fogend(float setter);                 // OpenGL fog ends at fogend * mjModel.stat.extent
+    @Name("map.znear") public native float map_znear(); public native mjVisual map_znear(float setter);                  // near clipping plane = znear * mjModel.stat.extent
+    @Name("map.zfar") public native float map_zfar(); public native mjVisual map_zfar(float setter);                   // far clipping plane = zfar * mjModel.stat.extent
+    @Name("map.haze") public native float map_haze(); public native mjVisual map_haze(float setter);                   // haze ratio
+    @Name("map.shadowclip") public native float map_shadowclip(); public native mjVisual map_shadowclip(float setter);             // directional light: shadowclip * mjModel.stat.extent
+    @Name("map.shadowscale") public native float map_shadowscale(); public native mjVisual map_shadowscale(float setter);            // spot light: shadowscale * light.cutoff
+    @Name("map.actuatortendon") public native float map_actuatortendon(); public native mjVisual map_actuatortendon(float setter);         // scale tendon width
+                        // scale of decor elements relative to mean body size
+    @Name("scale.forcewidth") public native float scale_forcewidth(); public native mjVisual scale_forcewidth(float setter);             // width of force arrow
+    @Name("scale.contactwidth") public native float scale_contactwidth(); public native mjVisual scale_contactwidth(float setter);           // contact width
+    @Name("scale.contactheight") public native float scale_contactheight(); public native mjVisual scale_contactheight(float setter);          // contact height
+    @Name("scale.connect") public native float scale_connect(); public native mjVisual scale_connect(float setter);                // autoconnect capsule width
+    @Name("scale.com") public native float scale_com(); public native mjVisual scale_com(float setter);                    // com radius
+    @Name("scale.camera") public native float scale_camera(); public native mjVisual scale_camera(float setter);                 // camera object
+    @Name("scale.light") public native float scale_light(); public native mjVisual scale_light(float setter);                  // light object
+    @Name("scale.selectpoint") public native float scale_selectpoint(); public native mjVisual scale_selectpoint(float setter);            // selection point
+    @Name("scale.jointlength") public native float scale_jointlength(); public native mjVisual scale_jointlength(float setter);            // joint length
+    @Name("scale.jointwidth") public native float scale_jointwidth(); public native mjVisual scale_jointwidth(float setter);             // joint width
+    @Name("scale.actuatorlength") public native float scale_actuatorlength(); public native mjVisual scale_actuatorlength(float setter);         // actuator length
+    @Name("scale.actuatorwidth") public native float scale_actuatorwidth(); public native mjVisual scale_actuatorwidth(float setter);          // actuator width
+    @Name("scale.framelength") public native float scale_framelength(); public native mjVisual scale_framelength(float setter);            // bodyframe axis length
+    @Name("scale.framewidth") public native float scale_framewidth(); public native mjVisual scale_framewidth(float setter);             // bodyframe axis width
+    @Name("scale.constraint") public native float scale_constraint(); public native mjVisual scale_constraint(float setter);             // constraint width
+    @Name("scale.slidercrank") public native float scale_slidercrank(); public native mjVisual scale_slidercrank(float setter);            // slidercrank width
+    @Name("scale.frustum") public native float scale_frustum(); public native mjVisual scale_frustum(float setter);                // frustum zfar plane
+                        // color of decor elements
+    @Name("rgba.fog") public native float rgba_fog(int i); public native mjVisual rgba_fog(int i, float setter);
+    @Name("rgba.fog") @MemberGetter public native FloatPointer rgba_fog();                 // fog
+    @Name("rgba.haze") public native float rgba_haze(int i); public native mjVisual rgba_haze(int i, float setter);
+    @Name("rgba.haze") @MemberGetter public native FloatPointer rgba_haze();                // haze
+    @Name("rgba.force") public native float rgba_force(int i); public native mjVisual rgba_force(int i, float setter);
+    @Name("rgba.force") @MemberGetter public native FloatPointer rgba_force();               // external force
+    @Name("rgba.inertia") public native float rgba_inertia(int i); public native mjVisual rgba_inertia(int i, float setter);
+    @Name("rgba.inertia") @MemberGetter public native FloatPointer rgba_inertia();             // inertia box
+    @Name("rgba.joint") public native float rgba_joint(int i); public native mjVisual rgba_joint(int i, float setter);
+    @Name("rgba.joint") @MemberGetter public native FloatPointer rgba_joint();               // joint
+    @Name("rgba.actuator") public native float rgba_actuator(int i); public native mjVisual rgba_actuator(int i, float setter);
+    @Name("rgba.actuator") @MemberGetter public native FloatPointer rgba_actuator();            // actuator, neutral
+    @Name("rgba.actuatornegative") public native float rgba_actuatornegative(int i); public native mjVisual rgba_actuatornegative(int i, float setter);
+    @Name("rgba.actuatornegative") @MemberGetter public native FloatPointer rgba_actuatornegative();    // actuator, negative limit
+    @Name("rgba.actuatorpositive") public native float rgba_actuatorpositive(int i); public native mjVisual rgba_actuatorpositive(int i, float setter);
+    @Name("rgba.actuatorpositive") @MemberGetter public native FloatPointer rgba_actuatorpositive();    // actuator, positive limit
+    @Name("rgba.com") public native float rgba_com(int i); public native mjVisual rgba_com(int i, float setter);
+    @Name("rgba.com") @MemberGetter public native FloatPointer rgba_com();                 // center of mass
+    @Name("rgba.camera") public native float rgba_camera(int i); public native mjVisual rgba_camera(int i, float setter);
+    @Name("rgba.camera") @MemberGetter public native FloatPointer rgba_camera();              // camera object
+    @Name("rgba.light") public native float rgba_light(int i); public native mjVisual rgba_light(int i, float setter);
+    @Name("rgba.light") @MemberGetter public native FloatPointer rgba_light();               // light object
+    @Name("rgba.selectpoint") public native float rgba_selectpoint(int i); public native mjVisual rgba_selectpoint(int i, float setter);
+    @Name("rgba.selectpoint") @MemberGetter public native FloatPointer rgba_selectpoint();         // selection point
+    @Name("rgba.connect") public native float rgba_connect(int i); public native mjVisual rgba_connect(int i, float setter);
+    @Name("rgba.connect") @MemberGetter public native FloatPointer rgba_connect();             // auto connect
+    @Name("rgba.contactpoint") public native float rgba_contactpoint(int i); public native mjVisual rgba_contactpoint(int i, float setter);
+    @Name("rgba.contactpoint") @MemberGetter public native FloatPointer rgba_contactpoint();        // contact point
+    @Name("rgba.contactforce") public native float rgba_contactforce(int i); public native mjVisual rgba_contactforce(int i, float setter);
+    @Name("rgba.contactforce") @MemberGetter public native FloatPointer rgba_contactforce();        // contact force
+    @Name("rgba.contactfriction") public native float rgba_contactfriction(int i); public native mjVisual rgba_contactfriction(int i, float setter);
+    @Name("rgba.contactfriction") @MemberGetter public native FloatPointer rgba_contactfriction();     // contact friction force
+    @Name("rgba.contacttorque") public native float rgba_contacttorque(int i); public native mjVisual rgba_contacttorque(int i, float setter);
+    @Name("rgba.contacttorque") @MemberGetter public native FloatPointer rgba_contacttorque();       // contact torque
+    @Name("rgba.contactgap") public native float rgba_contactgap(int i); public native mjVisual rgba_contactgap(int i, float setter);
+    @Name("rgba.contactgap") @MemberGetter public native FloatPointer rgba_contactgap();          // contact point in gap
+    @Name("rgba.rangefinder") public native float rgba_rangefinder(int i); public native mjVisual rgba_rangefinder(int i, float setter);
+    @Name("rgba.rangefinder") @MemberGetter public native FloatPointer rgba_rangefinder();         // rangefinder ray
+    @Name("rgba.constraint") public native float rgba_constraint(int i); public native mjVisual rgba_constraint(int i, float setter);
+    @Name("rgba.constraint") @MemberGetter public native FloatPointer rgba_constraint();          // constraint
+    @Name("rgba.slidercrank") public native float rgba_slidercrank(int i); public native mjVisual rgba_slidercrank(int i, float setter);
+    @Name("rgba.slidercrank") @MemberGetter public native FloatPointer rgba_slidercrank();         // slidercrank
+    @Name("rgba.crankbroken") public native float rgba_crankbroken(int i); public native mjVisual rgba_crankbroken(int i, float setter);
+    @Name("rgba.crankbroken") @MemberGetter public native FloatPointer rgba_crankbroken();         // used when crank must be stretched/broken
+    @Name("rgba.frustum") public native float rgba_frustum(int i); public native mjVisual rgba_frustum(int i, float setter);
+    @Name("rgba.frustum") @MemberGetter public native FloatPointer rgba_frustum();             // camera frustum
+    @Name("rgba.bv") public native float rgba_bv(int i); public native mjVisual rgba_bv(int i, float setter);
+    @Name("rgba.bv") @MemberGetter public native FloatPointer rgba_bv();                  // bounding volume
+    @Name("rgba.bvactive") public native float rgba_bvactive(int i); public native mjVisual rgba_bvactive(int i, float setter);
+    @Name("rgba.bvactive") @MemberGetter public native FloatPointer rgba_bvactive();            // active bounding volume
 }
 
 
 //---------------------------------- mjStatistic ---------------------------------------------------
 
-public static class mjStatistic_ extends Pointer {
+public static class mjStatistic extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjStatistic_() { super((Pointer)null); allocate(); }
+    public mjStatistic() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjStatistic_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjStatistic_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjStatistic_ position(long position) {
-        return (mjStatistic_)super.position(position);
-    }
-    @Override public mjStatistic_ getPointer(long i) {
-        return new mjStatistic_((Pointer)this).offsetAddress(i);
-    }
-             // model statistics (in qpos0)
-  public native @Cast("mjtNum") double meaninertia(); public native mjStatistic_ meaninertia(double setter);             // mean diagonal inertia
-  public native @Cast("mjtNum") double meanmass(); public native mjStatistic_ meanmass(double setter);                // mean body mass
-  public native @Cast("mjtNum") double meansize(); public native mjStatistic_ meansize(double setter);                // mean body size
-  public native @Cast("mjtNum") double extent(); public native mjStatistic_ extent(double setter);                  // spatial extent
-  public native @Cast("mjtNum") double center(int i); public native mjStatistic_ center(int i, double setter);
-  @MemberGetter public native @Cast("mjtNum*") DoublePointer center();               // center of model
-}
-@Opaque public static class mjStatistic extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjStatistic() { super((Pointer)null); }
+    public mjStatistic(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjStatistic(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjStatistic position(long position) {
+        return (mjStatistic)super.position(position);
+    }
+    @Override public mjStatistic getPointer(long i) {
+        return new mjStatistic((Pointer)this).offsetAddress(i);
+    }
+     // model statistics (in qpos0)
+  public native @Cast("mjtNum") double meaninertia(); public native mjStatistic meaninertia(double setter);             // mean diagonal inertia
+  public native @Cast("mjtNum") double meanmass(); public native mjStatistic meanmass(double setter);                // mean body mass
+  public native @Cast("mjtNum") double meansize(); public native mjStatistic meansize(double setter);                // mean body size
+  public native @Cast("mjtNum") double extent(); public native mjStatistic extent(double setter);                  // spatial extent
+  public native @Cast("mjtNum") double center(int i); public native mjStatistic center(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer center();               // center of model
 }
 
 
 //---------------------------------- mjModel -------------------------------------------------------
 
-public static class mjModel_ extends Pointer {
+public static class mjModel extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjModel_() { super((Pointer)null); allocate(); }
+    public mjModel() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjModel_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjModel(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjModel_(Pointer p) { super(p); }
+    public mjModel(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjModel_ position(long position) {
-        return (mjModel_)super.position(position);
+    @Override public mjModel position(long position) {
+        return (mjModel)super.position(position);
     }
-    @Override public mjModel_ getPointer(long i) {
-        return new mjModel_((Pointer)this).offsetAddress(i);
+    @Override public mjModel getPointer(long i) {
+        return new mjModel((Pointer)this).offsetAddress(i);
     }
 
   // ------------------------------- sizes
 
   // sizes needed at mjModel construction
-  public native int nq(); public native mjModel_ nq(int setter);                         // number of generalized coordinates = dim(qpos)
-  public native int nv(); public native mjModel_ nv(int setter);                         // number of degrees of freedom = dim(qvel)
-  public native int nu(); public native mjModel_ nu(int setter);                         // number of actuators/controls = dim(ctrl)
-  public native int na(); public native mjModel_ na(int setter);                         // number of activation states = dim(act)
-  public native int nbody(); public native mjModel_ nbody(int setter);                      // number of bodies
-  public native int nbvh(); public native mjModel_ nbvh(int setter);                       // number of total bounding volumes in all bodies
-  public native int nbvhstatic(); public native mjModel_ nbvhstatic(int setter);                 // number of static bounding volumes (aabb stored in mjModel)
-  public native int nbvhdynamic(); public native mjModel_ nbvhdynamic(int setter);                // number of dynamic bounding volumes (aabb stored in mjData)
-  public native int njnt(); public native mjModel_ njnt(int setter);                       // number of joints
-  public native int ngeom(); public native mjModel_ ngeom(int setter);                      // number of geoms
-  public native int nsite(); public native mjModel_ nsite(int setter);                      // number of sites
-  public native int ncam(); public native mjModel_ ncam(int setter);                       // number of cameras
-  public native int nlight(); public native mjModel_ nlight(int setter);                     // number of lights
-  public native int nflex(); public native mjModel_ nflex(int setter);                      // number of flexes
-  public native int nflexvert(); public native mjModel_ nflexvert(int setter);                  // number of vertices in all flexes
-  public native int nflexedge(); public native mjModel_ nflexedge(int setter);                  // number of edges in all flexes
-  public native int nflexelem(); public native mjModel_ nflexelem(int setter);                  // number of elements in all flexes
-  public native int nflexelemdata(); public native mjModel_ nflexelemdata(int setter);              // number of element vertex ids in all flexes
-  public native int nflexshelldata(); public native mjModel_ nflexshelldata(int setter);             // number of shell fragment vertex ids in all flexes
-  public native int nflexevpair(); public native mjModel_ nflexevpair(int setter);                // number of element-vertex pairs in all flexes
-  public native int nflextexcoord(); public native mjModel_ nflextexcoord(int setter);              // number of vertices with texture coordinates
-  public native int nmesh(); public native mjModel_ nmesh(int setter);                      // number of meshes
-  public native int nmeshvert(); public native mjModel_ nmeshvert(int setter);                  // number of vertices in all meshes
-  public native int nmeshnormal(); public native mjModel_ nmeshnormal(int setter);                // number of normals in all meshes
-  public native int nmeshtexcoord(); public native mjModel_ nmeshtexcoord(int setter);              // number of texcoords in all meshes
-  public native int nmeshface(); public native mjModel_ nmeshface(int setter);                  // number of triangular faces in all meshes
-  public native int nmeshgraph(); public native mjModel_ nmeshgraph(int setter);                 // number of ints in mesh auxiliary data
-  public native int nskin(); public native mjModel_ nskin(int setter);                      // number of skins
-  public native int nskinvert(); public native mjModel_ nskinvert(int setter);                  // number of vertices in all skins
-  public native int nskintexvert(); public native mjModel_ nskintexvert(int setter);               // number of vertiex with texcoords in all skins
-  public native int nskinface(); public native mjModel_ nskinface(int setter);                  // number of triangular faces in all skins
-  public native int nskinbone(); public native mjModel_ nskinbone(int setter);                  // number of bones in all skins
-  public native int nskinbonevert(); public native mjModel_ nskinbonevert(int setter);              // number of vertices in all skin bones
-  public native int nhfield(); public native mjModel_ nhfield(int setter);                    // number of heightfields
-  public native int nhfielddata(); public native mjModel_ nhfielddata(int setter);                // number of data points in all heightfields
-  public native int ntex(); public native mjModel_ ntex(int setter);                       // number of textures
-  public native int ntexdata(); public native mjModel_ ntexdata(int setter);                   // number of bytes in texture rgb data
-  public native int nmat(); public native mjModel_ nmat(int setter);                       // number of materials
-  public native int npair(); public native mjModel_ npair(int setter);                      // number of predefined geom pairs
-  public native int nexclude(); public native mjModel_ nexclude(int setter);                   // number of excluded geom pairs
-  public native int neq(); public native mjModel_ neq(int setter);                        // number of equality constraints
-  public native int ntendon(); public native mjModel_ ntendon(int setter);                    // number of tendons
-  public native int nwrap(); public native mjModel_ nwrap(int setter);                      // number of wrap objects in all tendon paths
-  public native int nsensor(); public native mjModel_ nsensor(int setter);                    // number of sensors
-  public native int nnumeric(); public native mjModel_ nnumeric(int setter);                   // number of numeric custom fields
-  public native int nnumericdata(); public native mjModel_ nnumericdata(int setter);               // number of mjtNums in all numeric fields
-  public native int ntext(); public native mjModel_ ntext(int setter);                      // number of text custom fields
-  public native int ntextdata(); public native mjModel_ ntextdata(int setter);                  // number of mjtBytes in all text fields
-  public native int ntuple(); public native mjModel_ ntuple(int setter);                     // number of tuple custom fields
-  public native int ntupledata(); public native mjModel_ ntupledata(int setter);                 // number of objects in all tuple fields
-  public native int nkey(); public native mjModel_ nkey(int setter);                       // number of keyframes
-  public native int nmocap(); public native mjModel_ nmocap(int setter);                     // number of mocap bodies
-  public native int nplugin(); public native mjModel_ nplugin(int setter);                    // number of plugin instances
-  public native int npluginattr(); public native mjModel_ npluginattr(int setter);                // number of chars in all plugin config attributes
-  public native int nuser_body(); public native mjModel_ nuser_body(int setter);                 // number of mjtNums in body_user
-  public native int nuser_jnt(); public native mjModel_ nuser_jnt(int setter);                  // number of mjtNums in jnt_user
-  public native int nuser_geom(); public native mjModel_ nuser_geom(int setter);                 // number of mjtNums in geom_user
-  public native int nuser_site(); public native mjModel_ nuser_site(int setter);                 // number of mjtNums in site_user
-  public native int nuser_cam(); public native mjModel_ nuser_cam(int setter);                  // number of mjtNums in cam_user
-  public native int nuser_tendon(); public native mjModel_ nuser_tendon(int setter);               // number of mjtNums in tendon_user
-  public native int nuser_actuator(); public native mjModel_ nuser_actuator(int setter);             // number of mjtNums in actuator_user
-  public native int nuser_sensor(); public native mjModel_ nuser_sensor(int setter);               // number of mjtNums in sensor_user
-  public native int nnames(); public native mjModel_ nnames(int setter);                     // number of chars in all names
-  public native int nnames_map(); public native mjModel_ nnames_map(int setter);                 // number of slots in the names hash map
-  public native int npaths(); public native mjModel_ npaths(int setter);                     // number of chars in all paths
+  public native @Cast("mjtSize") long nq(); public native mjModel nq(long setter);                     // number of generalized coordinates = dim(qpos)
+  public native @Cast("mjtSize") long nv(); public native mjModel nv(long setter);                     // number of degrees of freedom = dim(qvel)
+  public native @Cast("mjtSize") long nu(); public native mjModel nu(long setter);                     // number of scalar controls = dim(ctrl)
+  public native @Cast("mjtSize") long nactuator(); public native mjModel nactuator(long setter);              // number of actuators
+  public native @Cast("mjtSize") long nout(); public native mjModel nout(long setter);                   // number of force outputs, derived from transmission type
+  public native @Cast("mjtSize") long na(); public native mjModel na(long setter);                     // number of activation states = dim(act)
+  public native @Cast("mjtSize") long nbody(); public native mjModel nbody(long setter);                  // number of bodies
+  public native @Cast("mjtSize") long nbvh(); public native mjModel nbvh(long setter);                   // number of total bounding volumes in all bodies
+  public native @Cast("mjtSize") long nbvhstatic(); public native mjModel nbvhstatic(long setter);             // number of static bounding volumes (aabb stored in mjModel)
+  public native @Cast("mjtSize") long nbvhdynamic(); public native mjModel nbvhdynamic(long setter);            // number of dynamic bounding volumes (aabb stored in mjData)
+  public native @Cast("mjtSize") long noct(); public native mjModel noct(long setter);                   // number of total octree cells in all meshes
+  public native @Cast("mjtSize") long njnt(); public native mjModel njnt(long setter);                   // number of joints
+  public native @Cast("mjtSize") long ntree(); public native mjModel ntree(long setter);                  // number of kinematic trees under world body
+  public native @Cast("mjtSize") long nM(); public native mjModel nM(long setter);                     // number of non-zeros in sparse inertia matrix
+  public native @Cast("mjtSize") long nB(); public native mjModel nB(long setter);                     // number of non-zeros in sparse body-dof matrix
+  public native @Cast("mjtSize") long nC(); public native mjModel nC(long setter);                     // number of non-zeros in sparse reduced dof-dof matrix
+  public native @Cast("mjtSize") long nD(); public native mjModel nD(long setter);                     // number of non-zeros in sparse dof-dof matrix
+  public native @Cast("mjtSize") long ngeom(); public native mjModel ngeom(long setter);                  // number of geoms
+  public native @Cast("mjtSize") long nsite(); public native mjModel nsite(long setter);                  // number of sites
+  public native @Cast("mjtSize") long ncam(); public native mjModel ncam(long setter);                   // number of cameras
+  public native @Cast("mjtSize") long nlight(); public native mjModel nlight(long setter);                 // number of lights
+  public native @Cast("mjtSize") long nflex(); public native mjModel nflex(long setter);                  // number of flexes
+  public native @Cast("mjtSize") long nflexnode(); public native mjModel nflexnode(long setter);              // number of dofs in all flexes
+  public native @Cast("mjtSize") long nflexvert(); public native mjModel nflexvert(long setter);              // number of vertices in all flexes
+  public native @Cast("mjtSize") long nflexedge(); public native mjModel nflexedge(long setter);              // number of edges in all flexes
+  public native @Cast("mjtSize") long nflexelem(); public native mjModel nflexelem(long setter);              // number of elements in all flexes
+  public native @Cast("mjtSize") long nflexelemdata(); public native mjModel nflexelemdata(long setter);          // number of element vertex ids in all flexes
+  public native @Cast("mjtSize") long nflexstiffness(); public native mjModel nflexstiffness(long setter);         // number of stiffness parameters in all flexes
+  public native @Cast("mjtSize") long nflexbending(); public native mjModel nflexbending(long setter);           // number of bending parameters in all flexes
+  public native @Cast("mjtSize") long nefm0dof(); public native mjModel nefm0dof(long setter);               // number of dofs covered by the constant metric factor
+  public native @Cast("mjtSize") long nefm0L(); public native mjModel nefm0L(long setter);                 // number of non-zeros in the constant metric factor
+  public native @Cast("mjtSize") long nefmCvert(); public native mjModel nefmCvert(long setter);              // number of sparse metric factor ordering slots
+  public native @Cast("mjtSize") long nflexelemedge(); public native mjModel nflexelemedge(long setter);          // number of element edge ids in all flexes
+  public native @Cast("mjtSize") long nflexshelldata(); public native mjModel nflexshelldata(long setter);         // number of shell fragment vertex ids in all flexes
+  public native @Cast("mjtSize") long nflextexcoord(); public native mjModel nflextexcoord(long setter);          // number of vertices with texture coordinates
+  public native @Cast("mjtSize") long nJfe(); public native mjModel nJfe(long setter);                   // number of non-zeros in sparse flexedge Jacobian matrix
+  public native @Cast("mjtSize") long nmesh(); public native mjModel nmesh(long setter);                  // number of meshes
+  public native @Cast("mjtSize") long nmeshvert(); public native mjModel nmeshvert(long setter);              // number of vertices in all meshes
+  public native @Cast("mjtSize") long nmeshnormal(); public native mjModel nmeshnormal(long setter);            // number of normals in all meshes
+  public native @Cast("mjtSize") long nmeshtexcoord(); public native mjModel nmeshtexcoord(long setter);          // number of texcoords in all meshes
+  public native @Cast("mjtSize") long nmeshface(); public native mjModel nmeshface(long setter);              // number of triangular faces in all meshes
+  public native @Cast("mjtSize") long nmeshgraph(); public native mjModel nmeshgraph(long setter);             // number of ints in mesh auxiliary data
+  public native @Cast("mjtSize") long nmeshpoly(); public native mjModel nmeshpoly(long setter);              // number of polygons in all meshes
+  public native @Cast("mjtSize") long nmeshpolyvert(); public native mjModel nmeshpolyvert(long setter);          // number of vertices in all polygons
+  public native @Cast("mjtSize") long nmeshpolymap(); public native mjModel nmeshpolymap(long setter);           // number of polygons in vertex map
+  public native @Cast("mjtSize") long nskin(); public native mjModel nskin(long setter);                  // number of skins
+  public native @Cast("mjtSize") long nskinvert(); public native mjModel nskinvert(long setter);              // number of vertices in all skins
+  public native @Cast("mjtSize") long nskintexvert(); public native mjModel nskintexvert(long setter);           // number of vertices with texcoords in all skins
+  public native @Cast("mjtSize") long nskinface(); public native mjModel nskinface(long setter);              // number of triangular faces in all skins
+  public native @Cast("mjtSize") long nskinbone(); public native mjModel nskinbone(long setter);              // number of bones in all skins
+  public native @Cast("mjtSize") long nskinbonevert(); public native mjModel nskinbonevert(long setter);          // number of vertices in all skin bones
+  public native @Cast("mjtSize") long nhfield(); public native mjModel nhfield(long setter);                // number of heightfields
+  public native @Cast("mjtSize") long nhfielddata(); public native mjModel nhfielddata(long setter);            // number of data points in all heightfields
+  public native @Cast("mjtSize") long ntex(); public native mjModel ntex(long setter);                   // number of textures
+  public native @Cast("mjtSize") long ntexdata(); public native mjModel ntexdata(long setter);               // number of bytes in texture rgb data
+  public native @Cast("mjtSize") long nmat(); public native mjModel nmat(long setter);                   // number of materials
+  public native @Cast("mjtSize") long npair(); public native mjModel npair(long setter);                  // number of predefined geom pairs
+  public native @Cast("mjtSize") long nexclude(); public native mjModel nexclude(long setter);               // number of excluded geom pairs
+  public native @Cast("mjtSize") long neq(); public native mjModel neq(long setter);                    // number of equality constraints
+  public native @Cast("mjtSize") long ntendon(); public native mjModel ntendon(long setter);                // number of tendons
+  public native @Cast("mjtSize") long nJten(); public native mjModel nJten(long setter);                  // number of non-zeros in sparse ten_J matrix
+  public native @Cast("mjtSize") long nwrap(); public native mjModel nwrap(long setter);                  // number of wrap objects in all tendon paths
+  public native @Cast("mjtSize") long nsensor(); public native mjModel nsensor(long setter);                // number of sensors
+  public native @Cast("mjtSize") long nnumeric(); public native mjModel nnumeric(long setter);               // number of numeric custom fields
+  public native @Cast("mjtSize") long nnumericdata(); public native mjModel nnumericdata(long setter);           // number of mjtNums in all numeric fields
+  public native @Cast("mjtSize") long ntext(); public native mjModel ntext(long setter);                  // number of text custom fields
+  public native @Cast("mjtSize") long ntextdata(); public native mjModel ntextdata(long setter);              // number of mjtBytes in all text fields
+  public native @Cast("mjtSize") long ntuple(); public native mjModel ntuple(long setter);                 // number of tuple custom fields
+  public native @Cast("mjtSize") long ntupledata(); public native mjModel ntupledata(long setter);             // number of objects in all tuple fields
+  public native @Cast("mjtSize") long nkey(); public native mjModel nkey(long setter);                   // number of keyframes
+  public native @Cast("mjtSize") long nmocap(); public native mjModel nmocap(long setter);                 // number of mocap bodies
+  public native @Cast("mjtSize") long nplugin(); public native mjModel nplugin(long setter);                // number of plugin instances
+  public native @Cast("mjtSize") long npluginattr(); public native mjModel npluginattr(long setter);            // number of chars in all plugin config attributes
+  public native @Cast("mjtSize") long nuser_body(); public native mjModel nuser_body(long setter);             // number of mjtNums in body_user
+  public native @Cast("mjtSize") long nuser_jnt(); public native mjModel nuser_jnt(long setter);              // number of mjtNums in jnt_user
+  public native @Cast("mjtSize") long nuser_geom(); public native mjModel nuser_geom(long setter);             // number of mjtNums in geom_user
+  public native @Cast("mjtSize") long nuser_site(); public native mjModel nuser_site(long setter);             // number of mjtNums in site_user
+  public native @Cast("mjtSize") long nuser_cam(); public native mjModel nuser_cam(long setter);              // number of mjtNums in cam_user
+  public native @Cast("mjtSize") long nuser_tendon(); public native mjModel nuser_tendon(long setter);           // number of mjtNums in tendon_user
+  public native @Cast("mjtSize") long nuser_actuator(); public native mjModel nuser_actuator(long setter);         // number of mjtNums in actuator_user
+  public native @Cast("mjtSize") long nuser_sensor(); public native mjModel nuser_sensor(long setter);           // number of mjtNums in sensor_user
+  public native @Cast("mjtSize") long nnames(); public native mjModel nnames(long setter);                 // number of chars in all names
+  public native @Cast("mjtSize") long npaths(); public native mjModel npaths(long setter);                 // number of chars in all paths
+  public native @Cast("mjtSize") long nplastic(); public native mjModel nplastic(long setter);               // number of mjtNums in plastic state vector
 
-  // sizes set after mjModel construction (only affect mjData)
-  public native int nM(); public native mjModel_ nM(int setter);                         // number of non-zeros in sparse inertia matrix
-  public native int nD(); public native mjModel_ nD(int setter);                         // number of non-zeros in sparse dof-dof matrix
-  public native int nB(); public native mjModel_ nB(int setter);                         // number of non-zeros in sparse body-dof matrix
-  public native int ntree(); public native mjModel_ ntree(int setter);                      // number of kinematic trees under world body
-  public native int nemax(); public native mjModel_ nemax(int setter);                      // number of potential equality-constraint rows
-  public native int njmax(); public native mjModel_ njmax(int setter);                      // number of available rows in constraint Jacobian
-  public native int nconmax(); public native mjModel_ nconmax(int setter);                    // number of potential contacts in contact list
-  public native int nuserdata(); public native mjModel_ nuserdata(int setter);                  // number of extra fields in mjData
-  public native int nsensordata(); public native mjModel_ nsensordata(int setter);                // number of fields in sensor data vector
-  public native int npluginstate(); public native mjModel_ npluginstate(int setter);               // number of fields in plugin state vector
+  // sizes set after mjModel construction
+  public native @Cast("mjtSize") long nnames_map(); public native mjModel nnames_map(long setter);             // number of slots in the names hash map
+  public native @Cast("mjtSize") long nJmom(); public native mjModel nJmom(long setter);                  // number of non-zeros in sparse actuator_moment matrix
+  public native @Cast("mjtSize") long ngravcomp(); public native mjModel ngravcomp(long setter);              // number of bodies with nonzero gravcomp
+  public native @Cast("mjtSize") long nemax(); public native mjModel nemax(long setter);                  // number of potential equality-constraint rows
+  public native @Cast("mjtSize") long njmax(); public native mjModel njmax(long setter);                  // number of available rows in constraint Jacobian (legacy)
+  public native @Cast("mjtSize") long nconmax(); public native mjModel nconmax(long setter);                // number of potential contacts in contact list (legacy)
+  public native @Cast("mjtSize") long npolygonmax(); public native mjModel npolygonmax(long setter);            // maximum number of vertices in a mesh polygon
+  public native @Cast("mjtSize") long nmeshdegmax(); public native mjModel nmeshdegmax(long setter);            // maximum number of edges adjacent to a mesh vertex
+  public native @Cast("mjtSize") long nuserdata(); public native mjModel nuserdata(long setter);              // number of mjtNums reserved for the user
+  public native @Cast("mjtSize") long nsensordata(); public native mjModel nsensordata(long setter);            // number of mjtNums in sensor data vector
+  public native @Cast("mjtSize") long npluginstate(); public native mjModel npluginstate(long setter);           // number of mjtNums in plugin state vector
+  public native @Cast("mjtSize") long nhistory(); public native mjModel nhistory(long setter);               // number of mjtNums in history buffer
 
-  public native @Cast("size_t") long narena(); public native mjModel_ narena(long setter);                  // number of bytes in the mjData arena (inclusive of stack)
-  public native @Cast("size_t") long nbuffer(); public native mjModel_ nbuffer(long setter);                 // number of bytes in buffer
+  // buffer sizes
+  public native @Cast("mjtSize") long narena(); public native mjModel narena(long setter);                 // number of bytes in the mjData arena (inclusive of stack)
+  public native @Cast("mjtSize") long nbuffer(); public native mjModel nbuffer(long setter);                // number of bytes in buffer
+
+  // ------------------------------- flags
+
+  public native @Cast("mjtBool") boolean flg_gravcomp(); public native mjModel flg_gravcomp(boolean setter);           // whether any body has nonzero gravcomp
+  public native @Cast("mjtBool") boolean flg_surfacevel(); public native mjModel flg_surfacevel(boolean setter);         // whether any geom has nonzero surfacevel
+  public native @Cast("mjtBool") boolean flg_adhesion(); public native mjModel flg_adhesion(boolean setter);           // whether any geom or pair has nonzero adhesion
 
   // ------------------------------- options and statistics
 
-  public native @ByRef mjOption opt(); public native mjModel_ opt(mjOption setter);                   // physics options
-  public native @ByRef mjVisual vis(); public native mjModel_ vis(mjVisual setter);                   // visualization options
-  public native @ByRef mjStatistic stat(); public native mjModel_ stat(mjStatistic setter);               // model statistics
+  public native @ByRef mjOption opt(); public native mjModel opt(mjOption setter);                   // physics options
+  public native @ByRef mjVisual vis(); public native mjModel vis(mjVisual setter);                   // visualization options
+  public native @ByRef mjStatistic stat(); public native mjModel stat(mjStatistic setter);               // model statistics
 
   // ------------------------------- buffers
 
   // main buffer
-  public native Pointer buffer(); public native mjModel_ buffer(Pointer setter);               // main buffer; all pointers point in it    (nbuffer)
+  public native Pointer buffer(); public native mjModel buffer(Pointer setter);               // main buffer; all pointers point in it    (nbuffer)
 
   // default generalized coordinates
-  public native @Cast("mjtNum*") DoublePointer qpos0(); public native mjModel_ qpos0(DoublePointer setter);                // qpos values at default pose              (nq x 1)
-  public native @Cast("mjtNum*") DoublePointer qpos_spring(); public native mjModel_ qpos_spring(DoublePointer setter);          // reference pose for springs               (nq x 1)
+  public native @Cast("mjtNum*") DoublePointer qpos0(); public native mjModel qpos0(DoublePointer setter);                // qpos values at default pose              (nq x 1)
+  public native @Cast("mjtNum*") DoublePointer qpos_spring(); public native mjModel qpos_spring(DoublePointer setter);          // reference pose for springs               (nq x 1)
 
   // bodies
-  public native IntPointer body_parentid(); public native mjModel_ body_parentid(IntPointer setter);        // id of body's parent                      (nbody x 1)
-  public native IntPointer body_rootid(); public native mjModel_ body_rootid(IntPointer setter);          // id of root above body                    (nbody x 1)
-  public native IntPointer body_weldid(); public native mjModel_ body_weldid(IntPointer setter);          // id of body that this body is welded to   (nbody x 1)
-  public native IntPointer body_mocapid(); public native mjModel_ body_mocapid(IntPointer setter);         // id of mocap data; -1: none               (nbody x 1)
-  public native IntPointer body_jntnum(); public native mjModel_ body_jntnum(IntPointer setter);          // number of joints for this body           (nbody x 1)
-  public native IntPointer body_jntadr(); public native mjModel_ body_jntadr(IntPointer setter);          // start addr of joints; -1: no joints      (nbody x 1)
-  public native IntPointer body_dofnum(); public native mjModel_ body_dofnum(IntPointer setter);          // number of motion degrees of freedom      (nbody x 1)
-  public native IntPointer body_dofadr(); public native mjModel_ body_dofadr(IntPointer setter);          // start addr of dofs; -1: no dofs          (nbody x 1)
-  public native IntPointer body_treeid(); public native mjModel_ body_treeid(IntPointer setter);          // id of body's kinematic tree; -1: static  (nbody x 1)
-  public native IntPointer body_geomnum(); public native mjModel_ body_geomnum(IntPointer setter);         // number of geoms                          (nbody x 1)
-  public native IntPointer body_geomadr(); public native mjModel_ body_geomadr(IntPointer setter);         // start addr of geoms; -1: no geoms        (nbody x 1)
-  public native @Cast("mjtByte*") BytePointer body_simple(); public native mjModel_ body_simple(BytePointer setter);          // 1: diag M; 2: diag M, sliders only       (nbody x 1)
-  public native @Cast("mjtByte*") BytePointer body_sameframe(); public native mjModel_ body_sameframe(BytePointer setter);       // inertial frame is same as body frame     (nbody x 1)
-  public native @Cast("mjtNum*") DoublePointer body_pos(); public native mjModel_ body_pos(DoublePointer setter);             // position offset rel. to parent body      (nbody x 3)
-  public native @Cast("mjtNum*") DoublePointer body_quat(); public native mjModel_ body_quat(DoublePointer setter);            // orientation offset rel. to parent body   (nbody x 4)
-  public native @Cast("mjtNum*") DoublePointer body_ipos(); public native mjModel_ body_ipos(DoublePointer setter);            // local position of center of mass         (nbody x 3)
-  public native @Cast("mjtNum*") DoublePointer body_iquat(); public native mjModel_ body_iquat(DoublePointer setter);           // local orientation of inertia ellipsoid   (nbody x 4)
-  public native @Cast("mjtNum*") DoublePointer body_mass(); public native mjModel_ body_mass(DoublePointer setter);            // mass                                     (nbody x 1)
-  public native @Cast("mjtNum*") DoublePointer body_subtreemass(); public native mjModel_ body_subtreemass(DoublePointer setter);     // mass of subtree starting at this body    (nbody x 1)
-  public native @Cast("mjtNum*") DoublePointer body_inertia(); public native mjModel_ body_inertia(DoublePointer setter);         // diagonal inertia in ipos/iquat frame     (nbody x 3)
-  public native @Cast("mjtNum*") DoublePointer body_invweight0(); public native mjModel_ body_invweight0(DoublePointer setter);      // mean inv inert in qpos0 (trn, rot)       (nbody x 2)
-  public native @Cast("mjtNum*") DoublePointer body_gravcomp(); public native mjModel_ body_gravcomp(DoublePointer setter);        // antigravity force, units of body weight  (nbody x 1)
-  public native @Cast("mjtNum*") DoublePointer body_margin(); public native mjModel_ body_margin(DoublePointer setter);          // MAX over all geom margins                (nbody x 1)
-  public native @Cast("mjtNum*") DoublePointer body_user(); public native mjModel_ body_user(DoublePointer setter);            // user data                                (nbody x nuser_body)
-  public native IntPointer body_plugin(); public native mjModel_ body_plugin(IntPointer setter);          // plugin instance id; -1: not in use       (nbody x 1)
-  public native IntPointer body_contype(); public native mjModel_ body_contype(IntPointer setter);         // OR over all geom contypes                (nbody x 1)
-  public native IntPointer body_conaffinity(); public native mjModel_ body_conaffinity(IntPointer setter);     // OR over all geom conaffinities           (nbody x 1)
-  public native IntPointer body_bvhadr(); public native mjModel_ body_bvhadr(IntPointer setter);          // address of bvh root                      (nbody x 1)
-  public native IntPointer body_bvhnum(); public native mjModel_ body_bvhnum(IntPointer setter);          // number of bounding volumes               (nbody x 1)
+  public native IntPointer body_parentid(); public native mjModel body_parentid(IntPointer setter);        // id of body's parent                      (nbody x 1)
+  public native IntPointer body_rootid(); public native mjModel body_rootid(IntPointer setter);          // ancestor that is direct child of world   (nbody x 1)
+  public native IntPointer body_weldid(); public native mjModel body_weldid(IntPointer setter);          // top dof-less ancestor; mocap: own root   (nbody x 1)
+  public native IntPointer body_mocapid(); public native mjModel body_mocapid(IntPointer setter);         // id of mocap data; -1: none               (nbody x 1)
+  public native IntPointer body_jntnum(); public native mjModel body_jntnum(IntPointer setter);          // number of joints for this body           (nbody x 1)
+  public native IntPointer body_jntadr(); public native mjModel body_jntadr(IntPointer setter);          // start addr of joints; -1: no joints      (nbody x 1)
+  public native IntPointer body_dofnum(); public native mjModel body_dofnum(IntPointer setter);          // number of motion degrees of freedom      (nbody x 1)
+  public native IntPointer body_dofadr(); public native mjModel body_dofadr(IntPointer setter);          // start addr of dofs; -1: no dofs          (nbody x 1)
+  public native IntPointer body_treeid(); public native mjModel body_treeid(IntPointer setter);          // id of body's kinematic tree; -1: static  (nbody x 1)
+  public native IntPointer body_geomnum(); public native mjModel body_geomnum(IntPointer setter);         // number of geoms                          (nbody x 1)
+  public native IntPointer body_geomadr(); public native mjModel body_geomadr(IntPointer setter);         // start addr of geoms; -1: no geoms        (nbody x 1)
+  public native @Cast("mjtByte*") BytePointer body_simple(); public native mjModel body_simple(BytePointer setter);          // 1: diag M; 2: diag M, sliders only       (nbody x 1)
+  public native @Cast("mjtByte*") BytePointer body_sameframe(); public native mjModel body_sameframe(BytePointer setter);       // same frame as inertia (mjtSameframe)     (nbody x 1)
+  public native @Cast("mjtNum*") DoublePointer body_pos(); public native mjModel body_pos(DoublePointer setter);             // position offset rel. to parent body      (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer body_quat(); public native mjModel body_quat(DoublePointer setter);            // orientation offset rel. to parent body   (nbody x 4)
+  public native @Cast("mjtNum*") DoublePointer body_ipos(); public native mjModel body_ipos(DoublePointer setter);            // local position of center of mass         (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer body_iquat(); public native mjModel body_iquat(DoublePointer setter);           // local orientation of inertia ellipsoid   (nbody x 4)
+  public native @Cast("mjtNum*") DoublePointer body_mass(); public native mjModel body_mass(DoublePointer setter);            // mass                                     (nbody x 1)
+  public native @Cast("mjtNum*") DoublePointer body_subtreemass(); public native mjModel body_subtreemass(DoublePointer setter);     // mass of subtree starting at this body    (nbody x 1)
+  public native @Cast("mjtNum*") DoublePointer body_inertia(); public native mjModel body_inertia(DoublePointer setter);         // diagonal inertia in ipos/iquat frame     (nbody x 3)
+  public native @Cast("mjtNum*") DoublePointer body_invweight0(); public native mjModel body_invweight0(DoublePointer setter);      // mean inv inert in qpos0 (trn, rot)       (nbody x 2)
+  public native @Cast("mjtNum*") DoublePointer body_gravcomp(); public native mjModel body_gravcomp(DoublePointer setter);        // antigravity force, units of body weight  (nbody x 1)
+  public native @Cast("mjtNum*") DoublePointer body_margin(); public native mjModel body_margin(DoublePointer setter);          // MAX over all geom margins+gaps           (nbody x 1)
+  public native @Cast("mjtNum*") DoublePointer body_user(); public native mjModel body_user(DoublePointer setter);            // user data                                (nbody x nuser_body)
+  public native IntPointer body_plugin(); public native mjModel body_plugin(IntPointer setter);          // plugin instance id; -1: not in use       (nbody x 1)
+  public native IntPointer body_contype(); public native mjModel body_contype(IntPointer setter);         // OR over all geom contypes                (nbody x 1)
+  public native IntPointer body_conaffinity(); public native mjModel body_conaffinity(IntPointer setter);     // OR over all geom conaffinities           (nbody x 1)
+  public native IntPointer body_bvhadr(); public native mjModel body_bvhadr(IntPointer setter);          // address of bvh root                      (nbody x 1)
+  public native IntPointer body_bvhnum(); public native mjModel body_bvhnum(IntPointer setter);          // number of bounding volumes               (nbody x 1)
 
   // bounding volume hierarchy
-  public native IntPointer bvh_depth(); public native mjModel_ bvh_depth(IntPointer setter);            // depth in the bounding volume hierarchy   (nbvh x 1)
-  public native IntPointer bvh_child(); public native mjModel_ bvh_child(IntPointer setter);            // left and right children in tree          (nbvh x 2)
-  public native IntPointer bvh_nodeid(); public native mjModel_ bvh_nodeid(IntPointer setter);           // geom or elem id of node; -1: non-leaf    (nbvh x 1)
-  public native @Cast("mjtNum*") DoublePointer bvh_aabb(); public native mjModel_ bvh_aabb(DoublePointer setter);             // local bounding box (center, size)        (nbvhstatic x 6)
+  public native IntPointer bvh_depth(); public native mjModel bvh_depth(IntPointer setter);            // depth in the bounding volume hierarchy   (nbvh x 1)
+  public native IntPointer bvh_child(); public native mjModel bvh_child(IntPointer setter);            // left and right children in tree          (nbvh x 2)
+  public native IntPointer bvh_nodeid(); public native mjModel bvh_nodeid(IntPointer setter);           // geom or elem id of node; -1: non-leaf    (nbvh x 1)
+  public native @Cast("mjtNum*") DoublePointer bvh_aabb(); public native mjModel bvh_aabb(DoublePointer setter);             // local bounding box (center, size)        (nbvhstatic x 6)
+
+  // octree spatial partitioning
+  public native IntPointer oct_depth(); public native mjModel oct_depth(IntPointer setter);            // depth in the octree                      (noct x 1)
+  public native IntPointer oct_child(); public native mjModel oct_child(IntPointer setter);            // children of octree node                  (noct x 8)
+  public native @Cast("mjtNum*") DoublePointer oct_aabb(); public native mjModel oct_aabb(DoublePointer setter);             // octree node bounding box (center, size)  (noct x 6)
+  public native @Cast("mjtNum*") DoublePointer oct_coeff(); public native mjModel oct_coeff(DoublePointer setter);            // octree interpolation coefficients        (noct x 8)
 
   // joints
-  public native IntPointer jnt_type(); public native mjModel_ jnt_type(IntPointer setter);             // type of joint (mjtJoint)                 (njnt x 1)
-  public native IntPointer jnt_qposadr(); public native mjModel_ jnt_qposadr(IntPointer setter);          // start addr in 'qpos' for joint's data    (njnt x 1)
-  public native IntPointer jnt_dofadr(); public native mjModel_ jnt_dofadr(IntPointer setter);           // start addr in 'qvel' for joint's data    (njnt x 1)
-  public native IntPointer jnt_bodyid(); public native mjModel_ jnt_bodyid(IntPointer setter);           // id of joint's body                       (njnt x 1)
-  public native IntPointer jnt_group(); public native mjModel_ jnt_group(IntPointer setter);            // group for visibility                     (njnt x 1)
-  public native @Cast("mjtByte*") BytePointer jnt_limited(); public native mjModel_ jnt_limited(BytePointer setter);          // does joint have limits                   (njnt x 1)
-  public native @Cast("mjtByte*") BytePointer jnt_actfrclimited(); public native mjModel_ jnt_actfrclimited(BytePointer setter);    // does joint have actuator force limits    (njnt x 1)
-  public native @Cast("mjtNum*") DoublePointer jnt_solref(); public native mjModel_ jnt_solref(DoublePointer setter);           // constraint solver reference: limit       (njnt x mjNREF)
-  public native @Cast("mjtNum*") DoublePointer jnt_solimp(); public native mjModel_ jnt_solimp(DoublePointer setter);           // constraint solver impedance: limit       (njnt x mjNIMP)
-  public native @Cast("mjtNum*") DoublePointer jnt_pos(); public native mjModel_ jnt_pos(DoublePointer setter);              // local anchor position                    (njnt x 3)
-  public native @Cast("mjtNum*") DoublePointer jnt_axis(); public native mjModel_ jnt_axis(DoublePointer setter);             // local joint axis                         (njnt x 3)
-  public native @Cast("mjtNum*") DoublePointer jnt_stiffness(); public native mjModel_ jnt_stiffness(DoublePointer setter);        // stiffness coefficient                    (njnt x 1)
-  public native @Cast("mjtNum*") DoublePointer jnt_range(); public native mjModel_ jnt_range(DoublePointer setter);            // joint limits                             (njnt x 2)
-  public native @Cast("mjtNum*") DoublePointer jnt_actfrcrange(); public native mjModel_ jnt_actfrcrange(DoublePointer setter);      // range of total actuator force            (njnt x 2)
-  public native @Cast("mjtNum*") DoublePointer jnt_margin(); public native mjModel_ jnt_margin(DoublePointer setter);           // min distance for limit detection         (njnt x 1)
-  public native @Cast("mjtNum*") DoublePointer jnt_user(); public native mjModel_ jnt_user(DoublePointer setter);             // user data                                (njnt x nuser_jnt)
+  public native IntPointer jnt_type(); public native mjModel jnt_type(IntPointer setter);             // type of joint (mjtJoint)                 (njnt x 1)
+  public native IntPointer jnt_qposadr(); public native mjModel jnt_qposadr(IntPointer setter);          // start addr in 'qpos' for joint's data    (njnt x 1)
+  public native IntPointer jnt_dofadr(); public native mjModel jnt_dofadr(IntPointer setter);           // start addr in 'qvel' for joint's data    (njnt x 1)
+  public native IntPointer jnt_bodyid(); public native mjModel jnt_bodyid(IntPointer setter);           // id of joint's body                       (njnt x 1)
+  public native IntPointer jnt_actuatorid(); public native mjModel jnt_actuatorid(IntPointer setter);       // actuator contributing damping / armature (njnt x 1)
+  public native IntPointer jnt_group(); public native mjModel jnt_group(IntPointer setter);            // group for visibility                     (njnt x 1)
+  public native IntPointer jnt_plasticadr(); public native mjModel jnt_plasticadr(IntPointer setter);       // start addr in plastic state (-1: none)   (njnt x 1)
+  public native @Cast("mjtBool*") BoolPointer jnt_limited(); public native mjModel jnt_limited(BoolPointer setter);          // does joint have limits                   (njnt x 1)
+  public native @Cast("mjtBool*") BoolPointer jnt_actfrclimited(); public native mjModel jnt_actfrclimited(BoolPointer setter);    // does joint have actuator force limits    (njnt x 1)
+  public native @Cast("mjtBool*") BoolPointer jnt_actgravcomp(); public native mjModel jnt_actgravcomp(BoolPointer setter);      // is gravcomp force applied via actuators  (njnt x 1)
+  public native @Cast("mjtNum*") DoublePointer jnt_solref(); public native mjModel jnt_solref(DoublePointer setter);           // constraint solver reference: limit       (njnt x mjNREF)
+  public native @Cast("mjtNum*") DoublePointer jnt_solimp(); public native mjModel jnt_solimp(DoublePointer setter);           // constraint solver impedance: limit       (njnt x mjNIMP)
+  public native @Cast("mjtNum*") DoublePointer jnt_pos(); public native mjModel jnt_pos(DoublePointer setter);              // local anchor position                    (njnt x 3)
+  public native @Cast("mjtNum*") DoublePointer jnt_axis(); public native mjModel jnt_axis(DoublePointer setter);             // local joint axis                         (njnt x 3)
+  public native @Cast("mjtNum*") DoublePointer jnt_stiffness(); public native mjModel jnt_stiffness(DoublePointer setter);        // linear stiffness coefficient             (njnt x 1)
+  public native @Cast("mjtNum*") DoublePointer jnt_stiffnesspoly(); public native mjModel jnt_stiffnesspoly(DoublePointer setter);    // high-order stiffness coefficients        (njnt x mjNPOLY)
+  public native @Cast("mjtNum*") DoublePointer jnt_springyield(); public native mjModel jnt_springyield(DoublePointer setter);      // plastic yield threshold                  (njnt x 1)
+  public native @Cast("mjtNum*") DoublePointer jnt_range(); public native mjModel jnt_range(DoublePointer setter);            // joint limits                             (njnt x 2)
+  public native @Cast("mjtNum*") DoublePointer jnt_actfrcrange(); public native mjModel jnt_actfrcrange(DoublePointer setter);      // range of total actuator force            (njnt x 2)
+  public native @Cast("mjtNum*") DoublePointer jnt_margin(); public native mjModel jnt_margin(DoublePointer setter);           // min distance for limit detection         (njnt x 1)
+  public native @Cast("mjtNum*") DoublePointer jnt_user(); public native mjModel jnt_user(DoublePointer setter);             // user data                                (njnt x nuser_jnt)
 
   // dofs
-  public native IntPointer dof_bodyid(); public native mjModel_ dof_bodyid(IntPointer setter);           // id of dof's body                         (nv x 1)
-  public native IntPointer dof_jntid(); public native mjModel_ dof_jntid(IntPointer setter);            // id of dof's joint                        (nv x 1)
-  public native IntPointer dof_parentid(); public native mjModel_ dof_parentid(IntPointer setter);         // id of dof's parent; -1: none             (nv x 1)
-  public native IntPointer dof_treeid(); public native mjModel_ dof_treeid(IntPointer setter);           // id of dof's kinematic tree               (nv x 1)
-  public native IntPointer dof_Madr(); public native mjModel_ dof_Madr(IntPointer setter);             // dof address in M-diagonal                (nv x 1)
-  public native IntPointer dof_simplenum(); public native mjModel_ dof_simplenum(IntPointer setter);        // number of consecutive simple dofs        (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer dof_solref(); public native mjModel_ dof_solref(DoublePointer setter);           // constraint solver reference:frictionloss (nv x mjNREF)
-  public native @Cast("mjtNum*") DoublePointer dof_solimp(); public native mjModel_ dof_solimp(DoublePointer setter);           // constraint solver impedance:frictionloss (nv x mjNIMP)
-  public native @Cast("mjtNum*") DoublePointer dof_frictionloss(); public native mjModel_ dof_frictionloss(DoublePointer setter);     // dof friction loss                        (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer dof_armature(); public native mjModel_ dof_armature(DoublePointer setter);         // dof armature inertia/mass                (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer dof_damping(); public native mjModel_ dof_damping(DoublePointer setter);          // damping coefficient                      (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer dof_invweight0(); public native mjModel_ dof_invweight0(DoublePointer setter);       // diag. inverse inertia in qpos0           (nv x 1)
-  public native @Cast("mjtNum*") DoublePointer dof_M0(); public native mjModel_ dof_M0(DoublePointer setter);               // diag. inertia in qpos0                   (nv x 1)
+  public native IntPointer dof_bodyid(); public native mjModel dof_bodyid(IntPointer setter);           // id of dof's body                         (nv x 1)
+  public native IntPointer dof_jntid(); public native mjModel dof_jntid(IntPointer setter);            // id of dof's joint                        (nv x 1)
+  public native IntPointer dof_parentid(); public native mjModel dof_parentid(IntPointer setter);         // id of dof's parent; -1: none             (nv x 1)
+  public native IntPointer dof_treeid(); public native mjModel dof_treeid(IntPointer setter);           // id of dof's kinematic tree               (nv x 1)
+  public native IntPointer dof_Madr(); public native mjModel dof_Madr(IntPointer setter);             // dof address in M-diagonal                (nv x 1)
+  public native IntPointer dof_simplenum(); public native mjModel dof_simplenum(IntPointer setter);        // number of consecutive simple dofs        (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer dof_solref(); public native mjModel dof_solref(DoublePointer setter);           // constraint solver reference:frictionloss (nv x mjNREF)
+  public native @Cast("mjtNum*") DoublePointer dof_solimp(); public native mjModel dof_solimp(DoublePointer setter);           // constraint solver impedance:frictionloss (nv x mjNIMP)
+  public native @Cast("mjtNum*") DoublePointer dof_frictionloss(); public native mjModel dof_frictionloss(DoublePointer setter);     // dof friction loss                        (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer dof_armature(); public native mjModel dof_armature(DoublePointer setter);         // dof armature inertia/mass                (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer dof_damping(); public native mjModel dof_damping(DoublePointer setter);          // linear damping coefficient               (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer dof_dampingpoly(); public native mjModel dof_dampingpoly(DoublePointer setter);      // high-order damping coefficients          (nv x mjNPOLY)
+  public native @Cast("mjtNum*") DoublePointer dof_invweight0(); public native mjModel dof_invweight0(DoublePointer setter);       // diag. inverse inertia in qpos0           (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer dof_M0(); public native mjModel dof_M0(DoublePointer setter);               // diag. inertia in qpos0                   (nv x 1)
+  public native @Cast("mjtNum*") DoublePointer dof_length(); public native mjModel dof_length(DoublePointer setter);           // linear: 1; angular: approx. length scale (nv x 1)
+
+  // trees
+  public native IntPointer tree_bodyadr(); public native mjModel tree_bodyadr(IntPointer setter);         // start addr of bodies                     (ntree x 1)
+  public native IntPointer tree_bodynum(); public native mjModel tree_bodynum(IntPointer setter);         // number of bodies in tree                 (ntree x 1)
+  public native IntPointer tree_dofadr(); public native mjModel tree_dofadr(IntPointer setter);          // start addr of dofs                       (ntree x 1)
+  public native IntPointer tree_dofnum(); public native mjModel tree_dofnum(IntPointer setter);          // number of dofs in tree                   (ntree x 1)
+  public native IntPointer tree_sleep_policy(); public native mjModel tree_sleep_policy(IntPointer setter);    // sleep policy (mjtSleepPolicy)            (ntree x 1)
 
   // geoms
-  public native IntPointer geom_type(); public native mjModel_ geom_type(IntPointer setter);            // geometric type (mjtGeom)                 (ngeom x 1)
-  public native IntPointer geom_contype(); public native mjModel_ geom_contype(IntPointer setter);         // geom contact type                        (ngeom x 1)
-  public native IntPointer geom_conaffinity(); public native mjModel_ geom_conaffinity(IntPointer setter);     // geom contact affinity                    (ngeom x 1)
-  public native IntPointer geom_condim(); public native mjModel_ geom_condim(IntPointer setter);          // contact dimensionality (1, 3, 4, 6)      (ngeom x 1)
-  public native IntPointer geom_bodyid(); public native mjModel_ geom_bodyid(IntPointer setter);          // id of geom's body                        (ngeom x 1)
-  public native IntPointer geom_dataid(); public native mjModel_ geom_dataid(IntPointer setter);          // id of geom's mesh/hfield; -1: none       (ngeom x 1)
-  public native IntPointer geom_matid(); public native mjModel_ geom_matid(IntPointer setter);           // material id for rendering; -1: none      (ngeom x 1)
-  public native IntPointer geom_group(); public native mjModel_ geom_group(IntPointer setter);           // group for visibility                     (ngeom x 1)
-  public native IntPointer geom_priority(); public native mjModel_ geom_priority(IntPointer setter);        // geom contact priority                    (ngeom x 1)
-  public native IntPointer geom_plugin(); public native mjModel_ geom_plugin(IntPointer setter);          // plugin instance id; -1: not in use       (ngeom x 1)
-  public native @Cast("mjtByte*") BytePointer geom_sameframe(); public native mjModel_ geom_sameframe(BytePointer setter);       // same as body frame (1) or iframe (2)     (ngeom x 1)
-  public native @Cast("mjtNum*") DoublePointer geom_solmix(); public native mjModel_ geom_solmix(DoublePointer setter);          // mixing coef for solref/imp in geom pair  (ngeom x 1)
-  public native @Cast("mjtNum*") DoublePointer geom_solref(); public native mjModel_ geom_solref(DoublePointer setter);          // constraint solver reference: contact     (ngeom x mjNREF)
-  public native @Cast("mjtNum*") DoublePointer geom_solimp(); public native mjModel_ geom_solimp(DoublePointer setter);          // constraint solver impedance: contact     (ngeom x mjNIMP)
-  public native @Cast("mjtNum*") DoublePointer geom_size(); public native mjModel_ geom_size(DoublePointer setter);            // geom-specific size parameters            (ngeom x 3)
-  public native @Cast("mjtNum*") DoublePointer geom_aabb(); public native mjModel_ geom_aabb(DoublePointer setter);            // bounding box, (center, size)             (ngeom x 6)
-  public native @Cast("mjtNum*") DoublePointer geom_rbound(); public native mjModel_ geom_rbound(DoublePointer setter);          // radius of bounding sphere                (ngeom x 1)
-  public native @Cast("mjtNum*") DoublePointer geom_pos(); public native mjModel_ geom_pos(DoublePointer setter);             // local position offset rel. to body       (ngeom x 3)
-  public native @Cast("mjtNum*") DoublePointer geom_quat(); public native mjModel_ geom_quat(DoublePointer setter);            // local orientation offset rel. to body    (ngeom x 4)
-  public native @Cast("mjtNum*") DoublePointer geom_friction(); public native mjModel_ geom_friction(DoublePointer setter);        // friction for (slide, spin, roll)         (ngeom x 3)
-  public native @Cast("mjtNum*") DoublePointer geom_margin(); public native mjModel_ geom_margin(DoublePointer setter);          // detect contact if dist<margin            (ngeom x 1)
-  public native @Cast("mjtNum*") DoublePointer geom_gap(); public native mjModel_ geom_gap(DoublePointer setter);             // include in solver if dist<margin-gap     (ngeom x 1)
-  public native @Cast("mjtNum*") DoublePointer geom_fluid(); public native mjModel_ geom_fluid(DoublePointer setter);           // fluid interaction parameters             (ngeom x mjNFLUID)
-  public native @Cast("mjtNum*") DoublePointer geom_user(); public native mjModel_ geom_user(DoublePointer setter);            // user data                                (ngeom x nuser_geom)
-  public native FloatPointer geom_rgba(); public native mjModel_ geom_rgba(FloatPointer setter);            // rgba when material is omitted            (ngeom x 4)
+  public native IntPointer geom_type(); public native mjModel geom_type(IntPointer setter);            // geometric type (mjtGeom)                 (ngeom x 1)
+  public native IntPointer geom_contype(); public native mjModel geom_contype(IntPointer setter);         // geom contact type                        (ngeom x 1)
+  public native IntPointer geom_conaffinity(); public native mjModel geom_conaffinity(IntPointer setter);     // geom contact affinity                    (ngeom x 1)
+  public native IntPointer geom_condim(); public native mjModel geom_condim(IntPointer setter);          // contact dimensionality (1, 3, 4, 6)      (ngeom x 1)
+  public native IntPointer geom_bodyid(); public native mjModel geom_bodyid(IntPointer setter);          // id of geom's body                        (ngeom x 1)
+  public native IntPointer geom_dataid(); public native mjModel geom_dataid(IntPointer setter);          // id of geom's mesh/hfield; -1: none       (ngeom x 1)
+  public native IntPointer geom_matid(); public native mjModel geom_matid(IntPointer setter);           // material id for rendering; -1: none      (ngeom x 1)
+  public native IntPointer geom_group(); public native mjModel geom_group(IntPointer setter);           // group for visibility                     (ngeom x 1)
+  public native IntPointer geom_priority(); public native mjModel geom_priority(IntPointer setter);        // geom contact priority                    (ngeom x 1)
+  public native IntPointer geom_plugin(); public native mjModel geom_plugin(IntPointer setter);          // plugin instance id; -1: not in use       (ngeom x 1)
+  public native @Cast("mjtByte*") BytePointer geom_sameframe(); public native mjModel geom_sameframe(BytePointer setter);       // same frame as body (mjtSameframe)        (ngeom x 1)
+  public native @Cast("mjtBool*") BoolPointer geom_castshadow(); public native mjModel geom_castshadow(BoolPointer setter);      // does geom cast shadows                   (ngeom x 1)
+  public native @Cast("mjtNum*") DoublePointer geom_solmix(); public native mjModel geom_solmix(DoublePointer setter);          // mixing coef for solref/imp in geom pair  (ngeom x 1)
+  public native @Cast("mjtNum*") DoublePointer geom_solref(); public native mjModel geom_solref(DoublePointer setter);          // constraint solver reference: contact     (ngeom x mjNREF)
+  public native @Cast("mjtNum*") DoublePointer geom_solimp(); public native mjModel geom_solimp(DoublePointer setter);          // constraint solver impedance: contact     (ngeom x mjNIMP)
+  public native @Cast("mjtNum*") DoublePointer geom_size(); public native mjModel geom_size(DoublePointer setter);            // geom-specific size parameters            (ngeom x 3)
+  public native @Cast("mjtNum*") DoublePointer geom_aabb(); public native mjModel geom_aabb(DoublePointer setter);            // bounding box, (center, size)             (ngeom x 6)
+  public native @Cast("mjtNum*") DoublePointer geom_rbound(); public native mjModel geom_rbound(DoublePointer setter);          // radius of bounding sphere                (ngeom x 1)
+  public native @Cast("mjtNum*") DoublePointer geom_pos(); public native mjModel geom_pos(DoublePointer setter);             // local position offset rel. to body       (ngeom x 3)
+  public native @Cast("mjtNum*") DoublePointer geom_quat(); public native mjModel geom_quat(DoublePointer setter);            // local orientation offset rel. to body    (ngeom x 4)
+  public native @Cast("mjtNum*") DoublePointer geom_friction(); public native mjModel geom_friction(DoublePointer setter);        // friction for (slide, spin, roll)         (ngeom x 3)
+  public native @Cast("mjtNum*") DoublePointer geom_margin(); public native mjModel geom_margin(DoublePointer setter);          // geometric inflation for contact          (ngeom x 1)
+  public native @Cast("mjtNum*") DoublePointer geom_gap(); public native mjModel geom_gap(DoublePointer setter);             // additional contact detection buffer      (ngeom x 1)
+  public native @Cast("mjtNum*") DoublePointer geom_surfacevel(); public native mjModel geom_surfacevel(DoublePointer setter);      // surface velocity in local frame: lin,ang (ngeom x 6)
+  public native @Cast("mjtNum*") DoublePointer geom_adhesion(); public native mjModel geom_adhesion(DoublePointer setter);        // adhesive force of contacts               (ngeom x 1)
+  public native @Cast("mjtNum*") DoublePointer geom_fluid(); public native mjModel geom_fluid(DoublePointer setter);           // fluid interaction parameters             (ngeom x mjNFLUID)
+  public native @Cast("mjtNum*") DoublePointer geom_user(); public native mjModel geom_user(DoublePointer setter);            // user data                                (ngeom x nuser_geom)
+  public native FloatPointer geom_rgba(); public native mjModel geom_rgba(FloatPointer setter);            // rgba when material is omitted            (ngeom x 4)
 
   // sites
-  public native IntPointer site_type(); public native mjModel_ site_type(IntPointer setter);            // geom type for rendering (mjtGeom)        (nsite x 1)
-  public native IntPointer site_bodyid(); public native mjModel_ site_bodyid(IntPointer setter);          // id of site's body                        (nsite x 1)
-  public native IntPointer site_matid(); public native mjModel_ site_matid(IntPointer setter);           // material id for rendering; -1: none      (nsite x 1)
-  public native IntPointer site_group(); public native mjModel_ site_group(IntPointer setter);           // group for visibility                     (nsite x 1)
-  public native @Cast("mjtByte*") BytePointer site_sameframe(); public native mjModel_ site_sameframe(BytePointer setter);       // same as body frame (1) or iframe (2)     (nsite x 1)
-  public native @Cast("mjtNum*") DoublePointer site_size(); public native mjModel_ site_size(DoublePointer setter);            // geom size for rendering                  (nsite x 3)
-  public native @Cast("mjtNum*") DoublePointer site_pos(); public native mjModel_ site_pos(DoublePointer setter);             // local position offset rel. to body       (nsite x 3)
-  public native @Cast("mjtNum*") DoublePointer site_quat(); public native mjModel_ site_quat(DoublePointer setter);            // local orientation offset rel. to body    (nsite x 4)
-  public native @Cast("mjtNum*") DoublePointer site_user(); public native mjModel_ site_user(DoublePointer setter);            // user data                                (nsite x nuser_site)
-  public native FloatPointer site_rgba(); public native mjModel_ site_rgba(FloatPointer setter);            // rgba when material is omitted            (nsite x 4)
+  public native IntPointer site_type(); public native mjModel site_type(IntPointer setter);            // geom type for rendering (mjtGeom)        (nsite x 1)
+  public native IntPointer site_bodyid(); public native mjModel site_bodyid(IntPointer setter);          // id of site's body                        (nsite x 1)
+  public native IntPointer site_dataid(); public native mjModel site_dataid(IntPointer setter);          // id of site's mesh; -1: none              (nsite x 1)
+  public native IntPointer site_matid(); public native mjModel site_matid(IntPointer setter);           // material id for rendering; -1: none      (nsite x 1)
+  public native IntPointer site_group(); public native mjModel site_group(IntPointer setter);           // group for visibility                     (nsite x 1)
+  public native @Cast("mjtByte*") BytePointer site_sameframe(); public native mjModel site_sameframe(BytePointer setter);       // same frame as body (mjtSameframe)        (nsite x 1)
+  public native @Cast("mjtNum*") DoublePointer site_size(); public native mjModel site_size(DoublePointer setter);            // geom size for rendering                  (nsite x 3)
+  public native @Cast("mjtNum*") DoublePointer site_pos(); public native mjModel site_pos(DoublePointer setter);             // local position offset rel. to body       (nsite x 3)
+  public native @Cast("mjtNum*") DoublePointer site_quat(); public native mjModel site_quat(DoublePointer setter);            // local orientation offset rel. to body    (nsite x 4)
+  public native @Cast("mjtNum*") DoublePointer site_user(); public native mjModel site_user(DoublePointer setter);            // user data                                (nsite x nuser_site)
+  public native FloatPointer site_rgba(); public native mjModel site_rgba(FloatPointer setter);            // rgba when material is omitted            (nsite x 4)
 
   // cameras
-  public native IntPointer cam_mode(); public native mjModel_ cam_mode(IntPointer setter);             // camera tracking mode (mjtCamLight)       (ncam x 1)
-  public native IntPointer cam_bodyid(); public native mjModel_ cam_bodyid(IntPointer setter);           // id of camera's body                      (ncam x 1)
-  public native IntPointer cam_targetbodyid(); public native mjModel_ cam_targetbodyid(IntPointer setter);     // id of targeted body; -1: none            (ncam x 1)
-  public native @Cast("mjtNum*") DoublePointer cam_pos(); public native mjModel_ cam_pos(DoublePointer setter);              // position rel. to body frame              (ncam x 3)
-  public native @Cast("mjtNum*") DoublePointer cam_quat(); public native mjModel_ cam_quat(DoublePointer setter);             // orientation rel. to body frame           (ncam x 4)
-  public native @Cast("mjtNum*") DoublePointer cam_poscom0(); public native mjModel_ cam_poscom0(DoublePointer setter);          // global position rel. to sub-com in qpos0 (ncam x 3)
-  public native @Cast("mjtNum*") DoublePointer cam_pos0(); public native mjModel_ cam_pos0(DoublePointer setter);             // global position rel. to body in qpos0    (ncam x 3)
-  public native @Cast("mjtNum*") DoublePointer cam_mat0(); public native mjModel_ cam_mat0(DoublePointer setter);             // global orientation in qpos0              (ncam x 9)
-  public native IntPointer cam_resolution(); public native mjModel_ cam_resolution(IntPointer setter);       // [width, height] in pixels                (ncam x 2)
-  public native @Cast("mjtNum*") DoublePointer cam_fovy(); public native mjModel_ cam_fovy(DoublePointer setter);             // y-field of view (deg)                    (ncam x 1)
-  public native FloatPointer cam_intrinsic(); public native mjModel_ cam_intrinsic(FloatPointer setter);        // [focal length; principal point]          (ncam x 4)
-  public native FloatPointer cam_sensorsize(); public native mjModel_ cam_sensorsize(FloatPointer setter);       // sensor size                              (ncam x 2)
-  public native @Cast("mjtNum*") DoublePointer cam_ipd(); public native mjModel_ cam_ipd(DoublePointer setter);              // inter-pupilary distance                  (ncam x 1)
-  public native @Cast("mjtNum*") DoublePointer cam_user(); public native mjModel_ cam_user(DoublePointer setter);             // user data                                (ncam x nuser_cam)
+  public native IntPointer cam_mode(); public native mjModel cam_mode(IntPointer setter);             // camera tracking mode (mjtCamLight)       (ncam x 1)
+  public native IntPointer cam_bodyid(); public native mjModel cam_bodyid(IntPointer setter);           // id of camera's body                      (ncam x 1)
+  public native IntPointer cam_targetbodyid(); public native mjModel cam_targetbodyid(IntPointer setter);     // id of targeted body; -1: none            (ncam x 1)
+  public native @Cast("mjtNum*") DoublePointer cam_pos(); public native mjModel cam_pos(DoublePointer setter);              // position rel. to body frame              (ncam x 3)
+  public native @Cast("mjtNum*") DoublePointer cam_quat(); public native mjModel cam_quat(DoublePointer setter);             // orientation rel. to body frame           (ncam x 4)
+  public native @Cast("mjtNum*") DoublePointer cam_poscom0(); public native mjModel cam_poscom0(DoublePointer setter);          // global position rel. to sub-com in qpos0 (ncam x 3)
+  public native @Cast("mjtNum*") DoublePointer cam_pos0(); public native mjModel cam_pos0(DoublePointer setter);             // global position rel. to body in qpos0    (ncam x 3)
+  public native @Cast("mjtNum*") DoublePointer cam_mat0(); public native mjModel cam_mat0(DoublePointer setter);             // global orientation in qpos0              (ncam x 9)
+  public native IntPointer cam_projection(); public native mjModel cam_projection(IntPointer setter);       // projection type (mjtProjection)          (ncam x 1)
+  public native @Cast("mjtNum*") DoublePointer cam_fovy(); public native mjModel cam_fovy(DoublePointer setter);             // y field-of-view (ortho ? len : deg)      (ncam x 1)
+  public native @Cast("mjtNum*") DoublePointer cam_ipd(); public native mjModel cam_ipd(DoublePointer setter);              // inter-pupilary distance                  (ncam x 1)
+  public native IntPointer cam_resolution(); public native mjModel cam_resolution(IntPointer setter);       // resolution: pixels [width, height]       (ncam x 2)
+  public native IntPointer cam_output(); public native mjModel cam_output(IntPointer setter);           // output types (mjtCamOut bit flags)       (ncam x 1)
+  public native FloatPointer cam_sensorsize(); public native mjModel cam_sensorsize(FloatPointer setter);       // sensor size: length [width, height]      (ncam x 2)
+  public native FloatPointer cam_intrinsic(); public native mjModel cam_intrinsic(FloatPointer setter);        // [focal length; principal point]          (ncam x 4)
+  public native @Cast("mjtNum*") DoublePointer cam_user(); public native mjModel cam_user(DoublePointer setter);             // user data                                (ncam x nuser_cam)
 
   // lights
-  public native IntPointer light_mode(); public native mjModel_ light_mode(IntPointer setter);           // light tracking mode (mjtCamLight)        (nlight x 1)
-  public native IntPointer light_bodyid(); public native mjModel_ light_bodyid(IntPointer setter);         // id of light's body                       (nlight x 1)
-  public native IntPointer light_targetbodyid(); public native mjModel_ light_targetbodyid(IntPointer setter);   // id of targeted body; -1: none            (nlight x 1)
-  public native @Cast("mjtByte*") BytePointer light_directional(); public native mjModel_ light_directional(BytePointer setter);    // directional light                        (nlight x 1)
-  public native @Cast("mjtByte*") BytePointer light_castshadow(); public native mjModel_ light_castshadow(BytePointer setter);     // does light cast shadows                  (nlight x 1)
-  public native @Cast("mjtByte*") BytePointer light_active(); public native mjModel_ light_active(BytePointer setter);         // is light on                              (nlight x 1)
-  public native @Cast("mjtNum*") DoublePointer light_pos(); public native mjModel_ light_pos(DoublePointer setter);            // position rel. to body frame              (nlight x 3)
-  public native @Cast("mjtNum*") DoublePointer light_dir(); public native mjModel_ light_dir(DoublePointer setter);            // direction rel. to body frame             (nlight x 3)
-  public native @Cast("mjtNum*") DoublePointer light_poscom0(); public native mjModel_ light_poscom0(DoublePointer setter);        // global position rel. to sub-com in qpos0 (nlight x 3)
-  public native @Cast("mjtNum*") DoublePointer light_pos0(); public native mjModel_ light_pos0(DoublePointer setter);           // global position rel. to body in qpos0    (nlight x 3)
-  public native @Cast("mjtNum*") DoublePointer light_dir0(); public native mjModel_ light_dir0(DoublePointer setter);           // global direction in qpos0                (nlight x 3)
-  public native FloatPointer light_attenuation(); public native mjModel_ light_attenuation(FloatPointer setter);    // OpenGL attenuation (quadratic model)     (nlight x 3)
-  public native FloatPointer light_cutoff(); public native mjModel_ light_cutoff(FloatPointer setter);         // OpenGL cutoff                            (nlight x 1)
-  public native FloatPointer light_exponent(); public native mjModel_ light_exponent(FloatPointer setter);       // OpenGL exponent                          (nlight x 1)
-  public native FloatPointer light_ambient(); public native mjModel_ light_ambient(FloatPointer setter);        // ambient rgb (alpha=1)                    (nlight x 3)
-  public native FloatPointer light_diffuse(); public native mjModel_ light_diffuse(FloatPointer setter);        // diffuse rgb (alpha=1)                    (nlight x 3)
-  public native FloatPointer light_specular(); public native mjModel_ light_specular(FloatPointer setter);       // specular rgb (alpha=1)                   (nlight x 3)
+  public native IntPointer light_mode(); public native mjModel light_mode(IntPointer setter);           // light tracking mode (mjtCamLight)        (nlight x 1)
+  public native IntPointer light_bodyid(); public native mjModel light_bodyid(IntPointer setter);         // id of light's body                       (nlight x 1)
+  public native IntPointer light_targetbodyid(); public native mjModel light_targetbodyid(IntPointer setter);   // id of targeted body; -1: none            (nlight x 1)
+  public native IntPointer light_type(); public native mjModel light_type(IntPointer setter);           // spot, directional, etc. (mjtLightType)   (nlight x 1)
+  public native IntPointer light_texid(); public native mjModel light_texid(IntPointer setter);          // texture id for image lights              (nlight x 1)
+  public native @Cast("mjtBool*") BoolPointer light_castshadow(); public native mjModel light_castshadow(BoolPointer setter);     // does light cast shadows                  (nlight x 1)
+  public native FloatPointer light_bulbradius(); public native mjModel light_bulbradius(FloatPointer setter);     // light radius for soft shadows            (nlight x 1)
+  public native FloatPointer light_intensity(); public native mjModel light_intensity(FloatPointer setter);      // intensity, in candela                    (nlight x 1)
+  public native FloatPointer light_range(); public native mjModel light_range(FloatPointer setter);          // range of effectiveness                   (nlight x 1)
+  public native @Cast("mjtBool*") BoolPointer light_active(); public native mjModel light_active(BoolPointer setter);         // is light on                              (nlight x 1)
+  public native @Cast("mjtNum*") DoublePointer light_pos(); public native mjModel light_pos(DoublePointer setter);            // position rel. to body frame              (nlight x 3)
+  public native @Cast("mjtNum*") DoublePointer light_dir(); public native mjModel light_dir(DoublePointer setter);            // direction rel. to body frame             (nlight x 3)
+  public native @Cast("mjtNum*") DoublePointer light_poscom0(); public native mjModel light_poscom0(DoublePointer setter);        // global position rel. to sub-com in qpos0 (nlight x 3)
+  public native @Cast("mjtNum*") DoublePointer light_pos0(); public native mjModel light_pos0(DoublePointer setter);           // global position rel. to body in qpos0    (nlight x 3)
+  public native @Cast("mjtNum*") DoublePointer light_dir0(); public native mjModel light_dir0(DoublePointer setter);           // global direction in qpos0                (nlight x 3)
+  public native FloatPointer light_attenuation(); public native mjModel light_attenuation(FloatPointer setter);    // OpenGL attenuation (quadratic model)     (nlight x 3)
+  public native FloatPointer light_cutoff(); public native mjModel light_cutoff(FloatPointer setter);         // OpenGL cutoff                            (nlight x 1)
+  public native FloatPointer light_softness(); public native mjModel light_softness(FloatPointer setter);       // spotlight edge softness                  (nlight x 1)
+  public native FloatPointer light_exponent(); public native mjModel light_exponent(FloatPointer setter);       // OpenGL exponent                          (nlight x 1)
+  public native FloatPointer light_ambient(); public native mjModel light_ambient(FloatPointer setter);        // ambient rgb (alpha=1)                    (nlight x 3)
+  public native FloatPointer light_diffuse(); public native mjModel light_diffuse(FloatPointer setter);        // diffuse rgb (alpha=1)                    (nlight x 3)
+  public native FloatPointer light_specular(); public native mjModel light_specular(FloatPointer setter);       // specular rgb (alpha=1)                   (nlight x 3)
 
   // flexes: contact properties
-  public native IntPointer flex_contype(); public native mjModel_ flex_contype(IntPointer setter);         // flex contact type                        (nflex x 1)
-  public native IntPointer flex_conaffinity(); public native mjModel_ flex_conaffinity(IntPointer setter);     // flex contact affinity                    (nflex x 1)
-  public native IntPointer flex_condim(); public native mjModel_ flex_condim(IntPointer setter);          // contact dimensionality (1, 3, 4, 6)      (nflex x 1)
-  public native IntPointer flex_priority(); public native mjModel_ flex_priority(IntPointer setter);        // flex contact priority                    (nflex x 1)
-  public native @Cast("mjtNum*") DoublePointer flex_solmix(); public native mjModel_ flex_solmix(DoublePointer setter);          // mix coef for solref/imp in contact pair  (nflex x 1)
-  public native @Cast("mjtNum*") DoublePointer flex_solref(); public native mjModel_ flex_solref(DoublePointer setter);          // constraint solver reference: contact     (nflex x mjNREF)
-  public native @Cast("mjtNum*") DoublePointer flex_solimp(); public native mjModel_ flex_solimp(DoublePointer setter);          // constraint solver impedance: contact     (nflex x mjNIMP)
-  public native @Cast("mjtNum*") DoublePointer flex_friction(); public native mjModel_ flex_friction(DoublePointer setter);        // friction for (slide, spin, roll)         (nflex x 3)
-  public native @Cast("mjtNum*") DoublePointer flex_margin(); public native mjModel_ flex_margin(DoublePointer setter);          // detect contact if dist<margin            (nflex x 1)
-  public native @Cast("mjtNum*") DoublePointer flex_gap(); public native mjModel_ flex_gap(DoublePointer setter);             // include in solver if dist<margin-gap     (nflex x 1)
-  public native @Cast("mjtByte*") BytePointer flex_internal(); public native mjModel_ flex_internal(BytePointer setter);        // internal flex collision enabled          (nflex x 1)
-  public native IntPointer flex_selfcollide(); public native mjModel_ flex_selfcollide(IntPointer setter);     // self collision mode (mjtFlexSelf)        (nflex x 1)
-  public native IntPointer flex_activelayers(); public native mjModel_ flex_activelayers(IntPointer setter);    // number of active element layers, 3D only (nflex x 1)
+  public native IntPointer flex_contype(); public native mjModel flex_contype(IntPointer setter);         // flex contact type                        (nflex x 1)
+  public native IntPointer flex_conaffinity(); public native mjModel flex_conaffinity(IntPointer setter);     // flex contact affinity                    (nflex x 1)
+  public native IntPointer flex_condim(); public native mjModel flex_condim(IntPointer setter);          // contact dimensionality (1, 3, 4, 6)      (nflex x 1)
+  public native IntPointer flex_priority(); public native mjModel flex_priority(IntPointer setter);        // flex contact priority                    (nflex x 1)
+  public native @Cast("mjtNum*") DoublePointer flex_solmix(); public native mjModel flex_solmix(DoublePointer setter);          // mix coef for solref/imp in contact pair  (nflex x 1)
+  public native @Cast("mjtNum*") DoublePointer flex_solref(); public native mjModel flex_solref(DoublePointer setter);          // constraint solver reference: contact     (nflex x mjNREF)
+  public native @Cast("mjtNum*") DoublePointer flex_solimp(); public native mjModel flex_solimp(DoublePointer setter);          // constraint solver impedance: contact     (nflex x mjNIMP)
+  public native @Cast("mjtNum*") DoublePointer flex_friction(); public native mjModel flex_friction(DoublePointer setter);        // friction for (slide, spin, roll)         (nflex x 3)
+  public native @Cast("mjtNum*") DoublePointer flex_margin(); public native mjModel flex_margin(DoublePointer setter);          // geometric inflation for contact          (nflex x 1)
+  public native @Cast("mjtNum*") DoublePointer flex_gap(); public native mjModel flex_gap(DoublePointer setter);             // additional contact detection buffer      (nflex x 1)
+  public native IntPointer flex_selfcollide(); public native mjModel flex_selfcollide(IntPointer setter);     // self collision mode (mjtFlexSelf)        (nflex x 1)
+  public native IntPointer flex_activelayers(); public native mjModel flex_activelayers(IntPointer setter);    // number of active element layers, 3D only (nflex x 1)
+  public native IntPointer flex_passive(); public native mjModel flex_passive(IntPointer setter);         // passive collisions enabled               (nflex x 1)
 
   // flexes: other properties
-  public native IntPointer flex_dim(); public native mjModel_ flex_dim(IntPointer setter);             // 1: lines, 2: triangles, 3: tetrahedra    (nflex x 1)
-  public native IntPointer flex_matid(); public native mjModel_ flex_matid(IntPointer setter);           // material id for rendering                (nflex x 1)
-  public native IntPointer flex_group(); public native mjModel_ flex_group(IntPointer setter);           // group for visibility                     (nflex x 1)
-  public native IntPointer flex_vertadr(); public native mjModel_ flex_vertadr(IntPointer setter);         // first vertex address                     (nflex x 1)
-  public native IntPointer flex_vertnum(); public native mjModel_ flex_vertnum(IntPointer setter);         // number of vertices                       (nflex x 1)
-  public native IntPointer flex_edgeadr(); public native mjModel_ flex_edgeadr(IntPointer setter);         // first edge address                       (nflex x 1)
-  public native IntPointer flex_edgenum(); public native mjModel_ flex_edgenum(IntPointer setter);         // number of edges                          (nflex x 1)
-  public native IntPointer flex_elemadr(); public native mjModel_ flex_elemadr(IntPointer setter);         // first element address                    (nflex x 1)
-  public native IntPointer flex_elemnum(); public native mjModel_ flex_elemnum(IntPointer setter);         // number of elements                       (nflex x 1)
-  public native IntPointer flex_elemdataadr(); public native mjModel_ flex_elemdataadr(IntPointer setter);     // first element vertex id address          (nflex x 1)
-  public native IntPointer flex_shellnum(); public native mjModel_ flex_shellnum(IntPointer setter);        // number of shells                         (nflex x 1)
-  public native IntPointer flex_shelldataadr(); public native mjModel_ flex_shelldataadr(IntPointer setter);    // first shell data address                 (nflex x 1)
-  public native IntPointer flex_evpairadr(); public native mjModel_ flex_evpairadr(IntPointer setter);       // first evpair address                     (nflex x 1)
-  public native IntPointer flex_evpairnum(); public native mjModel_ flex_evpairnum(IntPointer setter);       // number of evpairs                        (nflex x 1)
-  public native IntPointer flex_texcoordadr(); public native mjModel_ flex_texcoordadr(IntPointer setter);     // address in flex_texcoord; -1: none       (nflex x 1)
-  public native IntPointer flex_vertbodyid(); public native mjModel_ flex_vertbodyid(IntPointer setter);      // vertex body ids                          (nflexvert x 1)
-  public native IntPointer flex_edge(); public native mjModel_ flex_edge(IntPointer setter);            // edge vertex ids (2 per edge)             (nflexedge x 2)
-  public native IntPointer flex_elem(); public native mjModel_ flex_elem(IntPointer setter);            // element vertex ids (dim+1 per elem)      (nflexelemdata x 1)
-  public native IntPointer flex_elemlayer(); public native mjModel_ flex_elemlayer(IntPointer setter);       // element distance from surface, 3D only   (nflexelem x 1)
-  public native IntPointer flex_shell(); public native mjModel_ flex_shell(IntPointer setter);           // shell fragment vertex ids (dim per frag) (nflexshelldata x 1)
-  public native IntPointer flex_evpair(); public native mjModel_ flex_evpair(IntPointer setter);          // (element, vertex) collision pairs        (nflexevpair x 2)
-  public native @Cast("mjtNum*") DoublePointer flex_vert(); public native mjModel_ flex_vert(DoublePointer setter);            // vertex positions in local body frames    (nflexvert x 3)
-  public native @Cast("mjtNum*") DoublePointer flex_xvert0(); public native mjModel_ flex_xvert0(DoublePointer setter);          // Cartesian vertex positions in qpos0      (nflexvert x 3)
-  public native @Cast("mjtNum*") DoublePointer flexedge_length0(); public native mjModel_ flexedge_length0(DoublePointer setter);     // edge lengths in qpos0                    (nflexedge x 1)
-  public native @Cast("mjtNum*") DoublePointer flexedge_invweight0(); public native mjModel_ flexedge_invweight0(DoublePointer setter);  // edge inv. weight in qpos0                (nflexedge x 1)
-  public native @Cast("mjtNum*") DoublePointer flex_radius(); public native mjModel_ flex_radius(DoublePointer setter);          // radius around primitive element          (nflex x 1)
-  public native @Cast("mjtNum*") DoublePointer flex_edgestiffness(); public native mjModel_ flex_edgestiffness(DoublePointer setter);   // edge stiffness                           (nflex x 1)
-  public native @Cast("mjtNum*") DoublePointer flex_edgedamping(); public native mjModel_ flex_edgedamping(DoublePointer setter);     // edge damping                             (nflex x 1)
-  public native @Cast("mjtByte*") BytePointer flex_edgeequality(); public native mjModel_ flex_edgeequality(BytePointer setter);    // is edge equality constraint defined      (nflex x 1)
-  public native @Cast("mjtByte*") BytePointer flex_rigid(); public native mjModel_ flex_rigid(BytePointer setter);           // are all verices in the same body         (nflex x 1)
-  public native @Cast("mjtByte*") BytePointer flexedge_rigid(); public native mjModel_ flexedge_rigid(BytePointer setter);       // are both edge vertices in same body      (nflexedge x 1)
-  public native @Cast("mjtByte*") BytePointer flex_centered(); public native mjModel_ flex_centered(BytePointer setter);        // are all vertex coordinates (0,0,0)       (nflex x 1)
-  public native @Cast("mjtByte*") BytePointer flex_flatskin(); public native mjModel_ flex_flatskin(BytePointer setter);        // render flex skin with flat shading       (nflex x 1)
-  public native IntPointer flex_bvhadr(); public native mjModel_ flex_bvhadr(IntPointer setter);          // address of bvh root; -1: no bvh          (nflex x 1)
-  public native IntPointer flex_bvhnum(); public native mjModel_ flex_bvhnum(IntPointer setter);          // number of bounding volumes               (nflex x 1)
-  public native FloatPointer flex_rgba(); public native mjModel_ flex_rgba(FloatPointer setter);            // rgba when material is omitted            (nflex x 4)
-  public native FloatPointer flex_texcoord(); public native mjModel_ flex_texcoord(FloatPointer setter);        // vertex texture coordinates               (nflextexcoord x 2)
+  public native IntPointer flex_dim(); public native mjModel flex_dim(IntPointer setter);             // 1: lines, 2: triangles, 3: tetrahedra    (nflex x 1)
+  public native IntPointer flex_matid(); public native mjModel flex_matid(IntPointer setter);           // material id for rendering                (nflexelem x 1)
+  public native IntPointer flex_group(); public native mjModel flex_group(IntPointer setter);           // group for visibility                     (nflex x 1)
+  public native IntPointer flex_interp(); public native mjModel flex_interp(IntPointer setter);          // interpolation (0: vertex, 1: nodes)      (nflex x 1)
+  public native IntPointer flex_cellnum(); public native mjModel flex_cellnum(IntPointer setter);         // finite cell num per dimension            (nflex x 3)
+  public native IntPointer flex_nodeadr(); public native mjModel flex_nodeadr(IntPointer setter);         // first node address                       (nflex x 1)
+  public native IntPointer flex_nodenum(); public native mjModel flex_nodenum(IntPointer setter);         // number of nodes                          (nflex x 1)
+  public native IntPointer flex_vertadr(); public native mjModel flex_vertadr(IntPointer setter);         // first vertex address                     (nflex x 1)
+  public native IntPointer flex_vertnum(); public native mjModel flex_vertnum(IntPointer setter);         // number of vertices                       (nflex x 1)
+  public native IntPointer flex_edgeadr(); public native mjModel flex_edgeadr(IntPointer setter);         // first edge address                       (nflex x 1)
+  public native IntPointer flex_edgenum(); public native mjModel flex_edgenum(IntPointer setter);         // number of edges                          (nflex x 1)
+  public native IntPointer flex_elemadr(); public native mjModel flex_elemadr(IntPointer setter);         // first element address                    (nflex x 1)
+  public native IntPointer flex_elemnum(); public native mjModel flex_elemnum(IntPointer setter);         // number of elements                       (nflex x 1)
+  public native IntPointer flex_elemdataadr(); public native mjModel flex_elemdataadr(IntPointer setter);     // first element vertex id address          (nflex x 1)
+  public native IntPointer flex_stiffnessadr(); public native mjModel flex_stiffnessadr(IntPointer setter);    // stiffness matrix address                 (nflex x 1)
+  public native IntPointer flex_elemedgeadr(); public native mjModel flex_elemedgeadr(IntPointer setter);     // first element edge id address            (nflex x 1)
+  public native IntPointer flex_bendingadr(); public native mjModel flex_bendingadr(IntPointer setter);      // first bending data address               (nflex x 1)
+  public native IntPointer flex_plasticadr(); public native mjModel flex_plasticadr(IntPointer setter);      // plastic state address; -1: elastic       (nflex x 1)
+  public native IntPointer flex_plasticmode(); public native mjModel flex_plasticmode(IntPointer setter);     // plastic state bits; 1: bend, 2: stretch  (nflex x 1)
+  public native IntPointer flex_shellnum(); public native mjModel flex_shellnum(IntPointer setter);        // number of shells                         (nflex x 1)
+  public native IntPointer flex_shelldataadr(); public native mjModel flex_shelldataadr(IntPointer setter);    // first shell data address                 (nflex x 1)
+  public native IntPointer flex_texcoordadr(); public native mjModel flex_texcoordadr(IntPointer setter);     // address in flex_texcoord; -1: none       (nflex x 1)
+  public native IntPointer flex_nodebodyid(); public native mjModel flex_nodebodyid(IntPointer setter);      // node body ids                            (nflexnode x 1)
+  public native IntPointer flex_vertbodyid(); public native mjModel flex_vertbodyid(IntPointer setter);      // vertex body ids                          (nflexvert x 1)
+  public native IntPointer flex_vertcell(); public native mjModel flex_vertcell(IntPointer setter);        // finite cell index for vertex; -1: none   (nflexvert x 1)
+  public native IntPointer flex_edge(); public native mjModel flex_edge(IntPointer setter);            // edge vertex ids (2 per edge)             (nflexedge x 2)
+  public native IntPointer flex_edgeflap(); public native mjModel flex_edgeflap(IntPointer setter);        // adjacent vertex ids (dim=2 only)         (nflexedge x 2)
+  public native IntPointer flex_elem(); public native mjModel flex_elem(IntPointer setter);            // element vertex ids (dim+1 per elem)      (nflexelemdata x 1)
+  public native IntPointer flex_elemtexcoord(); public native mjModel flex_elemtexcoord(IntPointer setter);    // element texture coordinates (dim+1)      (nflexelemdata x 1)
+  public native IntPointer flex_elemedge(); public native mjModel flex_elemedge(IntPointer setter);        // element edge ids                         (nflexelemedge x 1)
+  public native IntPointer flex_elemlayer(); public native mjModel flex_elemlayer(IntPointer setter);       // element distance from surface, 3D only   (nflexelem x 1)
+  public native IntPointer flex_shell(); public native mjModel flex_shell(IntPointer setter);           // shell fragment vertex ids (dim per frag) (nflexshelldata x 1)
+  public native @Cast("mjtNum*") DoublePointer flex_vert(); public native mjModel flex_vert(DoublePointer setter);            // vertex positions in local body frames    (nflexvert x 3)
+  public native @Cast("mjtNum*") DoublePointer flex_vert0(); public native mjModel flex_vert0(DoublePointer setter);           // vertex positions in qpos0 on [0, 1]^d    (nflexvert x 3)
+  public native @Cast("mjtNum*") DoublePointer flex_node(); public native mjModel flex_node(DoublePointer setter);            // node positions in local body frames      (nflexnode x 3)
+  public native @Cast("mjtNum*") DoublePointer flex_node0(); public native mjModel flex_node0(DoublePointer setter);           // Cartesian node positions in qpos0        (nflexnode x 3)
+  public native @Cast("mjtNum*") DoublePointer flexedge_length0(); public native mjModel flexedge_length0(DoublePointer setter);     // edge lengths in qpos0                    (nflexedge x 1)
+  public native @Cast("mjtNum*") DoublePointer flexedge_invweight0(); public native mjModel flexedge_invweight0(DoublePointer setter);  // edge inv. weight in qpos0                (nflexedge x 1)
+  public native @Cast("mjtNum*") DoublePointer flex_radius(); public native mjModel flex_radius(DoublePointer setter);          // radius around primitive element          (nflex x 1)
+  public native @Cast("mjtNum*") DoublePointer flex_size(); public native mjModel flex_size(DoublePointer setter);            // vertex bounding box half sizes in qpos0  (nflex x 3)
+  public native @Cast("mjtNum*") DoublePointer flex_stiffness(); public native mjModel flex_stiffness(DoublePointer setter);       // finite element stiffness matrix          (nflexstiffness x 1)
+  public native @Cast("mjtNum*") DoublePointer flex_bending(); public native mjModel flex_bending(DoublePointer setter);         // bending stiffness                        (nflexbending x 1)
+  public native IntPointer efm0_dofid(); public native mjModel efm0_dofid(IntPointer setter);           // constant metric factor row->dof address  (nefm0dof x 1)
+  public native IntPointer efm0_L_rownnz(); public native mjModel efm0_L_rownnz(IntPointer setter);        // constant metric factor row nonzeros      (nefm0dof x 1)
+  public native IntPointer efm0_L_rowadr(); public native mjModel efm0_L_rowadr(IntPointer setter);        // constant metric factor row addresses     (nefm0dof x 1)
+  public native IntPointer efm0_L_colind(); public native mjModel efm0_L_colind(IntPointer setter);        // constant metric factor column indices    (nefm0L x 1)
+  public native @Cast("mjtNum*") DoublePointer efm0_L(); public native mjModel efm0_L(DoublePointer setter);               // factor of M + (dt^2+dt*d)*K_bend         (nefm0L x 1)
+  public native IntPointer efmC_perm(); public native mjModel efmC_perm(IntPointer setter);            // sparse factor order: vertex dof or -1    (nefmCvert x 1)
+  public native @Cast("mjtNum*") DoublePointer flex_damping(); public native mjModel flex_damping(DoublePointer setter);         // Rayleigh's damping coefficient           (nflex x 1)
+  public native @Cast("mjtNum*") DoublePointer flex_yield(); public native mjModel flex_yield(DoublePointer setter);           // yield strain (stretch, bend); 0: elastic (nflex x 2)
+  public native @Cast("mjtNum*") DoublePointer flex_edgestiffness(); public native mjModel flex_edgestiffness(DoublePointer setter);   // edge stiffness                           (nflex x 1)
+  public native @Cast("mjtNum*") DoublePointer flex_edgedamping(); public native mjModel flex_edgedamping(DoublePointer setter);     // edge damping                             (nflex x 1)
+  public native IntPointer flex_edgeequality(); public native mjModel flex_edgeequality(IntPointer setter);    // 0:none, 1:edges, 3:strain                (nflex x 1)
+  public native @Cast("mjtBool*") BoolPointer flex_rigid(); public native mjModel flex_rigid(BoolPointer setter);           // are all vertices in the same body        (nflex x 1)
+  public native @Cast("mjtBool*") BoolPointer flexedge_rigid(); public native mjModel flexedge_rigid(BoolPointer setter);       // are both edge vertices in same body      (nflexedge x 1)
+  public native @Cast("mjtBool*") BoolPointer flex_centered(); public native mjModel flex_centered(BoolPointer setter);        // are all vertex coordinates (0,0,0)       (nflex x 1)
+  public native @Cast("mjtBool*") BoolPointer flex_flatskin(); public native mjModel flex_flatskin(BoolPointer setter);        // render flex skin with flat shading       (nflex x 1)
+  public native IntPointer flex_bvhadr(); public native mjModel flex_bvhadr(IntPointer setter);          // address of bvh root; -1: no bvh          (nflex x 1)
+  public native IntPointer flex_bvhnum(); public native mjModel flex_bvhnum(IntPointer setter);          // number of bounding volumes               (nflex x 1)
+  public native IntPointer flexedge_J_rownnz(); public native mjModel flexedge_J_rownnz(IntPointer setter);    // number of non-zeros in Jacobian row      (nflexedge x 1)
+  public native IntPointer flexedge_J_rowadr(); public native mjModel flexedge_J_rowadr(IntPointer setter);    // row start address in colind array        (nflexedge x 1)
+  public native IntPointer flexedge_J_colind(); public native mjModel flexedge_J_colind(IntPointer setter);    // column indices in sparse Jacobian        (nJfe x 1)
+  public native FloatPointer flex_rgba(); public native mjModel flex_rgba(FloatPointer setter);            // rgba when material is omitted            (nflex x 4)
+  public native FloatPointer flex_texcoord(); public native mjModel flex_texcoord(FloatPointer setter);        // vertex texture coordinates               (nflextexcoord x 2)
 
   // meshes
-  public native IntPointer mesh_vertadr(); public native mjModel_ mesh_vertadr(IntPointer setter);         // first vertex address                     (nmesh x 1)
-  public native IntPointer mesh_vertnum(); public native mjModel_ mesh_vertnum(IntPointer setter);         // number of vertices                       (nmesh x 1)
-  public native IntPointer mesh_faceadr(); public native mjModel_ mesh_faceadr(IntPointer setter);         // first face address                       (nmesh x 1)
-  public native IntPointer mesh_facenum(); public native mjModel_ mesh_facenum(IntPointer setter);         // number of faces                          (nmesh x 1)
-  public native IntPointer mesh_bvhadr(); public native mjModel_ mesh_bvhadr(IntPointer setter);          // address of bvh root                      (nmesh x 1)
-  public native IntPointer mesh_bvhnum(); public native mjModel_ mesh_bvhnum(IntPointer setter);          // number of bvh                            (nmesh x 1)
-  public native IntPointer mesh_normaladr(); public native mjModel_ mesh_normaladr(IntPointer setter);       // first normal address                     (nmesh x 1)
-  public native IntPointer mesh_normalnum(); public native mjModel_ mesh_normalnum(IntPointer setter);       // number of normals                        (nmesh x 1)
-  public native IntPointer mesh_texcoordadr(); public native mjModel_ mesh_texcoordadr(IntPointer setter);     // texcoord data address; -1: no texcoord   (nmesh x 1)
-  public native IntPointer mesh_texcoordnum(); public native mjModel_ mesh_texcoordnum(IntPointer setter);     // number of texcoord                       (nmesh x 1)
-  public native IntPointer mesh_graphadr(); public native mjModel_ mesh_graphadr(IntPointer setter);        // graph data address; -1: no graph         (nmesh x 1)
-  public native FloatPointer mesh_vert(); public native mjModel_ mesh_vert(FloatPointer setter);            // vertex positions for all meshes          (nmeshvert x 3)
-  public native FloatPointer mesh_normal(); public native mjModel_ mesh_normal(FloatPointer setter);          // normals for all meshes                   (nmeshnormal x 3)
-  public native FloatPointer mesh_texcoord(); public native mjModel_ mesh_texcoord(FloatPointer setter);        // vertex texcoords for all meshes          (nmeshtexcoord x 2)
-  public native IntPointer mesh_face(); public native mjModel_ mesh_face(IntPointer setter);            // vertex face data                         (nmeshface x 3)
-  public native IntPointer mesh_facenormal(); public native mjModel_ mesh_facenormal(IntPointer setter);      // normal face data                         (nmeshface x 3)
-  public native IntPointer mesh_facetexcoord(); public native mjModel_ mesh_facetexcoord(IntPointer setter);    // texture face data                        (nmeshface x 3)
-  public native IntPointer mesh_graph(); public native mjModel_ mesh_graph(IntPointer setter);           // convex graph data                        (nmeshgraph x 1)
-  public native @Cast("mjtNum*") DoublePointer mesh_pos(); public native mjModel_ mesh_pos(DoublePointer setter);             // translation applied to asset vertices    (nmesh x 3)
-  public native @Cast("mjtNum*") DoublePointer mesh_quat(); public native mjModel_ mesh_quat(DoublePointer setter);            // rotation applied to asset vertices       (nmesh x 4)
-  public native IntPointer mesh_pathadr(); public native mjModel_ mesh_pathadr(IntPointer setter);         // address of asset path for mesh; -1: none (nmesh x 1)
+  public native IntPointer mesh_vertadr(); public native mjModel mesh_vertadr(IntPointer setter);         // first vertex address                     (nmesh x 1)
+  public native IntPointer mesh_vertnum(); public native mjModel mesh_vertnum(IntPointer setter);         // number of vertices                       (nmesh x 1)
+  public native IntPointer mesh_faceadr(); public native mjModel mesh_faceadr(IntPointer setter);         // first face address                       (nmesh x 1)
+  public native IntPointer mesh_facenum(); public native mjModel mesh_facenum(IntPointer setter);         // number of faces                          (nmesh x 1)
+  public native IntPointer mesh_bvhadr(); public native mjModel mesh_bvhadr(IntPointer setter);          // address of bvh root                      (nmesh x 1)
+  public native IntPointer mesh_bvhnum(); public native mjModel mesh_bvhnum(IntPointer setter);          // number of bvh                            (nmesh x 1)
+  public native IntPointer mesh_octadr(); public native mjModel mesh_octadr(IntPointer setter);          // address of octree root                   (nmesh x 1)
+  public native IntPointer mesh_octnum(); public native mjModel mesh_octnum(IntPointer setter);          // number of octree nodes                   (nmesh x 1)
+  public native IntPointer mesh_normaladr(); public native mjModel mesh_normaladr(IntPointer setter);       // first normal address                     (nmesh x 1)
+  public native IntPointer mesh_normalnum(); public native mjModel mesh_normalnum(IntPointer setter);       // number of normals                        (nmesh x 1)
+  public native IntPointer mesh_texcoordadr(); public native mjModel mesh_texcoordadr(IntPointer setter);     // texcoord data address; -1: no texcoord   (nmesh x 1)
+  public native IntPointer mesh_texcoordnum(); public native mjModel mesh_texcoordnum(IntPointer setter);     // number of texcoord                       (nmesh x 1)
+  public native IntPointer mesh_graphadr(); public native mjModel mesh_graphadr(IntPointer setter);        // graph data address; -1: no graph         (nmesh x 1)
+  public native IntPointer mesh_extrema(); public native mjModel mesh_extrema(IntPointer setter);         // extremum vertices in 3x3x3 directions    (nmesh x 27)
+  public native FloatPointer mesh_vert(); public native mjModel mesh_vert(FloatPointer setter);            // vertex positions for all meshes          (nmeshvert x 3)
+  public native FloatPointer mesh_normal(); public native mjModel mesh_normal(FloatPointer setter);          // normals for all meshes                   (nmeshnormal x 3)
+  public native FloatPointer mesh_texcoord(); public native mjModel mesh_texcoord(FloatPointer setter);        // vertex texcoords for all meshes          (nmeshtexcoord x 2)
+  public native IntPointer mesh_face(); public native mjModel mesh_face(IntPointer setter);            // vertex face data                         (nmeshface x 3)
+  public native IntPointer mesh_facenormal(); public native mjModel mesh_facenormal(IntPointer setter);      // normal face data                         (nmeshface x 3)
+  public native IntPointer mesh_facetexcoord(); public native mjModel mesh_facetexcoord(IntPointer setter);    // texture face data                        (nmeshface x 3)
+  public native IntPointer mesh_graph(); public native mjModel mesh_graph(IntPointer setter);           // convex graph data                        (nmeshgraph x 1)
+  public native @Cast("mjtNum*") DoublePointer mesh_scale(); public native mjModel mesh_scale(DoublePointer setter);           // scaling applied to asset vertices        (nmesh x 3)
+  public native @Cast("mjtNum*") DoublePointer mesh_pos(); public native mjModel mesh_pos(DoublePointer setter);             // translation applied to asset vertices    (nmesh x 3)
+  public native @Cast("mjtNum*") DoublePointer mesh_quat(); public native mjModel mesh_quat(DoublePointer setter);            // rotation applied to asset vertices       (nmesh x 4)
+  public native IntPointer mesh_pathadr(); public native mjModel mesh_pathadr(IntPointer setter);         // address of asset path for mesh; -1: none (nmesh x 1)
+  public native IntPointer mesh_polynum(); public native mjModel mesh_polynum(IntPointer setter);         // number of polygons per mesh              (nmesh x 1)
+  public native IntPointer mesh_polyadr(); public native mjModel mesh_polyadr(IntPointer setter);         // first polygon address per mesh           (nmesh x 1)
+  public native @Cast("mjtNum*") DoublePointer mesh_polynormal(); public native mjModel mesh_polynormal(DoublePointer setter);      // all polygon normals                      (nmeshpoly x 3)
+  public native IntPointer mesh_polyvertadr(); public native mjModel mesh_polyvertadr(IntPointer setter);     // polygon vertex start address             (nmeshpoly x 1)
+  public native IntPointer mesh_polyvertnum(); public native mjModel mesh_polyvertnum(IntPointer setter);     // number of vertices per polygon           (nmeshpoly x 1)
+  public native IntPointer mesh_polyvert(); public native mjModel mesh_polyvert(IntPointer setter);        // all polygon vertices                     (nmeshpolyvert x 1)
+  public native IntPointer mesh_polymapadr(); public native mjModel mesh_polymapadr(IntPointer setter);      // first polygon address per vertex         (nmeshvert x 1)
+  public native IntPointer mesh_polymapnum(); public native mjModel mesh_polymapnum(IntPointer setter);      // number of polygons per vertex            (nmeshvert x 1)
+  public native IntPointer mesh_polymap(); public native mjModel mesh_polymap(IntPointer setter);         // vertex to polygon map                    (nmeshpolymap x 1)
 
   // skins
-  public native IntPointer skin_matid(); public native mjModel_ skin_matid(IntPointer setter);           // skin material id; -1: none               (nskin x 1)
-  public native IntPointer skin_group(); public native mjModel_ skin_group(IntPointer setter);           // group for visibility                     (nskin x 1)
-  public native FloatPointer skin_rgba(); public native mjModel_ skin_rgba(FloatPointer setter);            // skin rgba                                (nskin x 4)
-  public native FloatPointer skin_inflate(); public native mjModel_ skin_inflate(FloatPointer setter);         // inflate skin in normal direction         (nskin x 1)
-  public native IntPointer skin_vertadr(); public native mjModel_ skin_vertadr(IntPointer setter);         // first vertex address                     (nskin x 1)
-  public native IntPointer skin_vertnum(); public native mjModel_ skin_vertnum(IntPointer setter);         // number of vertices                       (nskin x 1)
-  public native IntPointer skin_texcoordadr(); public native mjModel_ skin_texcoordadr(IntPointer setter);     // texcoord data address; -1: no texcoord   (nskin x 1)
-  public native IntPointer skin_faceadr(); public native mjModel_ skin_faceadr(IntPointer setter);         // first face address                       (nskin x 1)
-  public native IntPointer skin_facenum(); public native mjModel_ skin_facenum(IntPointer setter);         // number of faces                          (nskin x 1)
-  public native IntPointer skin_boneadr(); public native mjModel_ skin_boneadr(IntPointer setter);         // first bone in skin                       (nskin x 1)
-  public native IntPointer skin_bonenum(); public native mjModel_ skin_bonenum(IntPointer setter);         // number of bones in skin                  (nskin x 1)
-  public native FloatPointer skin_vert(); public native mjModel_ skin_vert(FloatPointer setter);            // vertex positions for all skin meshes     (nskinvert x 3)
-  public native FloatPointer skin_texcoord(); public native mjModel_ skin_texcoord(FloatPointer setter);        // vertex texcoords for all skin meshes     (nskintexvert x 2)
-  public native IntPointer skin_face(); public native mjModel_ skin_face(IntPointer setter);            // triangle faces for all skin meshes       (nskinface x 3)
-  public native IntPointer skin_bonevertadr(); public native mjModel_ skin_bonevertadr(IntPointer setter);     // first vertex in each bone                (nskinbone x 1)
-  public native IntPointer skin_bonevertnum(); public native mjModel_ skin_bonevertnum(IntPointer setter);     // number of vertices in each bone          (nskinbone x 1)
-  public native FloatPointer skin_bonebindpos(); public native mjModel_ skin_bonebindpos(FloatPointer setter);     // bind pos of each bone                    (nskinbone x 3)
-  public native FloatPointer skin_bonebindquat(); public native mjModel_ skin_bonebindquat(FloatPointer setter);    // bind quat of each bone                   (nskinbone x 4)
-  public native IntPointer skin_bonebodyid(); public native mjModel_ skin_bonebodyid(IntPointer setter);      // body id of each bone                     (nskinbone x 1)
-  public native IntPointer skin_bonevertid(); public native mjModel_ skin_bonevertid(IntPointer setter);      // mesh ids of vertices in each bone        (nskinbonevert x 1)
-  public native FloatPointer skin_bonevertweight(); public native mjModel_ skin_bonevertweight(FloatPointer setter);  // weights of vertices in each bone         (nskinbonevert x 1)
-  public native IntPointer skin_pathadr(); public native mjModel_ skin_pathadr(IntPointer setter);         // address of asset path for skin; -1: none (nskin x 1)
+  public native IntPointer skin_matid(); public native mjModel skin_matid(IntPointer setter);           // skin material id; -1: none               (nskin x 1)
+  public native IntPointer skin_group(); public native mjModel skin_group(IntPointer setter);           // group for visibility                     (nskin x 1)
+  public native FloatPointer skin_rgba(); public native mjModel skin_rgba(FloatPointer setter);            // skin rgba                                (nskin x 4)
+  public native FloatPointer skin_inflate(); public native mjModel skin_inflate(FloatPointer setter);         // inflate skin in normal direction         (nskin x 1)
+  public native IntPointer skin_vertadr(); public native mjModel skin_vertadr(IntPointer setter);         // first vertex address                     (nskin x 1)
+  public native IntPointer skin_vertnum(); public native mjModel skin_vertnum(IntPointer setter);         // number of vertices                       (nskin x 1)
+  public native IntPointer skin_texcoordadr(); public native mjModel skin_texcoordadr(IntPointer setter);     // texcoord data address; -1: no texcoord   (nskin x 1)
+  public native IntPointer skin_faceadr(); public native mjModel skin_faceadr(IntPointer setter);         // first face address                       (nskin x 1)
+  public native IntPointer skin_facenum(); public native mjModel skin_facenum(IntPointer setter);         // number of faces                          (nskin x 1)
+  public native IntPointer skin_boneadr(); public native mjModel skin_boneadr(IntPointer setter);         // first bone in skin                       (nskin x 1)
+  public native IntPointer skin_bonenum(); public native mjModel skin_bonenum(IntPointer setter);         // number of bones in skin                  (nskin x 1)
+  public native FloatPointer skin_vert(); public native mjModel skin_vert(FloatPointer setter);            // vertex positions for all skin meshes     (nskinvert x 3)
+  public native FloatPointer skin_texcoord(); public native mjModel skin_texcoord(FloatPointer setter);        // vertex texcoords for all skin meshes     (nskintexvert x 2)
+  public native IntPointer skin_face(); public native mjModel skin_face(IntPointer setter);            // triangle faces for all skin meshes       (nskinface x 3)
+  public native IntPointer skin_bonevertadr(); public native mjModel skin_bonevertadr(IntPointer setter);     // first vertex in each bone                (nskinbone x 1)
+  public native IntPointer skin_bonevertnum(); public native mjModel skin_bonevertnum(IntPointer setter);     // number of vertices in each bone          (nskinbone x 1)
+  public native FloatPointer skin_bonebindpos(); public native mjModel skin_bonebindpos(FloatPointer setter);     // bind pos of each bone                    (nskinbone x 3)
+  public native FloatPointer skin_bonebindquat(); public native mjModel skin_bonebindquat(FloatPointer setter);    // bind quat of each bone                   (nskinbone x 4)
+  public native IntPointer skin_bonebodyid(); public native mjModel skin_bonebodyid(IntPointer setter);      // body id of each bone                     (nskinbone x 1)
+  public native IntPointer skin_bonevertid(); public native mjModel skin_bonevertid(IntPointer setter);      // mesh ids of vertices in each bone        (nskinbonevert x 1)
+  public native FloatPointer skin_bonevertweight(); public native mjModel skin_bonevertweight(FloatPointer setter);  // weights of vertices in each bone         (nskinbonevert x 1)
+  public native IntPointer skin_pathadr(); public native mjModel skin_pathadr(IntPointer setter);         // address of asset path for skin; -1: none (nskin x 1)
 
   // height fields
-  public native @Cast("mjtNum*") DoublePointer hfield_size(); public native mjModel_ hfield_size(DoublePointer setter);          // (x, y, z_top, z_bottom)                    (nhfield x 4)
-  public native IntPointer hfield_nrow(); public native mjModel_ hfield_nrow(IntPointer setter);          // number of rows in grid                     (nhfield x 1)
-  public native IntPointer hfield_ncol(); public native mjModel_ hfield_ncol(IntPointer setter);          // number of columns in grid                  (nhfield x 1)
-  public native IntPointer hfield_adr(); public native mjModel_ hfield_adr(IntPointer setter);           // address in hfield_data                     (nhfield x 1)
-  public native FloatPointer hfield_data(); public native mjModel_ hfield_data(FloatPointer setter);          // elevation data                             (nhfielddata x 1)
-  public native IntPointer hfield_pathadr(); public native mjModel_ hfield_pathadr(IntPointer setter);       // address of asset path for hfield; -1: none (nhfield x 1)
+  public native @Cast("mjtNum*") DoublePointer hfield_size(); public native mjModel hfield_size(DoublePointer setter);          // (x, y, z_top, z_bottom)                  (nhfield x 4)
+  public native IntPointer hfield_nrow(); public native mjModel hfield_nrow(IntPointer setter);          // number of rows in grid                   (nhfield x 1)
+  public native IntPointer hfield_ncol(); public native mjModel hfield_ncol(IntPointer setter);          // number of columns in grid                (nhfield x 1)
+  public native IntPointer hfield_adr(); public native mjModel hfield_adr(IntPointer setter);           // address in hfield_data                   (nhfield x 1)
+  public native FloatPointer hfield_data(); public native mjModel hfield_data(FloatPointer setter);          // elevation data                           (nhfielddata x 1)
+  public native IntPointer hfield_pathadr(); public native mjModel hfield_pathadr(IntPointer setter);       // address of hfield asset path; -1: none   (nhfield x 1)
 
   // textures
-  public native IntPointer tex_type(); public native mjModel_ tex_type(IntPointer setter);             // texture type (mjtTexture)                  (ntex x 1)
-  public native IntPointer tex_height(); public native mjModel_ tex_height(IntPointer setter);           // number of rows in texture image            (ntex x 1)
-  public native IntPointer tex_width(); public native mjModel_ tex_width(IntPointer setter);            // number of columns in texture image         (ntex x 1)
-  public native IntPointer tex_adr(); public native mjModel_ tex_adr(IntPointer setter);              // address in rgb                             (ntex x 1)
-  public native @Cast("mjtByte*") BytePointer tex_rgb(); public native mjModel_ tex_rgb(BytePointer setter);              // rgb (alpha = 1)                            (ntexdata x 1)
-  public native IntPointer tex_pathadr(); public native mjModel_ tex_pathadr(IntPointer setter);         // address of asset path for texture; -1: none (ntex x 1)
+  public native IntPointer tex_type(); public native mjModel tex_type(IntPointer setter);             // texture type (mjtTexture)                (ntex x 1)
+  public native IntPointer tex_colorspace(); public native mjModel tex_colorspace(IntPointer setter);       // texture colorspace (mjtColorSpace)       (ntex x 1)
+  public native IntPointer tex_height(); public native mjModel tex_height(IntPointer setter);           // number of rows in texture image          (ntex x 1)
+  public native IntPointer tex_width(); public native mjModel tex_width(IntPointer setter);            // number of columns in texture image       (ntex x 1)
+  public native IntPointer tex_nchannel(); public native mjModel tex_nchannel(IntPointer setter);         // number of channels in texture image      (ntex x 1)
+  public native @Cast("mjtSize*") LongPointer tex_adr(); public native mjModel tex_adr(LongPointer setter);              // start address in tex_data                (ntex x 1)
+  public native @Cast("mjtByte*") BytePointer tex_data(); public native mjModel tex_data(BytePointer setter);             // pixel values                             (ntexdata x 1)
+  public native IntPointer tex_pathadr(); public native mjModel tex_pathadr(IntPointer setter);          // address of texture asset path; -1: none  (ntex x 1)
+  public native IntPointer tex_contenttypeadr(); public native mjModel tex_contenttypeadr(IntPointer setter);   // content type address in paths; -1: none  (ntex x 1)
 
   // materials
-  public native IntPointer mat_texid(); public native mjModel_ mat_texid(IntPointer setter);            // texture id; -1: none                     (nmat x 1)
-  public native @Cast("mjtByte*") BytePointer mat_texuniform(); public native mjModel_ mat_texuniform(BytePointer setter);       // make texture cube uniform                (nmat x 1)
-  public native FloatPointer mat_texrepeat(); public native mjModel_ mat_texrepeat(FloatPointer setter);        // texture repetition for 2d mapping        (nmat x 2)
-  public native FloatPointer mat_emission(); public native mjModel_ mat_emission(FloatPointer setter);         // emission (x rgb)                         (nmat x 1)
-  public native FloatPointer mat_specular(); public native mjModel_ mat_specular(FloatPointer setter);         // specular (x white)                       (nmat x 1)
-  public native FloatPointer mat_shininess(); public native mjModel_ mat_shininess(FloatPointer setter);        // shininess coef                           (nmat x 1)
-  public native FloatPointer mat_reflectance(); public native mjModel_ mat_reflectance(FloatPointer setter);      // reflectance (0: disable)                 (nmat x 1)
-  public native FloatPointer mat_rgba(); public native mjModel_ mat_rgba(FloatPointer setter);             // rgba                                     (nmat x 4)
+  public native IntPointer mat_texid(); public native mjModel mat_texid(IntPointer setter);            // indices of textures; -1: none            (nmat x mjNTEXROLE)
+  public native @Cast("mjtBool*") BoolPointer mat_texuniform(); public native mjModel mat_texuniform(BoolPointer setter);       // make texture cube uniform                (nmat x 1)
+  public native FloatPointer mat_texrepeat(); public native mjModel mat_texrepeat(FloatPointer setter);        // texture repetition for 2d mapping        (nmat x 2)
+  public native FloatPointer mat_emission(); public native mjModel mat_emission(FloatPointer setter);         // emission (x rgb)                         (nmat x 1)
+  public native FloatPointer mat_specular(); public native mjModel mat_specular(FloatPointer setter);         // specular (x white)                       (nmat x 1)
+  public native FloatPointer mat_shininess(); public native mjModel mat_shininess(FloatPointer setter);        // shininess coef                           (nmat x 1)
+  public native FloatPointer mat_reflectance(); public native mjModel mat_reflectance(FloatPointer setter);      // reflectance (0: disable)                 (nmat x 1)
+  public native FloatPointer mat_metallic(); public native mjModel mat_metallic(FloatPointer setter);         // metallic coef                            (nmat x 1)
+  public native FloatPointer mat_roughness(); public native mjModel mat_roughness(FloatPointer setter);        // roughness coef                           (nmat x 1)
+  public native FloatPointer mat_rgba(); public native mjModel mat_rgba(FloatPointer setter);             // rgba                                     (nmat x 4)
 
   // predefined geom pairs for collision detection; has precedence over exclude
-  public native IntPointer pair_dim(); public native mjModel_ pair_dim(IntPointer setter);             // contact dimensionality                   (npair x 1)
-  public native IntPointer pair_geom1(); public native mjModel_ pair_geom1(IntPointer setter);           // id of geom1                              (npair x 1)
-  public native IntPointer pair_geom2(); public native mjModel_ pair_geom2(IntPointer setter);           // id of geom2                              (npair x 1)
-  public native IntPointer pair_signature(); public native mjModel_ pair_signature(IntPointer setter);       // body1 << 16 + body2                      (npair x 1)
-  public native @Cast("mjtNum*") DoublePointer pair_solref(); public native mjModel_ pair_solref(DoublePointer setter);          // solver reference: contact normal         (npair x mjNREF)
-  public native @Cast("mjtNum*") DoublePointer pair_solreffriction(); public native mjModel_ pair_solreffriction(DoublePointer setter);  // solver reference: contact friction       (npair x mjNREF)
-  public native @Cast("mjtNum*") DoublePointer pair_solimp(); public native mjModel_ pair_solimp(DoublePointer setter);          // solver impedance: contact                (npair x mjNIMP)
-  public native @Cast("mjtNum*") DoublePointer pair_margin(); public native mjModel_ pair_margin(DoublePointer setter);          // detect contact if dist<margin            (npair x 1)
-  public native @Cast("mjtNum*") DoublePointer pair_gap(); public native mjModel_ pair_gap(DoublePointer setter);             // include in solver if dist<margin-gap     (npair x 1)
-  public native @Cast("mjtNum*") DoublePointer pair_friction(); public native mjModel_ pair_friction(DoublePointer setter);        // tangent1, 2, spin, roll1, 2              (npair x 5)
+  public native IntPointer pair_dim(); public native mjModel pair_dim(IntPointer setter);             // contact dimensionality                   (npair x 1)
+  public native IntPointer pair_geom1(); public native mjModel pair_geom1(IntPointer setter);           // id of geom1                              (npair x 1)
+  public native IntPointer pair_geom2(); public native mjModel pair_geom2(IntPointer setter);           // id of geom2                              (npair x 1)
+  public native IntPointer pair_signature(); public native mjModel pair_signature(IntPointer setter);       // body1 << 16 + body2                      (npair x 1)
+  public native @Cast("mjtNum*") DoublePointer pair_solref(); public native mjModel pair_solref(DoublePointer setter);          // solver reference: contact normal         (npair x mjNREF)
+  public native @Cast("mjtNum*") DoublePointer pair_solreffriction(); public native mjModel pair_solreffriction(DoublePointer setter);  // solver reference: contact friction       (npair x mjNREF)
+  public native @Cast("mjtNum*") DoublePointer pair_solimp(); public native mjModel pair_solimp(DoublePointer setter);          // solver impedance: contact                (npair x mjNIMP)
+  public native @Cast("mjtNum*") DoublePointer pair_margin(); public native mjModel pair_margin(DoublePointer setter);          // geometric inflation for contact          (npair x 1)
+  public native @Cast("mjtNum*") DoublePointer pair_gap(); public native mjModel pair_gap(DoublePointer setter);             // additional contact detection buffer      (npair x 1)
+  public native @Cast("mjtNum*") DoublePointer pair_adhesion(); public native mjModel pair_adhesion(DoublePointer setter);        // adhesive force of contacts               (npair x 1)
+  public native @Cast("mjtNum*") DoublePointer pair_friction(); public native mjModel pair_friction(DoublePointer setter);        // tangent1, 2, spin, roll1, 2              (npair x 5)
 
   // excluded body pairs for collision detection
-  public native IntPointer exclude_signature(); public native mjModel_ exclude_signature(IntPointer setter);    // body1 << 16 + body2                      (nexclude x 1)
+  public native IntPointer exclude_signature(); public native mjModel exclude_signature(IntPointer setter);    // body1 << 16 + body2                      (nexclude x 1)
 
   // equality constraints
-  public native IntPointer eq_type(); public native mjModel_ eq_type(IntPointer setter);              // constraint type (mjtEq)                  (neq x 1)
-  public native IntPointer eq_obj1id(); public native mjModel_ eq_obj1id(IntPointer setter);            // id of object 1                           (neq x 1)
-  public native IntPointer eq_obj2id(); public native mjModel_ eq_obj2id(IntPointer setter);            // id of object 2                           (neq x 1)
-  public native @Cast("mjtByte*") BytePointer eq_active0(); public native mjModel_ eq_active0(BytePointer setter);           // initial enable/disable constraint state  (neq x 1)
-  public native @Cast("mjtNum*") DoublePointer eq_solref(); public native mjModel_ eq_solref(DoublePointer setter);            // constraint solver reference              (neq x mjNREF)
-  public native @Cast("mjtNum*") DoublePointer eq_solimp(); public native mjModel_ eq_solimp(DoublePointer setter);            // constraint solver impedance              (neq x mjNIMP)
-  public native @Cast("mjtNum*") DoublePointer eq_data(); public native mjModel_ eq_data(DoublePointer setter);              // numeric data for constraint              (neq x mjNEQDATA)
+  public native IntPointer eq_type(); public native mjModel eq_type(IntPointer setter);              // constraint type (mjtEq)                  (neq x 1)
+  public native IntPointer eq_obj1id(); public native mjModel eq_obj1id(IntPointer setter);            // id of object 1                           (neq x 1)
+  public native IntPointer eq_obj2id(); public native mjModel eq_obj2id(IntPointer setter);            // id of object 2                           (neq x 1)
+  public native IntPointer eq_objtype(); public native mjModel eq_objtype(IntPointer setter);           // type of both objects (mjtObj)            (neq x 1)
+  public native @Cast("mjtBool*") BoolPointer eq_active0(); public native mjModel eq_active0(BoolPointer setter);           // initial enable/disable constraint state  (neq x 1)
+  public native @Cast("mjtNum*") DoublePointer eq_solref(); public native mjModel eq_solref(DoublePointer setter);            // constraint solver reference              (neq x mjNREF)
+  public native @Cast("mjtNum*") DoublePointer eq_solimp(); public native mjModel eq_solimp(DoublePointer setter);            // constraint solver impedance              (neq x mjNIMP)
+  public native @Cast("mjtNum*") DoublePointer eq_data(); public native mjModel eq_data(DoublePointer setter);              // numeric data for constraint              (neq x mjNEQDATA)
 
   // tendons
-  public native IntPointer tendon_adr(); public native mjModel_ tendon_adr(IntPointer setter);           // address of first object in tendon's path (ntendon x 1)
-  public native IntPointer tendon_num(); public native mjModel_ tendon_num(IntPointer setter);           // number of objects in tendon's path       (ntendon x 1)
-  public native IntPointer tendon_matid(); public native mjModel_ tendon_matid(IntPointer setter);         // material id for rendering                (ntendon x 1)
-  public native IntPointer tendon_group(); public native mjModel_ tendon_group(IntPointer setter);         // group for visibility                     (ntendon x 1)
-  public native @Cast("mjtByte*") BytePointer tendon_limited(); public native mjModel_ tendon_limited(BytePointer setter);       // does tendon have length limits           (ntendon x 1)
-  public native @Cast("mjtNum*") DoublePointer tendon_width(); public native mjModel_ tendon_width(DoublePointer setter);         // width for rendering                      (ntendon x 1)
-  public native @Cast("mjtNum*") DoublePointer tendon_solref_lim(); public native mjModel_ tendon_solref_lim(DoublePointer setter);    // constraint solver reference: limit       (ntendon x mjNREF)
-  public native @Cast("mjtNum*") DoublePointer tendon_solimp_lim(); public native mjModel_ tendon_solimp_lim(DoublePointer setter);    // constraint solver impedance: limit       (ntendon x mjNIMP)
-  public native @Cast("mjtNum*") DoublePointer tendon_solref_fri(); public native mjModel_ tendon_solref_fri(DoublePointer setter);    // constraint solver reference: friction    (ntendon x mjNREF)
-  public native @Cast("mjtNum*") DoublePointer tendon_solimp_fri(); public native mjModel_ tendon_solimp_fri(DoublePointer setter);    // constraint solver impedance: friction    (ntendon x mjNIMP)
-  public native @Cast("mjtNum*") DoublePointer tendon_range(); public native mjModel_ tendon_range(DoublePointer setter);         // tendon length limits                     (ntendon x 2)
-  public native @Cast("mjtNum*") DoublePointer tendon_margin(); public native mjModel_ tendon_margin(DoublePointer setter);        // min distance for limit detection         (ntendon x 1)
-  public native @Cast("mjtNum*") DoublePointer tendon_stiffness(); public native mjModel_ tendon_stiffness(DoublePointer setter);     // stiffness coefficient                    (ntendon x 1)
-  public native @Cast("mjtNum*") DoublePointer tendon_damping(); public native mjModel_ tendon_damping(DoublePointer setter);       // damping coefficient                      (ntendon x 1)
-  public native @Cast("mjtNum*") DoublePointer tendon_frictionloss(); public native mjModel_ tendon_frictionloss(DoublePointer setter);  // loss due to friction                     (ntendon x 1)
-  public native @Cast("mjtNum*") DoublePointer tendon_lengthspring(); public native mjModel_ tendon_lengthspring(DoublePointer setter);  // spring resting length range              (ntendon x 2)
-  public native @Cast("mjtNum*") DoublePointer tendon_length0(); public native mjModel_ tendon_length0(DoublePointer setter);       // tendon length in qpos0                   (ntendon x 1)
-  public native @Cast("mjtNum*") DoublePointer tendon_invweight0(); public native mjModel_ tendon_invweight0(DoublePointer setter);    // inv. weight in qpos0                     (ntendon x 1)
-  public native @Cast("mjtNum*") DoublePointer tendon_user(); public native mjModel_ tendon_user(DoublePointer setter);          // user data                                (ntendon x nuser_tendon)
-  public native FloatPointer tendon_rgba(); public native mjModel_ tendon_rgba(FloatPointer setter);          // rgba when material is omitted            (ntendon x 4)
+  public native IntPointer tendon_type(); public native mjModel tendon_type(IntPointer setter);          // type of tendon (mjtTendon)               (ntendon x 1)
+  public native IntPointer tendon_adr(); public native mjModel tendon_adr(IntPointer setter);           // address of first object in tendon's path (ntendon x 1)
+  public native IntPointer tendon_num(); public native mjModel tendon_num(IntPointer setter);           // number of objects in tendon's path       (ntendon x 1)
+  public native IntPointer tendon_matid(); public native mjModel tendon_matid(IntPointer setter);         // material id for rendering                (ntendon x 1)
+  public native IntPointer tendon_actuatorid(); public native mjModel tendon_actuatorid(IntPointer setter);    // actuator contributing damping / armature (ntendon x 1)
+  public native IntPointer tendon_group(); public native mjModel tendon_group(IntPointer setter);         // group for visibility                     (ntendon x 1)
+  public native IntPointer tendon_plasticadr(); public native mjModel tendon_plasticadr(IntPointer setter);    // start addr in plastic state (-1: none)   (ntendon x 1)
+  public native IntPointer tendon_treenum(); public native mjModel tendon_treenum(IntPointer setter);       // number of trees along tendon's path      (ntendon x 1)
+  public native IntPointer tendon_treeid(); public native mjModel tendon_treeid(IntPointer setter);        // first two trees along tendon's path      (ntendon x 2)
+  public native IntPointer ten_J_rownnz(); public native mjModel ten_J_rownnz(IntPointer setter);         // number of non-zeros in Jacobian row      (ntendon x 1)
+  public native IntPointer ten_J_rowadr(); public native mjModel ten_J_rowadr(IntPointer setter);         // row start address in colind array        (ntendon x 1)
+  public native IntPointer ten_J_colind(); public native mjModel ten_J_colind(IntPointer setter);         // column indices in sparse Jacobian        (nJten x 1)
+  public native @Cast("mjtBool*") BoolPointer tendon_limited(); public native mjModel tendon_limited(BoolPointer setter);       // does tendon have length limits           (ntendon x 1)
+  public native @Cast("mjtBool*") BoolPointer tendon_actfrclimited(); public native mjModel tendon_actfrclimited(BoolPointer setter); // does tendon have actuator force limits   (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer tendon_width(); public native mjModel tendon_width(DoublePointer setter);         // width for rendering                      (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer tendon_solref_lim(); public native mjModel tendon_solref_lim(DoublePointer setter);    // constraint solver reference: limit       (ntendon x mjNREF)
+  public native @Cast("mjtNum*") DoublePointer tendon_solimp_lim(); public native mjModel tendon_solimp_lim(DoublePointer setter);    // constraint solver impedance: limit       (ntendon x mjNIMP)
+  public native @Cast("mjtNum*") DoublePointer tendon_solref_fri(); public native mjModel tendon_solref_fri(DoublePointer setter);    // constraint solver reference: friction    (ntendon x mjNREF)
+  public native @Cast("mjtNum*") DoublePointer tendon_solimp_fri(); public native mjModel tendon_solimp_fri(DoublePointer setter);    // constraint solver impedance: friction    (ntendon x mjNIMP)
+  public native @Cast("mjtNum*") DoublePointer tendon_range(); public native mjModel tendon_range(DoublePointer setter);         // tendon length limits                     (ntendon x 2)
+  public native @Cast("mjtNum*") DoublePointer tendon_actfrcrange(); public native mjModel tendon_actfrcrange(DoublePointer setter);   // range of total actuator force            (ntendon x 2)
+  public native @Cast("mjtNum*") DoublePointer tendon_margin(); public native mjModel tendon_margin(DoublePointer setter);        // min distance for limit detection         (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer tendon_stiffness(); public native mjModel tendon_stiffness(DoublePointer setter);     // linear stiffness coefficient             (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer tendon_stiffnesspoly(); public native mjModel tendon_stiffnesspoly(DoublePointer setter); // high-order stiffness coefficients        (ntendon x mjNPOLY)
+  public native @Cast("mjtNum*") DoublePointer tendon_damping(); public native mjModel tendon_damping(DoublePointer setter);       // linear damping coefficient               (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer tendon_dampingpoly(); public native mjModel tendon_dampingpoly(DoublePointer setter);   // high-order damping coefficients          (ntendon x mjNPOLY)
+  public native @Cast("mjtNum*") DoublePointer tendon_armature(); public native mjModel tendon_armature(DoublePointer setter);      // inertia associated with tendon velocity  (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer tendon_frictionloss(); public native mjModel tendon_frictionloss(DoublePointer setter);  // loss due to friction                     (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer tendon_lengthspring(); public native mjModel tendon_lengthspring(DoublePointer setter);  // spring resting length range              (ntendon x 2)
+  public native @Cast("mjtNum*") DoublePointer tendon_springyield(); public native mjModel tendon_springyield(DoublePointer setter);   // plastic yield threshold                  (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer tendon_length0(); public native mjModel tendon_length0(DoublePointer setter);       // tendon length in qpos0                   (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer tendon_invweight0(); public native mjModel tendon_invweight0(DoublePointer setter);    // inv. weight in qpos0                     (ntendon x 1)
+  public native @Cast("mjtNum*") DoublePointer tendon_user(); public native mjModel tendon_user(DoublePointer setter);          // user data                                (ntendon x nuser_tendon)
+  public native FloatPointer tendon_rgba(); public native mjModel tendon_rgba(FloatPointer setter);          // rgba when material is omitted            (ntendon x 4)
 
   // list of all wrap objects in tendon paths
-  public native IntPointer wrap_type(); public native mjModel_ wrap_type(IntPointer setter);            // wrap object type (mjtWrap)               (nwrap x 1)
-  public native IntPointer wrap_objid(); public native mjModel_ wrap_objid(IntPointer setter);           // object id: geom, site, joint             (nwrap x 1)
-  public native @Cast("mjtNum*") DoublePointer wrap_prm(); public native mjModel_ wrap_prm(DoublePointer setter);             // divisor, joint coef, or site id          (nwrap x 1)
+  public native IntPointer wrap_type(); public native mjModel wrap_type(IntPointer setter);            // wrap object type (mjtWrap)               (nwrap x 1)
+  public native IntPointer wrap_objid(); public native mjModel wrap_objid(IntPointer setter);           // object id: geom, site, joint             (nwrap x 1)
+  public native @Cast("mjtNum*") DoublePointer wrap_prm(); public native mjModel wrap_prm(DoublePointer setter);             // divisor, joint coef, or site id          (nwrap x 1)
 
   // actuators
-  public native IntPointer actuator_trntype(); public native mjModel_ actuator_trntype(IntPointer setter);     // transmission type (mjtTrn)               (nu x 1)
-  public native IntPointer actuator_dyntype(); public native mjModel_ actuator_dyntype(IntPointer setter);     // dynamics type (mjtDyn)                   (nu x 1)
-  public native IntPointer actuator_gaintype(); public native mjModel_ actuator_gaintype(IntPointer setter);    // gain type (mjtGain)                      (nu x 1)
-  public native IntPointer actuator_biastype(); public native mjModel_ actuator_biastype(IntPointer setter);    // bias type (mjtBias)                      (nu x 1)
-  public native IntPointer actuator_trnid(); public native mjModel_ actuator_trnid(IntPointer setter);       // transmission id: joint, tendon, site     (nu x 2)
-  public native IntPointer actuator_actadr(); public native mjModel_ actuator_actadr(IntPointer setter);      // first activation address; -1: stateless  (nu x 1)
-  public native IntPointer actuator_actnum(); public native mjModel_ actuator_actnum(IntPointer setter);      // number of activation variables           (nu x 1)
-  public native IntPointer actuator_group(); public native mjModel_ actuator_group(IntPointer setter);       // group for visibility                     (nu x 1)
-  public native @Cast("mjtByte*") BytePointer actuator_ctrllimited(); public native mjModel_ actuator_ctrllimited(BytePointer setter); // is control limited                       (nu x 1)
-  public native @Cast("mjtByte*") BytePointer actuator_forcelimited(); public native mjModel_ actuator_forcelimited(BytePointer setter);// is force limited                         (nu x 1)
-  public native @Cast("mjtByte*") BytePointer actuator_actlimited(); public native mjModel_ actuator_actlimited(BytePointer setter);  // is activation limited                    (nu x 1)
-  public native @Cast("mjtNum*") DoublePointer actuator_dynprm(); public native mjModel_ actuator_dynprm(DoublePointer setter);      // dynamics parameters                      (nu x mjNDYN)
-  public native @Cast("mjtNum*") DoublePointer actuator_gainprm(); public native mjModel_ actuator_gainprm(DoublePointer setter);     // gain parameters                          (nu x mjNGAIN)
-  public native @Cast("mjtNum*") DoublePointer actuator_biasprm(); public native mjModel_ actuator_biasprm(DoublePointer setter);     // bias parameters                          (nu x mjNBIAS)
-  public native @Cast("mjtByte*") BytePointer actuator_actearly(); public native mjModel_ actuator_actearly(BytePointer setter);    // step activation before force             (nu x 1)
-  public native @Cast("mjtNum*") DoublePointer actuator_ctrlrange(); public native mjModel_ actuator_ctrlrange(DoublePointer setter);   // range of controls                        (nu x 2)
-  public native @Cast("mjtNum*") DoublePointer actuator_forcerange(); public native mjModel_ actuator_forcerange(DoublePointer setter);  // range of forces                          (nu x 2)
-  public native @Cast("mjtNum*") DoublePointer actuator_actrange(); public native mjModel_ actuator_actrange(DoublePointer setter);    // range of activations                     (nu x 2)
-  public native @Cast("mjtNum*") DoublePointer actuator_gear(); public native mjModel_ actuator_gear(DoublePointer setter);        // scale length and transmitted force       (nu x 6)
-  public native @Cast("mjtNum*") DoublePointer actuator_cranklength(); public native mjModel_ actuator_cranklength(DoublePointer setter); // crank length for slider-crank            (nu x 1)
-  public native @Cast("mjtNum*") DoublePointer actuator_acc0(); public native mjModel_ actuator_acc0(DoublePointer setter);        // acceleration from unit force in qpos0    (nu x 1)
-  public native @Cast("mjtNum*") DoublePointer actuator_length0(); public native mjModel_ actuator_length0(DoublePointer setter);     // actuator length in qpos0                 (nu x 1)
-  public native @Cast("mjtNum*") DoublePointer actuator_lengthrange(); public native mjModel_ actuator_lengthrange(DoublePointer setter); // feasible actuator length range           (nu x 2)
-  public native @Cast("mjtNum*") DoublePointer actuator_user(); public native mjModel_ actuator_user(DoublePointer setter);        // user data                                (nu x nuser_actuator)
-  public native IntPointer actuator_plugin(); public native mjModel_ actuator_plugin(IntPointer setter);      // plugin instance id; -1: not a plugin     (nu x 1)
+  public native IntPointer actuator_trntype(); public native mjModel actuator_trntype(IntPointer setter);     // transmission type (mjtTrn)               (nactuator x 1)
+  public native IntPointer actuator_dyntype(); public native mjModel actuator_dyntype(IntPointer setter);     // dynamics type (mjtDyn)                   (nactuator x 1)
+  public native IntPointer actuator_gaintype(); public native mjModel actuator_gaintype(IntPointer setter);    // gain type (mjtGain)                      (nactuator x 1)
+  public native IntPointer actuator_biastype(); public native mjModel actuator_biastype(IntPointer setter);    // bias type (mjtBias)                      (nactuator x 1)
+  public native IntPointer actuator_ctrladr(); public native mjModel actuator_ctrladr(IntPointer setter);     // address of first control                 (nactuator x 1)
+  public native IntPointer actuator_ctrlnum(); public native mjModel actuator_ctrlnum(IntPointer setter);     // number of controls                       (nactuator x 1)
+  public native IntPointer actuator_ctrlspec(); public native mjModel actuator_ctrlspec(IntPointer setter);    // input signature, scoped by gaintype      (nactuator x 1)
+  public native IntPointer actuator_outadr(); public native mjModel actuator_outadr(IntPointer setter);      // address of first force output            (nactuator x 1)
+  public native IntPointer actuator_outnum(); public native mjModel actuator_outnum(IntPointer setter);      // number of force outputs, from trntype    (nactuator x 1)
+  public native IntPointer actuator_actadr(); public native mjModel actuator_actadr(IntPointer setter);      // first activation address; -1: stateless  (nactuator x 1)
+  public native IntPointer actuator_actnum(); public native mjModel actuator_actnum(IntPointer setter);      // number of activation variables           (nactuator x 1)
+  public native IntPointer actuator_trnid(); public native mjModel actuator_trnid(IntPointer setter);       // transmission id: joint, tendon, site     (nactuator x 2)
+  public native @Cast("mjtNum*") DoublePointer actuator_cranklength(); public native mjModel actuator_cranklength(DoublePointer setter); // crank length for slider-crank            (nactuator x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_dynprm(); public native mjModel actuator_dynprm(DoublePointer setter);      // dynamics parameters                      (nactuator x mjNDYN)
+  public native @Cast("mjtNum*") DoublePointer actuator_gainprm(); public native mjModel actuator_gainprm(DoublePointer setter);     // gain parameters                          (nactuator x mjNGAIN)
+  public native @Cast("mjtNum*") DoublePointer actuator_biasprm(); public native mjModel actuator_biasprm(DoublePointer setter);     // bias parameters                          (nactuator x mjNBIAS)
+  public native @Cast("mjtBool*") BoolPointer actuator_actlimited(); public native mjModel actuator_actlimited(BoolPointer setter);  // is activation limited                    (nactuator x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_actrange(); public native mjModel actuator_actrange(DoublePointer setter);    // range of activations                     (nactuator x 2)
+  public native @Cast("mjtBool*") BoolPointer actuator_actearly(); public native mjModel actuator_actearly(BoolPointer setter);    // step activation before force             (nactuator x 1)
+  public native IntPointer actuator_history(); public native mjModel actuator_history(IntPointer setter);     // history buffer: [nsample, interp]        (nactuator x 2)
+  public native IntPointer actuator_historyadr(); public native mjModel actuator_historyadr(IntPointer setter);  // address in history buffer; -1: none      (nactuator x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_delay(); public native mjModel actuator_delay(DoublePointer setter);       // delay time; 0: no delay                  (nactuator x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_damping(); public native mjModel actuator_damping(DoublePointer setter);     // linear damping coefficient               (nactuator x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_dampingpoly(); public native mjModel actuator_dampingpoly(DoublePointer setter); // high-order damping coefficients          (nactuator x mjNPOLY)
+  public native @Cast("mjtNum*") DoublePointer actuator_armature(); public native mjModel actuator_armature(DoublePointer setter);    // armature added to target (joint, tendon) (nactuator x 1)
+  public native IntPointer actuator_group(); public native mjModel actuator_group(IntPointer setter);       // group for visibility                     (nactuator x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_user(); public native mjModel actuator_user(DoublePointer setter);        // user data                                (nactuator x nuser_actuator)
+  public native IntPointer actuator_plugin(); public native mjModel actuator_plugin(IntPointer setter);      // plugin instance id; -1: not a plugin     (nactuator x 1)
+  public native @Cast("mjtBool*") BoolPointer actuator_forcelimited(); public native mjModel actuator_forcelimited(BoolPointer setter);// is force limited                         (nactuator x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_forcerange(); public native mjModel actuator_forcerange(DoublePointer setter);  // range of forces                          (nactuator x 2)
+  public native @Cast("mjtBool*") BoolPointer actuator_ctrllimited(); public native mjModel actuator_ctrllimited(BoolPointer setter); // is control limited                       (nu x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_ctrlrange(); public native mjModel actuator_ctrlrange(DoublePointer setter);   // range of controls                        (nu x 2)
+  public native @Cast("mjtNum*") DoublePointer actuator_gear(); public native mjModel actuator_gear(DoublePointer setter);        // scale length and transmitted force       (nout x 6)
+  public native @Cast("mjtNum*") DoublePointer actuator_acc0(); public native mjModel actuator_acc0(DoublePointer setter);        // acceleration from unit force in qpos0    (nout x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_length0(); public native mjModel actuator_length0(DoublePointer setter);     // actuator length in qpos0                 (nout x 1)
+  public native @Cast("mjtNum*") DoublePointer actuator_lengthrange(); public native mjModel actuator_lengthrange(DoublePointer setter); // feasible actuator length range           (nout x 2)
 
   // sensors
-  public native IntPointer sensor_type(); public native mjModel_ sensor_type(IntPointer setter);          // sensor type (mjtSensor)                  (nsensor x 1)
-  public native IntPointer sensor_datatype(); public native mjModel_ sensor_datatype(IntPointer setter);      // numeric data type (mjtDataType)          (nsensor x 1)
-  public native IntPointer sensor_needstage(); public native mjModel_ sensor_needstage(IntPointer setter);     // required compute stage (mjtStage)        (nsensor x 1)
-  public native IntPointer sensor_objtype(); public native mjModel_ sensor_objtype(IntPointer setter);       // type of sensorized object (mjtObj)       (nsensor x 1)
-  public native IntPointer sensor_objid(); public native mjModel_ sensor_objid(IntPointer setter);         // id of sensorized object                  (nsensor x 1)
-  public native IntPointer sensor_reftype(); public native mjModel_ sensor_reftype(IntPointer setter);       // type of reference frame (mjtObj)         (nsensor x 1)
-  public native IntPointer sensor_refid(); public native mjModel_ sensor_refid(IntPointer setter);         // id of reference frame; -1: global frame  (nsensor x 1)
-  public native IntPointer sensor_dim(); public native mjModel_ sensor_dim(IntPointer setter);           // number of scalar outputs                 (nsensor x 1)
-  public native IntPointer sensor_adr(); public native mjModel_ sensor_adr(IntPointer setter);           // address in sensor array                  (nsensor x 1)
-  public native @Cast("mjtNum*") DoublePointer sensor_cutoff(); public native mjModel_ sensor_cutoff(DoublePointer setter);        // cutoff for real and positive; 0: ignore  (nsensor x 1)
-  public native @Cast("mjtNum*") DoublePointer sensor_noise(); public native mjModel_ sensor_noise(DoublePointer setter);         // noise standard deviation                 (nsensor x 1)
-  public native @Cast("mjtNum*") DoublePointer sensor_user(); public native mjModel_ sensor_user(DoublePointer setter);          // user data                                (nsensor x nuser_sensor)
-  public native IntPointer sensor_plugin(); public native mjModel_ sensor_plugin(IntPointer setter);        // plugin instance id; -1: not a plugin     (nsensor x 1)
+  public native IntPointer sensor_type(); public native mjModel sensor_type(IntPointer setter);          // sensor type (mjtSensor)                  (nsensor x 1)
+  public native IntPointer sensor_datatype(); public native mjModel sensor_datatype(IntPointer setter);      // numeric data type (mjtDataType)          (nsensor x 1)
+  public native IntPointer sensor_needstage(); public native mjModel sensor_needstage(IntPointer setter);     // required compute stage (mjtStage)        (nsensor x 1)
+  public native IntPointer sensor_objtype(); public native mjModel sensor_objtype(IntPointer setter);       // type of sensorized object (mjtObj)       (nsensor x 1)
+  public native IntPointer sensor_objid(); public native mjModel sensor_objid(IntPointer setter);         // id of sensorized object                  (nsensor x 1)
+  public native IntPointer sensor_reftype(); public native mjModel sensor_reftype(IntPointer setter);       // type of reference frame (mjtObj)         (nsensor x 1)
+  public native IntPointer sensor_refid(); public native mjModel sensor_refid(IntPointer setter);         // id of reference frame; -1: global frame  (nsensor x 1)
+  public native IntPointer sensor_intprm(); public native mjModel sensor_intprm(IntPointer setter);        // sensor parameters                        (nsensor x mjNSENS)
+  public native IntPointer sensor_dim(); public native mjModel sensor_dim(IntPointer setter);           // number of scalar outputs                 (nsensor x 1)
+  public native IntPointer sensor_adr(); public native mjModel sensor_adr(IntPointer setter);           // address in sensor array                  (nsensor x 1)
+  public native @Cast("mjtNum*") DoublePointer sensor_cutoff(); public native mjModel sensor_cutoff(DoublePointer setter);        // cutoff for real and positive; 0: ignore  (nsensor x 1)
+  public native @Cast("mjtNum*") DoublePointer sensor_noise(); public native mjModel sensor_noise(DoublePointer setter);         // noise standard deviation                 (nsensor x 1)
+  public native IntPointer sensor_history(); public native mjModel sensor_history(IntPointer setter);       // history buffer: [nsample, interp]        (nsensor x 2)
+  public native IntPointer sensor_historyadr(); public native mjModel sensor_historyadr(IntPointer setter);    // address in history buffer; -1: none      (nsensor x 1)
+  public native @Cast("mjtNum*") DoublePointer sensor_delay(); public native mjModel sensor_delay(DoublePointer setter);         // delay time in seconds; 0: no delay       (nsensor x 1)
+  public native @Cast("mjtNum*") DoublePointer sensor_interval(); public native mjModel sensor_interval(DoublePointer setter);      // interval: [period, phase] in seconds     (nsensor x 2)
+  public native @Cast("mjtNum*") DoublePointer sensor_user(); public native mjModel sensor_user(DoublePointer setter);          // user data                                (nsensor x nuser_sensor)
+  public native IntPointer sensor_plugin(); public native mjModel sensor_plugin(IntPointer setter);        // plugin instance id; -1: not a plugin     (nsensor x 1)
 
   // plugin instances
-  public native IntPointer plugin(); public native mjModel_ plugin(IntPointer setter);               // globally registered plugin slot number   (nplugin x 1)
-  public native IntPointer plugin_stateadr(); public native mjModel_ plugin_stateadr(IntPointer setter);      // address in the plugin state array        (nplugin x 1)
-  public native IntPointer plugin_statenum(); public native mjModel_ plugin_statenum(IntPointer setter);      // number of states in the plugin instance  (nplugin x 1)
-  public native @Cast("char*") BytePointer plugin_attr(); public native mjModel_ plugin_attr(BytePointer setter);          // config attributes of plugin instances    (npluginattr x 1)
-  public native IntPointer plugin_attradr(); public native mjModel_ plugin_attradr(IntPointer setter);       // address to each instance's config attrib (nplugin x 1)
+  public native IntPointer plugin(); public native mjModel plugin(IntPointer setter);               // globally registered plugin slot number   (nplugin x 1)
+  public native IntPointer plugin_stateadr(); public native mjModel plugin_stateadr(IntPointer setter);      // address in the plugin state array        (nplugin x 1)
+  public native IntPointer plugin_statenum(); public native mjModel plugin_statenum(IntPointer setter);      // number of states in the plugin instance  (nplugin x 1)
+  public native @Cast("char*") BytePointer plugin_attr(); public native mjModel plugin_attr(BytePointer setter);          // config attributes of plugin instances    (npluginattr x 1)
+  public native IntPointer plugin_attradr(); public native mjModel plugin_attradr(IntPointer setter);       // address to each instance's config attrib (nplugin x 1)
 
   // custom numeric fields
-  public native IntPointer numeric_adr(); public native mjModel_ numeric_adr(IntPointer setter);          // address of field in numeric_data         (nnumeric x 1)
-  public native IntPointer numeric_size(); public native mjModel_ numeric_size(IntPointer setter);         // size of numeric field                    (nnumeric x 1)
-  public native @Cast("mjtNum*") DoublePointer numeric_data(); public native mjModel_ numeric_data(DoublePointer setter);         // array of all numeric fields              (nnumericdata x 1)
+  public native IntPointer numeric_adr(); public native mjModel numeric_adr(IntPointer setter);          // address of field in numeric_data         (nnumeric x 1)
+  public native IntPointer numeric_size(); public native mjModel numeric_size(IntPointer setter);         // size of numeric field                    (nnumeric x 1)
+  public native @Cast("mjtNum*") DoublePointer numeric_data(); public native mjModel numeric_data(DoublePointer setter);         // array of all numeric fields              (nnumericdata x 1)
 
   // custom text fields
-  public native IntPointer text_adr(); public native mjModel_ text_adr(IntPointer setter);             // address of text in text_data             (ntext x 1)
-  public native IntPointer text_size(); public native mjModel_ text_size(IntPointer setter);            // size of text field (strlen+1)            (ntext x 1)
-  public native @Cast("char*") BytePointer text_data(); public native mjModel_ text_data(BytePointer setter);            // array of all text fields (0-terminated)  (ntextdata x 1)
+  public native IntPointer text_adr(); public native mjModel text_adr(IntPointer setter);             // address of text in text_data             (ntext x 1)
+  public native IntPointer text_size(); public native mjModel text_size(IntPointer setter);            // size of text field (strlen+1)            (ntext x 1)
+  public native @Cast("char*") BytePointer text_data(); public native mjModel text_data(BytePointer setter);            // array of all text fields (0-terminated)  (ntextdata x 1)
 
   // custom tuple fields
-  public native IntPointer tuple_adr(); public native mjModel_ tuple_adr(IntPointer setter);            // address of text in text_data             (ntuple x 1)
-  public native IntPointer tuple_size(); public native mjModel_ tuple_size(IntPointer setter);           // number of objects in tuple               (ntuple x 1)
-  public native IntPointer tuple_objtype(); public native mjModel_ tuple_objtype(IntPointer setter);        // array of object types in all tuples      (ntupledata x 1)
-  public native IntPointer tuple_objid(); public native mjModel_ tuple_objid(IntPointer setter);          // array of object ids in all tuples        (ntupledata x 1)
-  public native @Cast("mjtNum*") DoublePointer tuple_objprm(); public native mjModel_ tuple_objprm(DoublePointer setter);         // array of object params in all tuples     (ntupledata x 1)
+  public native IntPointer tuple_adr(); public native mjModel tuple_adr(IntPointer setter);            // address of text in text_data             (ntuple x 1)
+  public native IntPointer tuple_size(); public native mjModel tuple_size(IntPointer setter);           // number of objects in tuple               (ntuple x 1)
+  public native IntPointer tuple_objtype(); public native mjModel tuple_objtype(IntPointer setter);        // array of object types in all tuples      (ntupledata x 1)
+  public native IntPointer tuple_objid(); public native mjModel tuple_objid(IntPointer setter);          // array of object ids in all tuples        (ntupledata x 1)
+  public native @Cast("mjtNum*") DoublePointer tuple_objprm(); public native mjModel tuple_objprm(DoublePointer setter);         // array of object params in all tuples     (ntupledata x 1)
 
   // keyframes
-  public native @Cast("mjtNum*") DoublePointer key_time(); public native mjModel_ key_time(DoublePointer setter);             // key time                                 (nkey x 1)
-  public native @Cast("mjtNum*") DoublePointer key_qpos(); public native mjModel_ key_qpos(DoublePointer setter);             // key position                             (nkey x nq)
-  public native @Cast("mjtNum*") DoublePointer key_qvel(); public native mjModel_ key_qvel(DoublePointer setter);             // key velocity                             (nkey x nv)
-  public native @Cast("mjtNum*") DoublePointer key_act(); public native mjModel_ key_act(DoublePointer setter);              // key activation                           (nkey x na)
-  public native @Cast("mjtNum*") DoublePointer key_mpos(); public native mjModel_ key_mpos(DoublePointer setter);             // key mocap position                       (nkey x 3*nmocap)
-  public native @Cast("mjtNum*") DoublePointer key_mquat(); public native mjModel_ key_mquat(DoublePointer setter);            // key mocap quaternion                     (nkey x 4*nmocap)
-  public native @Cast("mjtNum*") DoublePointer key_ctrl(); public native mjModel_ key_ctrl(DoublePointer setter);             // key control                              (nkey x nu)
+  public native @Cast("mjtNum*") DoublePointer key_time(); public native mjModel key_time(DoublePointer setter);             // key time                                 (nkey x 1)
+  public native @Cast("mjtNum*") DoublePointer key_qpos(); public native mjModel key_qpos(DoublePointer setter);             // key position                             (nkey x nq)
+  public native @Cast("mjtNum*") DoublePointer key_qvel(); public native mjModel key_qvel(DoublePointer setter);             // key velocity                             (nkey x nv)
+  public native @Cast("mjtNum*") DoublePointer key_act(); public native mjModel key_act(DoublePointer setter);              // key activation                           (nkey x na)
+  public native @Cast("mjtNum*") DoublePointer key_mpos(); public native mjModel key_mpos(DoublePointer setter);             // key mocap position                       (nkey x nmocap*3)
+  public native @Cast("mjtNum*") DoublePointer key_mquat(); public native mjModel key_mquat(DoublePointer setter);            // key mocap quaternion                     (nkey x nmocap*4)
+  public native @Cast("mjtNum*") DoublePointer key_ctrl(); public native mjModel key_ctrl(DoublePointer setter);             // key control                              (nkey x nu)
+  public native @Cast("mjtNum*") DoublePointer key_plastic(); public native mjModel key_plastic(DoublePointer setter);          // key plastic state                        (nkey x nplastic)
 
   // names
-  public native IntPointer name_bodyadr(); public native mjModel_ name_bodyadr(IntPointer setter);         // body name pointers                       (nbody x 1)
-  public native IntPointer name_jntadr(); public native mjModel_ name_jntadr(IntPointer setter);          // joint name pointers                      (njnt x 1)
-  public native IntPointer name_geomadr(); public native mjModel_ name_geomadr(IntPointer setter);         // geom name pointers                       (ngeom x 1)
-  public native IntPointer name_siteadr(); public native mjModel_ name_siteadr(IntPointer setter);         // site name pointers                       (nsite x 1)
-  public native IntPointer name_camadr(); public native mjModel_ name_camadr(IntPointer setter);          // camera name pointers                     (ncam x 1)
-  public native IntPointer name_lightadr(); public native mjModel_ name_lightadr(IntPointer setter);        // light name pointers                      (nlight x 1)
-  public native IntPointer name_flexadr(); public native mjModel_ name_flexadr(IntPointer setter);         // flex name pointers                       (nflex x 1)
-  public native IntPointer name_meshadr(); public native mjModel_ name_meshadr(IntPointer setter);         // mesh name pointers                       (nmesh x 1)
-  public native IntPointer name_skinadr(); public native mjModel_ name_skinadr(IntPointer setter);         // skin name pointers                       (nskin x 1)
-  public native IntPointer name_hfieldadr(); public native mjModel_ name_hfieldadr(IntPointer setter);       // hfield name pointers                     (nhfield x 1)
-  public native IntPointer name_texadr(); public native mjModel_ name_texadr(IntPointer setter);          // texture name pointers                    (ntex x 1)
-  public native IntPointer name_matadr(); public native mjModel_ name_matadr(IntPointer setter);          // material name pointers                   (nmat x 1)
-  public native IntPointer name_pairadr(); public native mjModel_ name_pairadr(IntPointer setter);         // geom pair name pointers                  (npair x 1)
-  public native IntPointer name_excludeadr(); public native mjModel_ name_excludeadr(IntPointer setter);      // exclude name pointers                    (nexclude x 1)
-  public native IntPointer name_eqadr(); public native mjModel_ name_eqadr(IntPointer setter);           // equality constraint name pointers        (neq x 1)
-  public native IntPointer name_tendonadr(); public native mjModel_ name_tendonadr(IntPointer setter);       // tendon name pointers                     (ntendon x 1)
-  public native IntPointer name_actuatoradr(); public native mjModel_ name_actuatoradr(IntPointer setter);     // actuator name pointers                   (nu x 1)
-  public native IntPointer name_sensoradr(); public native mjModel_ name_sensoradr(IntPointer setter);       // sensor name pointers                     (nsensor x 1)
-  public native IntPointer name_numericadr(); public native mjModel_ name_numericadr(IntPointer setter);      // numeric name pointers                    (nnumeric x 1)
-  public native IntPointer name_textadr(); public native mjModel_ name_textadr(IntPointer setter);         // text name pointers                       (ntext x 1)
-  public native IntPointer name_tupleadr(); public native mjModel_ name_tupleadr(IntPointer setter);        // tuple name pointers                      (ntuple x 1)
-  public native IntPointer name_keyadr(); public native mjModel_ name_keyadr(IntPointer setter);          // keyframe name pointers                   (nkey x 1)
-  public native IntPointer name_pluginadr(); public native mjModel_ name_pluginadr(IntPointer setter);       // plugin instance name pointers            (nplugin x 1)
-  public native @Cast("char*") BytePointer names(); public native mjModel_ names(BytePointer setter);                // names of all objects, 0-terminated       (nnames x 1)
-  public native IntPointer names_map(); public native mjModel_ names_map(IntPointer setter);            // internal hash map of names               (nnames_map x 1)
+  public native IntPointer name_bodyadr(); public native mjModel name_bodyadr(IntPointer setter);         // body name pointers                       (nbody x 1)
+  public native IntPointer name_jntadr(); public native mjModel name_jntadr(IntPointer setter);          // joint name pointers                      (njnt x 1)
+  public native IntPointer name_geomadr(); public native mjModel name_geomadr(IntPointer setter);         // geom name pointers                       (ngeom x 1)
+  public native IntPointer name_siteadr(); public native mjModel name_siteadr(IntPointer setter);         // site name pointers                       (nsite x 1)
+  public native IntPointer name_camadr(); public native mjModel name_camadr(IntPointer setter);          // camera name pointers                     (ncam x 1)
+  public native IntPointer name_lightadr(); public native mjModel name_lightadr(IntPointer setter);        // light name pointers                      (nlight x 1)
+  public native IntPointer name_flexadr(); public native mjModel name_flexadr(IntPointer setter);         // flex name pointers                       (nflex x 1)
+  public native IntPointer name_meshadr(); public native mjModel name_meshadr(IntPointer setter);         // mesh name pointers                       (nmesh x 1)
+  public native IntPointer name_skinadr(); public native mjModel name_skinadr(IntPointer setter);         // skin name pointers                       (nskin x 1)
+  public native IntPointer name_hfieldadr(); public native mjModel name_hfieldadr(IntPointer setter);       // hfield name pointers                     (nhfield x 1)
+  public native IntPointer name_texadr(); public native mjModel name_texadr(IntPointer setter);          // texture name pointers                    (ntex x 1)
+  public native IntPointer name_matadr(); public native mjModel name_matadr(IntPointer setter);          // material name pointers                   (nmat x 1)
+  public native IntPointer name_pairadr(); public native mjModel name_pairadr(IntPointer setter);         // geom pair name pointers                  (npair x 1)
+  public native IntPointer name_excludeadr(); public native mjModel name_excludeadr(IntPointer setter);      // exclude name pointers                    (nexclude x 1)
+  public native IntPointer name_eqadr(); public native mjModel name_eqadr(IntPointer setter);           // equality constraint name pointers        (neq x 1)
+  public native IntPointer name_tendonadr(); public native mjModel name_tendonadr(IntPointer setter);       // tendon name pointers                     (ntendon x 1)
+  public native IntPointer name_actuatoradr(); public native mjModel name_actuatoradr(IntPointer setter);     // actuator name pointers                   (nactuator x 1)
+  public native IntPointer name_sensoradr(); public native mjModel name_sensoradr(IntPointer setter);       // sensor name pointers                     (nsensor x 1)
+  public native IntPointer name_numericadr(); public native mjModel name_numericadr(IntPointer setter);      // numeric name pointers                    (nnumeric x 1)
+  public native IntPointer name_textadr(); public native mjModel name_textadr(IntPointer setter);         // text name pointers                       (ntext x 1)
+  public native IntPointer name_tupleadr(); public native mjModel name_tupleadr(IntPointer setter);        // tuple name pointers                      (ntuple x 1)
+  public native IntPointer name_keyadr(); public native mjModel name_keyadr(IntPointer setter);          // keyframe name pointers                   (nkey x 1)
+  public native IntPointer name_pluginadr(); public native mjModel name_pluginadr(IntPointer setter);       // plugin instance name pointers            (nplugin x 1)
+  public native @Cast("char*") BytePointer names(); public native mjModel names(BytePointer setter);                // names of all objects, 0-terminated       (nnames x 1)
+  public native IntPointer names_map(); public native mjModel names_map(IntPointer setter);            // internal hash map of names               (nnames_map x 1)
 
   // paths
-  public native @Cast("char*") BytePointer paths(); public native mjModel_ paths(BytePointer setter);                // paths to assets, 0-terminated            (npaths x 1)
-}
-@Opaque public static class mjModel extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjModel() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjModel(Pointer p) { super(p); }
+  public native @Cast("char*") BytePointer paths(); public native mjModel paths(BytePointer setter);                // resolved paths to assets, 0-terminated   (npaths x 1)
+
+  // sparse structures
+  public native IntPointer B_rownnz(); public native mjModel B_rownnz(IntPointer setter);             // body-dof: non-zeros in each row          (nbody x 1)
+  public native IntPointer B_rowadr(); public native mjModel B_rowadr(IntPointer setter);             // body-dof: row addresses                  (nbody x 1)
+  public native IntPointer B_colind(); public native mjModel B_colind(IntPointer setter);             // body-dof: column indices                 (nB x 1)
+  public native IntPointer M_rownnz(); public native mjModel M_rownnz(IntPointer setter);             // reduced inertia: non-zeros in each row   (nv x 1)
+  public native IntPointer M_rowadr(); public native mjModel M_rowadr(IntPointer setter);             // reduced inertia: row addresses           (nv x 1)
+  public native IntPointer M_colind(); public native mjModel M_colind(IntPointer setter);             // reduced inertia: column indices          (nC x 1)
+  public native IntPointer mapM2M(); public native mjModel mapM2M(IntPointer setter);               // index mapping from qM to M               (nC x 1)
+  public native IntPointer D_rownnz(); public native mjModel D_rownnz(IntPointer setter);             // full inertia: non-zeros in each row      (nv x 1)
+  public native IntPointer D_rowadr(); public native mjModel D_rowadr(IntPointer setter);             // full inertia: row addresses              (nv x 1)
+  public native IntPointer D_diag(); public native mjModel D_diag(IntPointer setter);               // full inertia: index of diagonal element  (nv x 1)
+  public native IntPointer D_colind(); public native mjModel D_colind(IntPointer setter);             // full inertia: column indices             (nD x 1)
+  public native IntPointer mapM2D(); public native mjModel mapM2D(IntPointer setter);               // index mapping from M to D                (nD x 1)
+  public native IntPointer mapD2M(); public native mjModel mapD2M(IntPointer setter);               // index mapping from D to M                (nC x 1)
+
+  // compilation signature
+  public native @Cast("uint64_t") long signature(); public native mjModel signature(long setter);            // also held by the mjSpec that compiled this model
 }
 
 // #endif  // MUJOCO_MJMODEL_H_
@@ -3625,13 +6415,15 @@ public static class mjModel_ extends Pointer {
 // #ifndef MUJOCO_MJRENDER_H_
 // #define MUJOCO_MJRENDER_H_
 
+// #include <mujoco/mjtype.h>
+// #include <mujoco/mjvisualize.h>
 
 // #if defined(__cplusplus)
 // #endif
 
 public static final int mjNAUX =          10;        // number of auxiliary buffers
 public static final int mjMAXTEXTURE =    1000;      // maximum number of textures
-
+public static final int mjMAXMATERIAL =   1000;      // maximum number of materials with textures
 
 //---------------------------------- primitive types (mjt) -----------------------------------------
 
@@ -3652,10 +6444,12 @@ public static final int    // OpenGL framebuffer option
   mjFB_WINDOW         = 0,        // default/window buffer
   mjFB_OFFSCREEN = 1;                  // offscreen buffer
 
+
 /** enum mjtDepthMap */
 public static final int       // depth mapping for `mjr_readPixels`
   mjDEPTH_ZERONEAR    = 0,        // standard depth map; 0: znear, 1: zfar
   mjDEPTH_ZEROFAR     = 1;         // reversed depth map; 1: znear, 0: zfar
+
 
 /** enum mjtFontScale */
 public static final int      // font scale, used at context creation
@@ -3674,158 +6468,241 @@ public static final int           // font type, used at each text operation
   mjFONT_BIG = 2;                      // big font (for user alerts)
 
 
-public static class mjrRect_ extends Pointer {
+/** enum mjrPixelFormat */
+public static final int    // pixel format for textures
+  mjPIXEL_FORMAT_UNKNOWN = 0,     // unknown/unspecified
+  mjPIXEL_FORMAT_R8 = 1,              // 1 channel, 8 bit
+  mjPIXEL_FORMAT_RGB8 = 2,            // 3 channels, 8 bits per channel
+  mjPIXEL_FORMAT_RGBA8 = 3,           // 4 channels, 8 bits per channel
+  mjPIXEL_FORMAT_R32F = 4,            // 1 channel, 32 bit float
+  mjPIXEL_FORMAT_DEPTH32F = 5,        // 1 channel, 32 bit float, for depth buffers
+  mjPIXEL_FORMAT_KTX = 6;             // ktx compressed data
+
+
+/** enum mjrVertexAttributeUsage */
+public static final int   // usage/purpose of a vertex attribute
+  mjVERTEX_ATTRIBUTE_USAGE_POSITION = 0,  // vertex position
+  mjVERTEX_ATTRIBUTE_USAGE_NORMAL = 1,        // vertex normal
+  mjVERTEX_ATTRIBUTE_USAGE_TANGENTS = 2,      // vertex tangents
+  mjVERTEX_ATTRIBUTE_USAGE_UV = 3,            // vertex texture coordinates
+  mjVERTEX_ATTRIBUTE_USAGE_COLOR = 4;         // vertex color
+
+
+/** enum mjrVertexAttributeType */
+public static final int  // data format of a vertex attribute
+  mjVERTEX_ATTRIBUTE_TYPE_FLOAT2 = 0,   // 2D 32-bit float vector
+  mjVERTEX_ATTRIBUTE_TYPE_FLOAT3 = 1,       // 3D 32-bit float vector
+  mjVERTEX_ATTRIBUTE_TYPE_FLOAT4 = 2,       // 4D 32-bit float vector
+  mjVERTEX_ATTRIBUTE_TYPE_UBYTE4 = 3;       // 4D unsigned 8-bit byte vector
+
+
+/** enum mjrIndexType */
+public static final int  // data type of index buffer data
+  mjINDEX_TYPE_U16 = 0,       // 16-bit unsigned integer
+  mjINDEX_TYPE_U32 = 1;           // 32-bit unsigned integer
+
+
+/** enum mjrMeshPrimitiveType */
+public static final int    // type of mesh primitive
+  mjMESH_PRIMITIVE_TYPE_TRIANGLES = 0,  // triangles
+  mjMESH_PRIMITIVE_TYPE_LINES = 1;          // lines
+
+
+public static class mjrRect extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjrRect_() { super((Pointer)null); allocate(); }
+    public mjrRect() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjrRect_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjrRect_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjrRect_ position(long position) {
-        return (mjrRect_)super.position(position);
-    }
-    @Override public mjrRect_ getPointer(long i) {
-        return new mjrRect_((Pointer)this).offsetAddress(i);
-    }
-                 // OpenGL rectangle
-  public native int left(); public native mjrRect_ left(int setter);                       // left (usually 0)
-  public native int bottom(); public native mjrRect_ bottom(int setter);                     // bottom (usually 0)
-  public native int width(); public native mjrRect_ width(int setter);                      // width (usually buffer width)
-  public native int height(); public native mjrRect_ height(int setter);                     // height (usually buffer height)
-}
-@Opaque public static class mjrRect extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjrRect() { super((Pointer)null); }
+    public mjrRect(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjrRect(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjrRect position(long position) {
+        return (mjrRect)super.position(position);
+    }
+    @Override public mjrRect getPointer(long i) {
+        return new mjrRect((Pointer)this).offsetAddress(i);
+    }
+         // OpenGL rectangle
+  public native int left(); public native mjrRect left(int setter);                       // left (usually 0)
+  public native int bottom(); public native mjrRect bottom(int setter);                     // bottom (usually 0)
+  public native int width(); public native mjrRect width(int setter);                      // width (usually buffer width)
+  public native int height(); public native mjrRect height(int setter);                     // height (usually buffer height)
 }
+
+
+public static class mjrRendererInfo extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjrRendererInfo() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjrRendererInfo(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjrRendererInfo(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjrRendererInfo position(long position) {
+        return (mjrRendererInfo)super.position(position);
+    }
+    @Override public mjrRendererInfo getPointer(long i) {
+        return new mjrRendererInfo((Pointer)this).offsetAddress(i);
+    }
+  // active renderer identity
+  public native @Cast("const char*") BytePointer renderer(); public native mjrRendererInfo renderer(BytePointer setter);            // renderer family: classic, filament, noop
+  public native @Cast("const char*") BytePointer backend(); public native mjrRendererInfo backend(BytePointer setter);             // graphics backend: opengl, vulkan; empty if uninitialized
+}
+
+
+public static class mjrVertexAttribute extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjrVertexAttribute() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjrVertexAttribute(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjrVertexAttribute(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjrVertexAttribute position(long position) {
+        return (mjrVertexAttribute)super.position(position);
+    }
+    @Override public mjrVertexAttribute getPointer(long i) {
+        return new mjrVertexAttribute((Pointer)this).offsetAddress(i);
+    }
+  // vertex attribute format specification
+  public native int usage(); public native mjrVertexAttribute usage(int setter);                          // position, normal, etc [mjrVertexAttributeUsage]
+  public native int type(); public native mjrVertexAttribute type(int setter);                           // float3, ubyte4, etc. [mjrVertexAttributeType]
+}
+
+
+// alias non-rendering types into mjr namespace
 
 
 //---------------------------------- mjrContext ----------------------------------------------------
 
-public static class mjrContext_ extends Pointer {
+public static class mjrContext extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjrContext_() { super((Pointer)null); allocate(); }
+    public mjrContext() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjrContext_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjrContext(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjrContext_(Pointer p) { super(p); }
+    public mjrContext(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjrContext_ position(long position) {
-        return (mjrContext_)super.position(position);
+    @Override public mjrContext position(long position) {
+        return (mjrContext)super.position(position);
     }
-    @Override public mjrContext_ getPointer(long i) {
-        return new mjrContext_((Pointer)this).offsetAddress(i);
+    @Override public mjrContext getPointer(long i) {
+        return new mjrContext((Pointer)this).offsetAddress(i);
     }
-              // custom OpenGL context
+        // custom OpenGL context
   // parameters copied from mjVisual
-  public native float lineWidth(); public native mjrContext_ lineWidth(float setter);                // line width for wireframe rendering
-  public native float shadowClip(); public native mjrContext_ shadowClip(float setter);               // clipping radius for directional lights
-  public native float shadowScale(); public native mjrContext_ shadowScale(float setter);              // fraction of light cutoff for spot lights
-  public native float fogStart(); public native mjrContext_ fogStart(float setter);                 // fog start = stat.extent * vis.map.fogstart
-  public native float fogEnd(); public native mjrContext_ fogEnd(float setter);                   // fog end = stat.extent * vis.map.fogend
-  public native float fogRGBA(int i); public native mjrContext_ fogRGBA(int i, float setter);
-  @MemberGetter public native FloatPointer fogRGBA();               // fog rgba
-  public native int shadowSize(); public native mjrContext_ shadowSize(int setter);                 // size of shadow map texture
-  public native int offWidth(); public native mjrContext_ offWidth(int setter);                   // width of offscreen buffer
-  public native int offHeight(); public native mjrContext_ offHeight(int setter);                  // height of offscreen buffer
-  public native int offSamples(); public native mjrContext_ offSamples(int setter);                 // number of offscreen buffer multisamples
+  public native float lineWidth(); public native mjrContext lineWidth(float setter);                  // line width for wireframe rendering
+  public native float shadowClip(); public native mjrContext shadowClip(float setter);                 // clipping radius for directional lights
+  public native float shadowScale(); public native mjrContext shadowScale(float setter);                // fraction of light cutoff for spot lights
+  public native float fogStart(); public native mjrContext fogStart(float setter);                   // fog start = stat.extent * vis.map.fogstart
+  public native float fogEnd(); public native mjrContext fogEnd(float setter);                     // fog end = stat.extent * vis.map.fogend
+  public native float fogRGBA(int i); public native mjrContext fogRGBA(int i, float setter);
+  @MemberGetter public native FloatPointer fogRGBA();                 // fog rgba
+  public native int shadowSize(); public native mjrContext shadowSize(int setter);                   // size of shadow map texture
+  public native int offWidth(); public native mjrContext offWidth(int setter);                     // width of offscreen buffer
+  public native int offHeight(); public native mjrContext offHeight(int setter);                    // height of offscreen buffer
+  public native int offSamples(); public native mjrContext offSamples(int setter);                   // number of offscreen buffer multisamples
 
   // parameters specified at creation
-  public native int fontScale(); public native mjrContext_ fontScale(int setter);                  // font scale
-  public native int auxWidth(int i); public native mjrContext_ auxWidth(int i, int setter);
-  @MemberGetter public native IntPointer auxWidth();           // auxiliary buffer width
-  public native int auxHeight(int i); public native mjrContext_ auxHeight(int i, int setter);
-  @MemberGetter public native IntPointer auxHeight();          // auxiliary buffer height
-  public native int auxSamples(int i); public native mjrContext_ auxSamples(int i, int setter);
-  @MemberGetter public native IntPointer auxSamples();         // auxiliary buffer multisamples
+  public native int fontScale(); public native mjrContext fontScale(int setter);                    // font scale
+  public native int auxWidth(int i); public native mjrContext auxWidth(int i, int setter);
+  @MemberGetter public native IntPointer auxWidth();             // auxiliary buffer width
+  public native int auxHeight(int i); public native mjrContext auxHeight(int i, int setter);
+  @MemberGetter public native IntPointer auxHeight();            // auxiliary buffer height
+  public native int auxSamples(int i); public native mjrContext auxSamples(int i, int setter);
+  @MemberGetter public native IntPointer auxSamples();           // auxiliary buffer multisamples
 
   // offscreen rendering objects
-  public native @Cast("unsigned int") int offFBO(); public native mjrContext_ offFBO(int setter);            // offscreen framebuffer object
-  public native @Cast("unsigned int") int offFBO_r(); public native mjrContext_ offFBO_r(int setter);          // offscreen framebuffer for resolving multisamples
-  public native @Cast("unsigned int") int offColor(); public native mjrContext_ offColor(int setter);          // offscreen color buffer
-  public native @Cast("unsigned int") int offColor_r(); public native mjrContext_ offColor_r(int setter);        // offscreen color buffer for resolving multisamples
-  public native @Cast("unsigned int") int offDepthStencil(); public native mjrContext_ offDepthStencil(int setter);   // offscreen depth and stencil buffer
-  public native @Cast("unsigned int") int offDepthStencil_r(); public native mjrContext_ offDepthStencil_r(int setter); // offscreen depth and stencil buffer for resolving multisamples
+  public native @Cast("unsigned int") int offFBO(); public native mjrContext offFBO(int setter);              // offscreen framebuffer object
+  public native @Cast("unsigned int") int offFBO_r(); public native mjrContext offFBO_r(int setter);            // offscreen framebuffer for resolving multisamples
+  public native @Cast("unsigned int") int offColor(); public native mjrContext offColor(int setter);            // offscreen color buffer
+  public native @Cast("unsigned int") int offColor_r(); public native mjrContext offColor_r(int setter);          // offscreen color buffer for resolving multisamples
+  public native @Cast("unsigned int") int offDepthStencil(); public native mjrContext offDepthStencil(int setter);     // offscreen depth and stencil buffer
+  public native @Cast("unsigned int") int offDepthStencil_r(); public native mjrContext offDepthStencil_r(int setter);   // offscreen depth and stencil buffer for multisamples
 
   // shadow rendering objects
-  public native @Cast("unsigned int") int shadowFBO(); public native mjrContext_ shadowFBO(int setter);         // shadow map framebuffer object
-  public native @Cast("unsigned int") int shadowTex(); public native mjrContext_ shadowTex(int setter);         // shadow map texture
+  public native @Cast("unsigned int") int shadowFBO(); public native mjrContext shadowFBO(int setter);           // shadow map framebuffer object
+  public native @Cast("unsigned int") int shadowTex(); public native mjrContext shadowTex(int setter);           // shadow map texture
 
   // auxiliary buffers
-  public native @Cast("unsigned int") int auxFBO(int i); public native mjrContext_ auxFBO(int i, int setter);
-  @MemberGetter public native @Cast("unsigned int*") IntPointer auxFBO();    // auxiliary framebuffer object
-  public native @Cast("unsigned int") int auxFBO_r(int i); public native mjrContext_ auxFBO_r(int i, int setter);
-  @MemberGetter public native @Cast("unsigned int*") IntPointer auxFBO_r();  // auxiliary framebuffer object for resolving
-  public native @Cast("unsigned int") int auxColor(int i); public native mjrContext_ auxColor(int i, int setter);
-  @MemberGetter public native @Cast("unsigned int*") IntPointer auxColor();  // auxiliary color buffer
-  public native @Cast("unsigned int") int auxColor_r(int i); public native mjrContext_ auxColor_r(int i, int setter);
-  @MemberGetter public native @Cast("unsigned int*") IntPointer auxColor_r();// auxiliary color buffer for resolving
+  public native @Cast("unsigned int") int auxFBO(int i); public native mjrContext auxFBO(int i, int setter);
+  @MemberGetter public native @Cast("unsigned int*") IntPointer auxFBO();      // auxiliary framebuffer object
+  public native @Cast("unsigned int") int auxFBO_r(int i); public native mjrContext auxFBO_r(int i, int setter);
+  @MemberGetter public native @Cast("unsigned int*") IntPointer auxFBO_r();    // auxiliary framebuffer object for resolving
+  public native @Cast("unsigned int") int auxColor(int i); public native mjrContext auxColor(int i, int setter);
+  @MemberGetter public native @Cast("unsigned int*") IntPointer auxColor();    // auxiliary color buffer
+  public native @Cast("unsigned int") int auxColor_r(int i); public native mjrContext auxColor_r(int i, int setter);
+  @MemberGetter public native @Cast("unsigned int*") IntPointer auxColor_r();  // auxiliary color buffer for resolving
+
+  // materials with textures
+  public native int mat_texid(int i); public native mjrContext mat_texid(int i, int setter);
+  @MemberGetter public native IntPointer mat_texid(); // material texture ids (-1: no texture)
+  public native int mat_texuniform(int i); public native mjrContext mat_texuniform(int i, int setter);
+  @MemberGetter public native IntPointer mat_texuniform();       // uniform cube mapping
+  public native float mat_texrepeat(int i); public native mjrContext mat_texrepeat(int i, float setter);
+  @MemberGetter public native FloatPointer mat_texrepeat();    // texture repetition for 2d mapping
 
   // texture objects and info
-  public native int ntexture(); public native mjrContext_ ntexture(int setter);                   // number of allocated textures
-  public native int textureType(int i); public native mjrContext_ textureType(int i, int setter);
+  public native int ntexture(); public native mjrContext ntexture(int setter);                            // number of allocated textures
+  public native int textureType(int i); public native mjrContext textureType(int i, int setter);
   @MemberGetter public native IntPointer textureType();           // type of texture (mjtTexture) (ntexture)
-  public native @Cast("unsigned int") int texture(int i); public native mjrContext_ texture(int i, int setter);
+  public native @Cast("unsigned int") int texture(int i); public native mjrContext texture(int i, int setter);
   @MemberGetter public native @Cast("unsigned int*") IntPointer texture();      // texture names
 
   // displaylist starting positions
-  public native @Cast("unsigned int") int basePlane(); public native mjrContext_ basePlane(int setter);         // all planes from model
-  public native @Cast("unsigned int") int baseMesh(); public native mjrContext_ baseMesh(int setter);          // all meshes from model
-  public native @Cast("unsigned int") int baseHField(); public native mjrContext_ baseHField(int setter);        // all hfields from model
-  public native @Cast("unsigned int") int baseBuiltin(); public native mjrContext_ baseBuiltin(int setter);       // all buildin geoms, with quality from model
-  public native @Cast("unsigned int") int baseFontNormal(); public native mjrContext_ baseFontNormal(int setter);    // normal font
-  public native @Cast("unsigned int") int baseFontShadow(); public native mjrContext_ baseFontShadow(int setter);    // shadow font
-  public native @Cast("unsigned int") int baseFontBig(); public native mjrContext_ baseFontBig(int setter);       // big font
+  public native @Cast("unsigned int") int basePlane(); public native mjrContext basePlane(int setter);           // all planes from model
+  public native @Cast("unsigned int") int baseMesh(); public native mjrContext baseMesh(int setter);            // all meshes from model
+  public native @Cast("unsigned int") int baseHField(); public native mjrContext baseHField(int setter);          // all height fields from model
+  public native @Cast("unsigned int") int baseBuiltin(); public native mjrContext baseBuiltin(int setter);         // all builtin geoms, with quality from model
+  public native @Cast("unsigned int") int baseFontNormal(); public native mjrContext baseFontNormal(int setter);      // normal font
+  public native @Cast("unsigned int") int baseFontShadow(); public native mjrContext baseFontShadow(int setter);      // shadow font
+  public native @Cast("unsigned int") int baseFontBig(); public native mjrContext baseFontBig(int setter);         // big font
 
   // displaylist ranges
-  public native int rangePlane(); public native mjrContext_ rangePlane(int setter);                 // all planes from model
-  public native int rangeMesh(); public native mjrContext_ rangeMesh(int setter);                  // all meshes from model
-  public native int rangeHField(); public native mjrContext_ rangeHField(int setter);                // all hfields from model
-  public native int rangeBuiltin(); public native mjrContext_ rangeBuiltin(int setter);               // all builtin geoms, with quality from model
-  public native int rangeFont(); public native mjrContext_ rangeFont(int setter);                  // all characters in font
+  public native int rangePlane(); public native mjrContext rangePlane(int setter);                   // all planes from model
+  public native int rangeMesh(); public native mjrContext rangeMesh(int setter);                    // all meshes from model
+  public native int rangeHField(); public native mjrContext rangeHField(int setter);                  // all hfields from model
+  public native int rangeBuiltin(); public native mjrContext rangeBuiltin(int setter);                 // all builtin geoms, with quality from model
+  public native int rangeFont(); public native mjrContext rangeFont(int setter);                    // all characters in font
 
   // skin VBOs
-  public native int nskin(); public native mjrContext_ nskin(int setter);                      // number of skins
-  public native @Cast("unsigned int*") IntPointer skinvertVBO(); public native mjrContext_ skinvertVBO(IntPointer setter);      // skin vertex position VBOs (nskin)
-  public native @Cast("unsigned int*") IntPointer skinnormalVBO(); public native mjrContext_ skinnormalVBO(IntPointer setter);    // skin vertex normal VBOs (nskin)
-  public native @Cast("unsigned int*") IntPointer skintexcoordVBO(); public native mjrContext_ skintexcoordVBO(IntPointer setter);  // skin vertex texture coordinate VBOs (nskin)
-  public native @Cast("unsigned int*") IntPointer skinfaceVBO(); public native mjrContext_ skinfaceVBO(IntPointer setter);      // skin face index VBOs (nskin)
+  public native int nskin(); public native mjrContext nskin(int setter);                        // number of skins
+  public native @Cast("unsigned int*") IntPointer skinvertVBO(); public native mjrContext skinvertVBO(IntPointer setter);        // skin vertex position VBOs (nskin)
+  public native @Cast("unsigned int*") IntPointer skinnormalVBO(); public native mjrContext skinnormalVBO(IntPointer setter);      // skin vertex normal VBOs (nskin)
+  public native @Cast("unsigned int*") IntPointer skintexcoordVBO(); public native mjrContext skintexcoordVBO(IntPointer setter);    // skin vertex texture coordinate VBOs (nskin)
+  public native @Cast("unsigned int*") IntPointer skinfaceVBO(); public native mjrContext skinfaceVBO(IntPointer setter);        // skin face index VBOs (nskin)
 
   // character info
-  public native int charWidth(int i); public native mjrContext_ charWidth(int i, int setter);
-  @MemberGetter public native IntPointer charWidth();             // character widths: normal and shadow
-  public native int charWidthBig(int i); public native mjrContext_ charWidthBig(int i, int setter);
-  @MemberGetter public native IntPointer charWidthBig();          // chacarter widths: big
-  public native int charHeight(); public native mjrContext_ charHeight(int setter);                 // character heights: normal and shadow
-  public native int charHeightBig(); public native mjrContext_ charHeightBig(int setter);              // character heights: big
+  public native int charWidth(int i); public native mjrContext charWidth(int i, int setter);
+  @MemberGetter public native IntPointer charWidth();               // character widths: normal and shadow
+  public native int charWidthBig(int i); public native mjrContext charWidthBig(int i, int setter);
+  @MemberGetter public native IntPointer charWidthBig();            // character widths: big
+  public native int charHeight(); public native mjrContext charHeight(int setter);                   // character heights: normal and shadow
+  public native int charHeightBig(); public native mjrContext charHeightBig(int setter);                // character heights: big
 
   // capabilities
-  public native int glInitialized(); public native mjrContext_ glInitialized(int setter);              // is OpenGL initialized
-  public native int windowAvailable(); public native mjrContext_ windowAvailable(int setter);            // is default/window framebuffer available
-  public native int windowSamples(); public native mjrContext_ windowSamples(int setter);              // number of samples for default/window framebuffer
-  public native int windowStereo(); public native mjrContext_ windowStereo(int setter);               // is stereo available for default/window framebuffer
-  public native int windowDoublebuffer(); public native mjrContext_ windowDoublebuffer(int setter);         // is default/window framebuffer double buffered
+  public native int glInitialized(); public native mjrContext glInitialized(int setter);                // is OpenGL initialized
+  public native int windowAvailable(); public native mjrContext windowAvailable(int setter);              // is default/window framebuffer available
+  public native int windowSamples(); public native mjrContext windowSamples(int setter);                // number of samples for default/window framebuffer
+  public native int windowStereo(); public native mjrContext windowStereo(int setter);                 // is stereo available for default/window framebuffer
+  public native int windowDoublebuffer(); public native mjrContext windowDoublebuffer(int setter);           // is default/window framebuffer double buffered
 
   // framebuffer
-  public native int currentBuffer(); public native mjrContext_ currentBuffer(int setter);          // currently active framebuffer: mjFB_WINDOW or mjFB_OFFSCREEN
+  public native int currentBuffer(); public native mjrContext currentBuffer(int setter);                // currently active framebuffer: mjFB_WINDOW or mjFB_OFFSCREEN
 
   // pixel output format
-  public native int readPixelFormat(); public native mjrContext_ readPixelFormat(int setter);        // default color pixel format for mjr_readPixels
+  public native int readPixelFormat(); public native mjrContext readPixelFormat(int setter);              // default color pixel format for mjr_readPixels
 
   // depth output format
-  public native int readDepthMap(); public native mjrContext_ readDepthMap(int setter);           // depth mapping: mjDEPTH_ZERONEAR or mjDEPTH_ZEROFAR
-}
-@Opaque public static class mjrContext extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjrContext() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjrContext(Pointer p) { super(p); }
+  public native int readDepthMap(); public native mjrContext readDepthMap(int setter);                 // depth mapping: mjDEPTH_ZERONEAR or mjDEPTH_ZEROFAR
 }
 
 // #if defined(__cplusplus)
@@ -3863,6 +6740,7 @@ public static final int mjMAXUIEDIT =     7;       // maximum number of elements
 public static final int mjMAXUIRECT =     25;      // maximum number of rectangles
 
 public static final int mjSEPCLOSED =     1000;    // closed state of adjustable separator
+public static final int mjPRESERVE =      2000;    // preserve section or separator state
 
 
 // key codes matching GLFW (user must remap for other frameworks)
@@ -3899,7 +6777,7 @@ public static final int mjKEY_NUMPAD_9 =   329;
 //---------------------------------- primitive types (mjt) -----------------------------------------
 
 /** enum mjtButton */
-public static final int         // mouse button
+public static final int          // mouse button
   mjBUTTON_NONE = 0,              // no button
   mjBUTTON_LEFT = 1,                  // left button
   mjBUTTON_RIGHT = 2,                 // right button
@@ -3907,7 +6785,7 @@ public static final int         // mouse button
 
 
 /** enum mjtEvent */
-public static final int          // mouse and keyboard event type
+public static final int           // mouse and keyboard event type
   mjEVENT_NONE = 0,               // no event
   mjEVENT_MOVE = 1,                   // mouse move
   mjEVENT_PRESS = 2,                  // mouse button press
@@ -3920,7 +6798,7 @@ public static final int          // mouse and keyboard event type
 
 
 /** enum mjtItem */
-public static final int           // UI item type
+public static final int            // UI item type
   mjITEM_END = -2,                // end of definition list (not an item)
   mjITEM_SECTION = -1,            // section (not an item)
   mjITEM_SEPARATOR = 0,           // separator
@@ -3943,6 +6821,13 @@ public static final int           // UI item type
   mjNITEM = 14;                         // number of item types
 
 
+/** enum mjtSection */
+public static final int         // UI section state
+  mjSECT_CLOSED = 0,              // closed state (regular section)
+  mjSECT_OPEN = 1,                    // open state (regular section)
+  mjSECT_FIXED = 2;                    // fixed section: always open, no title
+
+
 // predicate function: set enable/disable based on item category
 public static class mjfItemEnable extends FunctionPointer {
     static { Loader.load(); }
@@ -3956,179 +6841,177 @@ public static class mjfItemEnable extends FunctionPointer {
 
 //---------------------------------- mjuiState -----------------------------------------------------
 
-public static class mjuiState_ extends Pointer {
+public static class mjuiState extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjuiState_() { super((Pointer)null); allocate(); }
+    public mjuiState() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjuiState_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjuiState_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjuiState_ position(long position) {
-        return (mjuiState_)super.position(position);
-    }
-    @Override public mjuiState_ getPointer(long i) {
-        return new mjuiState_((Pointer)this).offsetAddress(i);
-    }
-               // mouse and keyboard state
-  // constants set by user
-  public native int nrect(); public native mjuiState_ nrect(int setter);                      // number of rectangles used
-  public native @ByRef mjrRect rect(int i); public native mjuiState_ rect(int i, mjrRect setter);
-  @MemberGetter public native mjrRect rect();      // rectangles (index 0: entire window)
-  public native Pointer userdata(); public native mjuiState_ userdata(Pointer setter);                 // pointer to user data (for callbacks)
-
-  // event type
-  public native int type(); public native mjuiState_ type(int setter);                       // (type mjtEvent)
-
-  // mouse buttons
-  public native int left(); public native mjuiState_ left(int setter);                       // is left button down
-  public native int right(); public native mjuiState_ right(int setter);                      // is right button down
-  public native int middle(); public native mjuiState_ middle(int setter);                     // is middle button down
-  public native int doubleclick(); public native mjuiState_ doubleclick(int setter);                // is last press a double click
-  public native int button(); public native mjuiState_ button(int setter);                     // which button was pressed (mjtButton)
-  public native double buttontime(); public native mjuiState_ buttontime(double setter);              // time of last button press
-
-  // mouse position
-  public native double x(); public native mjuiState_ x(double setter);                       // x position
-  public native double y(); public native mjuiState_ y(double setter);                       // y position
-  public native double dx(); public native mjuiState_ dx(double setter);                      // x displacement
-  public native double dy(); public native mjuiState_ dy(double setter);                      // y displacement
-  public native double sx(); public native mjuiState_ sx(double setter);                      // x scroll
-  public native double sy(); public native mjuiState_ sy(double setter);                      // y scroll
-
-  // keyboard
-  public native int control(); public native mjuiState_ control(int setter);                    // is control down
-  public native int shift(); public native mjuiState_ shift(int setter);                      // is shift down
-  public native int alt(); public native mjuiState_ alt(int setter);                        // is alt down
-  public native int key(); public native mjuiState_ key(int setter);                        // which key was pressed
-  public native double keytime(); public native mjuiState_ keytime(double setter);                 // time of last key press
-
-  // rectangle ownership and dragging
-  public native int mouserect(); public native mjuiState_ mouserect(int setter);                  // which rectangle contains mouse
-  public native int dragrect(); public native mjuiState_ dragrect(int setter);                   // which rectangle is dragged with mouse
-  public native int dragbutton(); public native mjuiState_ dragbutton(int setter);                 // which button started drag (mjtButton)
-
-  // files dropping (only valid when type == mjEVENT_FILESDROP)
-  public native int dropcount(); public native mjuiState_ dropcount(int setter);                  // number of files dropped
-  public native @Cast("const char*") BytePointer droppaths(int i); public native mjuiState_ droppaths(int i, BytePointer setter);
-  @MemberGetter public native @Cast("const char**") PointerPointer droppaths();         // paths to files dropped
-}
-@Opaque public static class mjuiState extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjuiState() { super((Pointer)null); }
+    public mjuiState(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjuiState(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjuiState position(long position) {
+        return (mjuiState)super.position(position);
+    }
+    @Override public mjuiState getPointer(long i) {
+        return new mjuiState((Pointer)this).offsetAddress(i);
+    }
+       // mouse and keyboard state
+  // constants set by user
+  public native int nrect(); public native mjuiState nrect(int setter);                      // number of rectangles used
+  public native @ByRef mjrRect rect(int i); public native mjuiState rect(int i, mjrRect setter);
+  @MemberGetter public native mjrRect rect();      // rectangles (index 0: entire window)
+  public native Pointer userdata(); public native mjuiState userdata(Pointer setter);                 // pointer to user data (for callbacks)
+
+  // event type
+  public native int type(); public native mjuiState type(int setter);                       // (type mjtEvent)
+
+  // mouse buttons
+  public native int left(); public native mjuiState left(int setter);                       // is left button down
+  public native int right(); public native mjuiState right(int setter);                      // is right button down
+  public native int middle(); public native mjuiState middle(int setter);                     // is middle button down
+  public native int doubleclick(); public native mjuiState doubleclick(int setter);                // is last press a double click
+  public native int button(); public native mjuiState button(int setter);                     // which button was pressed (mjtButton)
+  public native double buttontime(); public native mjuiState buttontime(double setter);              // time of last button press
+
+  // mouse position
+  public native double x(); public native mjuiState x(double setter);                       // x position
+  public native double y(); public native mjuiState y(double setter);                       // y position
+  public native double dx(); public native mjuiState dx(double setter);                      // x displacement
+  public native double dy(); public native mjuiState dy(double setter);                      // y displacement
+  public native double sx(); public native mjuiState sx(double setter);                      // x scroll
+  public native double sy(); public native mjuiState sy(double setter);                      // y scroll
+
+  // keyboard
+  public native int control(); public native mjuiState control(int setter);                    // is control down
+  public native int shift(); public native mjuiState shift(int setter);                      // is shift down
+  public native int alt(); public native mjuiState alt(int setter);                        // is alt down
+  public native int key(); public native mjuiState key(int setter);                        // which key was pressed
+  public native double keytime(); public native mjuiState keytime(double setter);                 // time of last key press
+
+  // rectangle ownership and dragging
+  public native int mouserect(); public native mjuiState mouserect(int setter);                  // which rectangle contains mouse
+  public native int dragrect(); public native mjuiState dragrect(int setter);                   // which rectangle is dragged with mouse
+  public native int dragbutton(); public native mjuiState dragbutton(int setter);                 // which button started drag (mjtButton)
+
+  // files dropping (only valid when type == mjEVENT_FILESDROP)
+  public native int dropcount(); public native mjuiState dropcount(int setter);                  // number of files dropped
+  public native @Cast("const char*") BytePointer droppaths(int i); public native mjuiState droppaths(int i, BytePointer setter);
+  @MemberGetter public native @Cast("const char**") PointerPointer droppaths();         // paths to files dropped
 }
 
 
 //---------------------------------- mjuiThemeSpacing ----------------------------------------------
 
-public static class mjuiThemeSpacing_ extends Pointer {
+public static class mjuiThemeSpacing extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjuiThemeSpacing_() { super((Pointer)null); allocate(); }
+    public mjuiThemeSpacing() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjuiThemeSpacing_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjuiThemeSpacing_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjuiThemeSpacing_ position(long position) {
-        return (mjuiThemeSpacing_)super.position(position);
-    }
-    @Override public mjuiThemeSpacing_ getPointer(long i) {
-        return new mjuiThemeSpacing_((Pointer)this).offsetAddress(i);
-    }
-        // UI visualization theme spacing
-  public native int total(); public native mjuiThemeSpacing_ total(int setter);                      // total width
-  public native int scroll(); public native mjuiThemeSpacing_ scroll(int setter);                     // scrollbar width
-  public native int label(); public native mjuiThemeSpacing_ label(int setter);                      // label width
-  public native int section(); public native mjuiThemeSpacing_ section(int setter);                    // section gap
-  public native int itemside(); public native mjuiThemeSpacing_ itemside(int setter);                   // item side gap
-  public native int itemmid(); public native mjuiThemeSpacing_ itemmid(int setter);                    // item middle gap
-  public native int itemver(); public native mjuiThemeSpacing_ itemver(int setter);                    // item vertical gap
-  public native int texthor(); public native mjuiThemeSpacing_ texthor(int setter);                    // text horizontal gap
-  public native int textver(); public native mjuiThemeSpacing_ textver(int setter);                    // text vertical gap
-  public native int linescroll(); public native mjuiThemeSpacing_ linescroll(int setter);                 // number of pixels to scroll
-  public native int samples(); public native mjuiThemeSpacing_ samples(int setter);                    // number of multisamples
-}
-@Opaque public static class mjuiThemeSpacing extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjuiThemeSpacing() { super((Pointer)null); }
+    public mjuiThemeSpacing(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjuiThemeSpacing(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjuiThemeSpacing position(long position) {
+        return (mjuiThemeSpacing)super.position(position);
+    }
+    @Override public mjuiThemeSpacing getPointer(long i) {
+        return new mjuiThemeSpacing((Pointer)this).offsetAddress(i);
+    }
+  // UI visualization theme spacing
+  public native int total(); public native mjuiThemeSpacing total(int setter);                        // total width
+  public native int scroll(); public native mjuiThemeSpacing scroll(int setter);                       // scrollbar width
+  public native int label(); public native mjuiThemeSpacing label(int setter);                        // label width
+  public native int section(); public native mjuiThemeSpacing section(int setter);                      // section gap
+  public native int cornersect(); public native mjuiThemeSpacing cornersect(int setter);                   // corner radius for section
+  public native int cornersep(); public native mjuiThemeSpacing cornersep(int setter);                    // corner radius for separator
+  public native int itemside(); public native mjuiThemeSpacing itemside(int setter);                     // item side gap
+  public native int itemmid(); public native mjuiThemeSpacing itemmid(int setter);                      // item middle gap
+  public native int itemver(); public native mjuiThemeSpacing itemver(int setter);                      // item vertical gap
+  public native int texthor(); public native mjuiThemeSpacing texthor(int setter);                      // text horizontal gap
+  public native int textver(); public native mjuiThemeSpacing textver(int setter);                      // text vertical gap
+  public native int linescroll(); public native mjuiThemeSpacing linescroll(int setter);                   // number of pixels to scroll
+  public native int samples(); public native mjuiThemeSpacing samples(int setter);                      // number of multisamples
 }
 
 
 //---------------------------------- mjuiThemeColor ------------------------------------------------
 
-public static class mjuiThemeColor_ extends Pointer {
+public static class mjuiThemeColor extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjuiThemeColor_() { super((Pointer)null); allocate(); }
+    public mjuiThemeColor() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjuiThemeColor_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjuiThemeColor_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjuiThemeColor_ position(long position) {
-        return (mjuiThemeColor_)super.position(position);
-    }
-    @Override public mjuiThemeColor_ getPointer(long i) {
-        return new mjuiThemeColor_((Pointer)this).offsetAddress(i);
-    }
-          // UI visualization theme color
-  public native float master(int i); public native mjuiThemeColor_ master(int i, float setter);
-  @MemberGetter public native FloatPointer master();                // master background
-  public native float thumb(int i); public native mjuiThemeColor_ thumb(int i, float setter);
-  @MemberGetter public native FloatPointer thumb();                 // scrollbar thumb
-  public native float secttitle(int i); public native mjuiThemeColor_ secttitle(int i, float setter);
-  @MemberGetter public native FloatPointer secttitle();             // section title
-  public native float sectfont(int i); public native mjuiThemeColor_ sectfont(int i, float setter);
-  @MemberGetter public native FloatPointer sectfont();              // section font
-  public native float sectsymbol(int i); public native mjuiThemeColor_ sectsymbol(int i, float setter);
-  @MemberGetter public native FloatPointer sectsymbol();            // section symbol
-  public native float sectpane(int i); public native mjuiThemeColor_ sectpane(int i, float setter);
-  @MemberGetter public native FloatPointer sectpane();              // section pane
-  public native float shortcut(int i); public native mjuiThemeColor_ shortcut(int i, float setter);
-  @MemberGetter public native FloatPointer shortcut();              // shortcut background
-  public native float fontactive(int i); public native mjuiThemeColor_ fontactive(int i, float setter);
-  @MemberGetter public native FloatPointer fontactive();            // font active
-  public native float fontinactive(int i); public native mjuiThemeColor_ fontinactive(int i, float setter);
-  @MemberGetter public native FloatPointer fontinactive();          // font inactive
-  public native float decorinactive(int i); public native mjuiThemeColor_ decorinactive(int i, float setter);
-  @MemberGetter public native FloatPointer decorinactive();         // decor inactive
-  public native float decorinactive2(int i); public native mjuiThemeColor_ decorinactive2(int i, float setter);
-  @MemberGetter public native FloatPointer decorinactive2();        // inactive slider color 2
-  public native float button(int i); public native mjuiThemeColor_ button(int i, float setter);
-  @MemberGetter public native FloatPointer button();                // button
-  public native float check(int i); public native mjuiThemeColor_ check(int i, float setter);
-  @MemberGetter public native FloatPointer check();                 // check
-  public native float radio(int i); public native mjuiThemeColor_ radio(int i, float setter);
-  @MemberGetter public native FloatPointer radio();                 // radio
-  public native float select(int i); public native mjuiThemeColor_ select(int i, float setter);
-  @MemberGetter public native FloatPointer select();                // select
-  public native float select2(int i); public native mjuiThemeColor_ select2(int i, float setter);
-  @MemberGetter public native FloatPointer select2();               // select pane
-  public native float slider(int i); public native mjuiThemeColor_ slider(int i, float setter);
-  @MemberGetter public native FloatPointer slider();                // slider
-  public native float slider2(int i); public native mjuiThemeColor_ slider2(int i, float setter);
-  @MemberGetter public native FloatPointer slider2();               // slider color 2
-  public native float edit(int i); public native mjuiThemeColor_ edit(int i, float setter);
-  @MemberGetter public native FloatPointer edit();                  // edit
-  public native float edit2(int i); public native mjuiThemeColor_ edit2(int i, float setter);
-  @MemberGetter public native FloatPointer edit2();                 // edit invalid
-  public native float cursor(int i); public native mjuiThemeColor_ cursor(int i, float setter);
-  @MemberGetter public native FloatPointer cursor();                // edit cursor
-}
-@Opaque public static class mjuiThemeColor extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjuiThemeColor() { super((Pointer)null); }
+    public mjuiThemeColor(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjuiThemeColor(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjuiThemeColor position(long position) {
+        return (mjuiThemeColor)super.position(position);
+    }
+    @Override public mjuiThemeColor getPointer(long i) {
+        return new mjuiThemeColor((Pointer)this).offsetAddress(i);
+    }
+  // UI visualization theme color
+  public native float master(int i); public native mjuiThemeColor master(int i, float setter);
+  @MemberGetter public native FloatPointer master();                // master background
+  public native float thumb(int i); public native mjuiThemeColor thumb(int i, float setter);
+  @MemberGetter public native FloatPointer thumb();                 // scrollbar thumb
+  public native float secttitle(int i); public native mjuiThemeColor secttitle(int i, float setter);
+  @MemberGetter public native FloatPointer secttitle();             // section title
+  public native float secttitle2(int i); public native mjuiThemeColor secttitle2(int i, float setter);
+  @MemberGetter public native FloatPointer secttitle2();            // section title: bottom color
+  public native float secttitleuncheck(int i); public native mjuiThemeColor secttitleuncheck(int i, float setter);
+  @MemberGetter public native FloatPointer secttitleuncheck();      // section title with unchecked box
+  public native float secttitleuncheck2(int i); public native mjuiThemeColor secttitleuncheck2(int i, float setter);
+  @MemberGetter public native FloatPointer secttitleuncheck2();     // section title with unchecked box: bottom color
+  public native float secttitlecheck(int i); public native mjuiThemeColor secttitlecheck(int i, float setter);
+  @MemberGetter public native FloatPointer secttitlecheck();        // section title with checked box
+  public native float secttitlecheck2(int i); public native mjuiThemeColor secttitlecheck2(int i, float setter);
+  @MemberGetter public native FloatPointer secttitlecheck2();       // section title with checked box: bottom color
+  public native float sectfont(int i); public native mjuiThemeColor sectfont(int i, float setter);
+  @MemberGetter public native FloatPointer sectfont();              // section font
+  public native float sectsymbol(int i); public native mjuiThemeColor sectsymbol(int i, float setter);
+  @MemberGetter public native FloatPointer sectsymbol();            // section symbol
+  public native float sectpane(int i); public native mjuiThemeColor sectpane(int i, float setter);
+  @MemberGetter public native FloatPointer sectpane();              // section pane
+  public native float separator(int i); public native mjuiThemeColor separator(int i, float setter);
+  @MemberGetter public native FloatPointer separator();             // separator title
+  public native float separator2(int i); public native mjuiThemeColor separator2(int i, float setter);
+  @MemberGetter public native FloatPointer separator2();            // separator title: bottom color
+  public native float shortcut(int i); public native mjuiThemeColor shortcut(int i, float setter);
+  @MemberGetter public native FloatPointer shortcut();              // shortcut background
+  public native float fontactive(int i); public native mjuiThemeColor fontactive(int i, float setter);
+  @MemberGetter public native FloatPointer fontactive();            // font active
+  public native float fontinactive(int i); public native mjuiThemeColor fontinactive(int i, float setter);
+  @MemberGetter public native FloatPointer fontinactive();          // font inactive
+  public native float decorinactive(int i); public native mjuiThemeColor decorinactive(int i, float setter);
+  @MemberGetter public native FloatPointer decorinactive();         // decor inactive
+  public native float decorinactive2(int i); public native mjuiThemeColor decorinactive2(int i, float setter);
+  @MemberGetter public native FloatPointer decorinactive2();        // inactive slider color 2
+  public native float button(int i); public native mjuiThemeColor button(int i, float setter);
+  @MemberGetter public native FloatPointer button();                // button
+  public native float check(int i); public native mjuiThemeColor check(int i, float setter);
+  @MemberGetter public native FloatPointer check();                 // check
+  public native float radio(int i); public native mjuiThemeColor radio(int i, float setter);
+  @MemberGetter public native FloatPointer radio();                 // radio
+  public native float select(int i); public native mjuiThemeColor select(int i, float setter);
+  @MemberGetter public native FloatPointer select();                // select
+  public native float select2(int i); public native mjuiThemeColor select2(int i, float setter);
+  @MemberGetter public native FloatPointer select2();               // select pane
+  public native float slider(int i); public native mjuiThemeColor slider(int i, float setter);
+  @MemberGetter public native FloatPointer slider();                // slider
+  public native float slider2(int i); public native mjuiThemeColor slider2(int i, float setter);
+  @MemberGetter public native FloatPointer slider2();               // slider color 2
+  public native float edit(int i); public native mjuiThemeColor edit(int i, float setter);
+  @MemberGetter public native FloatPointer edit();                  // edit
+  public native float edit2(int i); public native mjuiThemeColor edit2(int i, float setter);
+  @MemberGetter public native FloatPointer edit2();                 // edit invalid
+  public native float cursor(int i); public native mjuiThemeColor cursor(int i, float setter);
+  @MemberGetter public native FloatPointer cursor();                // edit cursor
 }
 
 
@@ -4225,183 +7108,166 @@ public static class mjuiItemEdit_ extends Pointer {
 }
 
 
-public static class mjuiItem_ extends Pointer {
+public static class mjuiItem extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjuiItem_() { super((Pointer)null); allocate(); }
+    public mjuiItem() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjuiItem_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjuiItem_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjuiItem_ position(long position) {
-        return (mjuiItem_)super.position(position);
-    }
-    @Override public mjuiItem_ getPointer(long i) {
-        return new mjuiItem_((Pointer)this).offsetAddress(i);
-    }
-                // UI item
-  // common properties
-  public native int type(); public native mjuiItem_ type(int setter);                       // type (mjtItem)
-  public native @Cast("char") byte name(int i); public native mjuiItem_ name(int i, byte setter);
-  @MemberGetter public native @Cast("char*") BytePointer name();         // name
-  public native int state(); public native mjuiItem_ state(int setter);                      // 0: disable, 1: enable, 2+: use predicate
-  public native Pointer pdata(); public native mjuiItem_ pdata(Pointer setter);                    // data pointer (type-specific)
-  public native int sectionid(); public native mjuiItem_ sectionid(int setter);                  // id of section containing item
-  public native int itemid(); public native mjuiItem_ itemid(int setter);                     // id of item within section
-
-  // type-specific properties
-    public native @ByRef mjuiItemSingle_ single(); public native mjuiItem_ single(mjuiItemSingle_ setter);  // check and button
-    public native @ByRef mjuiItemMulti_ multi(); public native mjuiItem_ multi(mjuiItemMulti_ setter);    // static, radio and select
-    public native @ByRef mjuiItemSlider_ slider(); public native mjuiItem_ slider(mjuiItemSlider_ setter);  // slider
-    public native @ByRef mjuiItemEdit_ edit(); public native mjuiItem_ edit(mjuiItemEdit_ setter);      // edit
-
-  // internal
-  public native @ByRef mjrRect rect(); public native mjuiItem_ rect(mjrRect setter);                   // rectangle occupied by item
-}
-@Opaque public static class mjuiItem extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjuiItem() { super((Pointer)null); }
+    public mjuiItem(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjuiItem(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjuiItem position(long position) {
+        return (mjuiItem)super.position(position);
+    }
+    @Override public mjuiItem getPointer(long i) {
+        return new mjuiItem((Pointer)this).offsetAddress(i);
+    }
+        // UI item
+  // common properties
+  public native int type(); public native mjuiItem type(int setter);                       // type (mjtItem)
+  public native @Cast("char") byte name(int i); public native mjuiItem name(int i, byte setter);
+  @MemberGetter public native @Cast("char*") BytePointer name();         // name
+  public native int state(); public native mjuiItem state(int setter);                      // 0: disable, 1: enable, 2+: use predicate
+  public native Pointer pdata(); public native mjuiItem pdata(Pointer setter);                    // data pointer (type-specific)
+  public native int sectionid(); public native mjuiItem sectionid(int setter);                  // id of section containing item
+  public native int itemid(); public native mjuiItem itemid(int setter);                     // id of item within section
+  public native int userid(); public native mjuiItem userid(int setter);                     // user-supplied id (for event handling)
+
+  // type-specific properties
+    public native @ByRef mjuiItemSingle_ single(); public native mjuiItem single(mjuiItemSingle_ setter);  // check and button
+    public native @ByRef mjuiItemMulti_ multi(); public native mjuiItem multi(mjuiItemMulti_ setter);    // static, radio and select
+    public native @ByRef mjuiItemSlider_ slider(); public native mjuiItem slider(mjuiItemSlider_ setter);  // slider
+    public native @ByRef mjuiItemEdit_ edit(); public native mjuiItem edit(mjuiItemEdit_ setter);      // edit
+
+  // internal
+  public native @ByRef mjrRect rect(); public native mjuiItem rect(mjrRect setter);                   // rectangle occupied by item
+  public native int skip(); public native mjuiItem skip(int setter);                       // item skipped due to closed separator
 }
 
 
 //---------------------------------- mjuiSection ---------------------------------------------------
 
-public static class mjuiSection_ extends Pointer {
+public static class mjuiSection extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjuiSection_() { super((Pointer)null); allocate(); }
+    public mjuiSection() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjuiSection_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjuiSection(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjuiSection_(Pointer p) { super(p); }
+    public mjuiSection(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjuiSection_ position(long position) {
-        return (mjuiSection_)super.position(position);
+    @Override public mjuiSection position(long position) {
+        return (mjuiSection)super.position(position);
     }
-    @Override public mjuiSection_ getPointer(long i) {
-        return new mjuiSection_((Pointer)this).offsetAddress(i);
+    @Override public mjuiSection getPointer(long i) {
+        return new mjuiSection((Pointer)this).offsetAddress(i);
     }
-             // UI section
+     // UI section
   // properties
-  public native @Cast("char") byte name(int i); public native mjuiSection_ name(int i, byte setter);
+  public native @Cast("char") byte name(int i); public native mjuiSection name(int i, byte setter);
   @MemberGetter public native @Cast("char*") BytePointer name();         // name
-  public native int state(); public native mjuiSection_ state(int setter);                      // 0: closed, 1: open
-  public native int modifier(); public native mjuiSection_ modifier(int setter);                   // 0: none, 1: control, 2: shift; 4: alt
-  public native int shortcut(); public native mjuiSection_ shortcut(int setter);                   // shortcut key; 0: undefined
-  public native int nitem(); public native mjuiSection_ nitem(int setter);                      // number of items in use
-  public native @ByRef mjuiItem item(int i); public native mjuiSection_ item(int i, mjuiItem setter);
+  public native int state(); public native mjuiSection state(int setter);                      // section state (mjtSection)
+  public native int modifier(); public native mjuiSection modifier(int setter);                   // 0: none, 1: control, 2: shift; 4: alt
+  public native int shortcut(); public native mjuiSection shortcut(int setter);                   // shortcut key; 0: undefined
+  public native int checkbox(); public native mjuiSection checkbox(int setter);                   // 0: none, 1: unchecked, 2: checked
+  public native int nitem(); public native mjuiSection nitem(int setter);                      // number of items in use
+  public native @ByRef mjuiItem item(int i); public native mjuiSection item(int i, mjuiItem setter);
   @MemberGetter public native mjuiItem item();     // preallocated array of items
 
   // internal
-  public native @ByRef mjrRect rtitle(); public native mjuiSection_ rtitle(mjrRect setter);                 // rectangle occupied by title
-  public native @ByRef mjrRect rcontent(); public native mjuiSection_ rcontent(mjrRect setter);               // rectangle occupied by content
-}
-@Opaque public static class mjuiSection extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjuiSection() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjuiSection(Pointer p) { super(p); }
+  public native @ByRef mjrRect rtitle(); public native mjuiSection rtitle(mjrRect setter);                 // rectangle occupied by title
+  public native @ByRef mjrRect rcontent(); public native mjuiSection rcontent(mjrRect setter);               // rectangle occupied by content
+  public native int lastclick(); public native mjuiSection lastclick(int setter);                  // last mouse click over this section
 }
 
 
 //---------------------------------- mjUI ----------------------------------------------------------
 
-public static class mjUI_ extends Pointer {
+public static class mjUI extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjUI_() { super((Pointer)null); allocate(); }
+    public mjUI() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjUI_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjUI_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjUI_ position(long position) {
-        return (mjUI_)super.position(position);
-    }
-    @Override public mjUI_ getPointer(long i) {
-        return new mjUI_((Pointer)this).offsetAddress(i);
-    }
-                    // entire UI
-  // constants set by user
-  public native @ByRef mjuiThemeSpacing spacing(); public native mjUI_ spacing(mjuiThemeSpacing setter);       // UI theme spacing
-  public native @ByRef mjuiThemeColor color(); public native mjUI_ color(mjuiThemeColor setter);           // UI theme color
-  public native mjfItemEnable predicate(); public native mjUI_ predicate(mjfItemEnable setter);        // callback to set item state programmatically
-  public native Pointer userdata(); public native mjUI_ userdata(Pointer setter);                 // pointer to user data (passed to predicate)
-  public native int rectid(); public native mjUI_ rectid(int setter);                     // index of this ui rectangle in mjuiState
-  public native int auxid(); public native mjUI_ auxid(int setter);                      // aux buffer index of this ui
-  public native int radiocol(); public native mjUI_ radiocol(int setter);                   // number of radio columns (0 defaults to 2)
-
-  // UI sizes (framebuffer units)
-  public native int width(); public native mjUI_ width(int setter);                      // width
-  public native int height(); public native mjUI_ height(int setter);                     // current heigth
-  public native int maxheight(); public native mjUI_ maxheight(int setter);                  // height when all sections open
-  public native int scroll(); public native mjUI_ scroll(int setter);                     // scroll from top of UI
-
-  // mouse focus
-  public native int mousesect(); public native mjUI_ mousesect(int setter);                  // 0: none, -1: scroll, otherwise 1+section
-  public native int mouseitem(); public native mjUI_ mouseitem(int setter);                  // item within section
-  public native int mousehelp(); public native mjUI_ mousehelp(int setter);                  // help button down: print shortcuts
-
-  // keyboard focus and edit
-  public native int editsect(); public native mjUI_ editsect(int setter);                   // 0: none, otherwise 1+section
-  public native int edititem(); public native mjUI_ edititem(int setter);                   // item within section
-  public native int editcursor(); public native mjUI_ editcursor(int setter);                 // cursor position
-  public native int editscroll(); public native mjUI_ editscroll(int setter);                 // horizontal scroll
-  public native @Cast("char") byte edittext(int i); public native mjUI_ edittext(int i, byte setter);
-  @MemberGetter public native @Cast("char*") BytePointer edittext();     // current text
-  public native mjuiItem editchanged(); public native mjUI_ editchanged(mjuiItem setter);          // pointer to changed edit in last mjui_event
-
-  // sections
-  public native int nsect(); public native mjUI_ nsect(int setter);                      // number of sections in use
-  public native @ByRef mjuiSection sect(int i); public native mjUI_ sect(int i, mjuiSection setter);
-  @MemberGetter public native mjuiSection sect();  // preallocated array of sections
-}
-@Opaque public static class mjUI extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjUI() { super((Pointer)null); }
+    public mjUI(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjUI(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjUI position(long position) {
+        return (mjUI)super.position(position);
+    }
+    @Override public mjUI getPointer(long i) {
+        return new mjUI((Pointer)this).offsetAddress(i);
+    }
+            // entire UI
+  // constants set by user
+  public native @ByRef mjuiThemeSpacing spacing(); public native mjUI spacing(mjuiThemeSpacing setter);       // UI theme spacing
+  public native @ByRef mjuiThemeColor color(); public native mjUI color(mjuiThemeColor setter);           // UI theme color
+  public native mjfItemEnable predicate(); public native mjUI predicate(mjfItemEnable setter);        // callback to set item state programmatically
+  public native Pointer userdata(); public native mjUI userdata(Pointer setter);                 // pointer to user data (passed to predicate)
+  public native int rectid(); public native mjUI rectid(int setter);                     // index of this ui rectangle in mjuiState
+  public native int auxid(); public native mjUI auxid(int setter);                      // aux buffer index of this ui
+  public native int radiocol(); public native mjUI radiocol(int setter);                   // number of radio columns (0 defaults to 2)
+
+  // UI sizes (framebuffer units)
+  public native int width(); public native mjUI width(int setter);                      // width
+  public native int height(); public native mjUI height(int setter);                     // current height
+  public native int maxheight(); public native mjUI maxheight(int setter);                  // height when all sections open
+  public native int scroll(); public native mjUI scroll(int setter);                     // scroll from top of UI
+
+  // mouse focus and count
+  public native int mousesect(); public native mjUI mousesect(int setter);                  // 0: none, -1: scroll, otherwise 1+section
+  public native int mouseitem(); public native mjUI mouseitem(int setter);                  // item within section
+  public native int mousehelp(); public native mjUI mousehelp(int setter);                  // help button down: print shortcuts
+  public native int mouseclicks(); public native mjUI mouseclicks(int setter);                // number of mouse clicks over UI
+  public native int mousesectcheck(); public native mjUI mousesectcheck(int setter);             // 0: none, otherwise 1+section
+
+  // keyboard focus and edit
+  public native int editsect(); public native mjUI editsect(int setter);                   // 0: none, otherwise 1+section
+  public native int edititem(); public native mjUI edititem(int setter);                   // item within section
+  public native int editcursor(); public native mjUI editcursor(int setter);                 // cursor position
+  public native int editscroll(); public native mjUI editscroll(int setter);                 // horizontal scroll
+  public native @Cast("char") byte edittext(int i); public native mjUI edittext(int i, byte setter);
+  @MemberGetter public native @Cast("char*") BytePointer edittext();     // current text
+  public native mjuiItem editchanged(); public native mjUI editchanged(mjuiItem setter);          // pointer to changed edit in last mjui_event
+
+  // sections
+  public native int nsect(); public native mjUI nsect(int setter);                      // number of sections in use
+  public native @ByRef mjuiSection sect(int i); public native mjUI sect(int i, mjuiSection setter);
+  @MemberGetter public native mjuiSection sect();  // preallocated array of sections
 }
 
 
 //---------------------------------- mjuiDef -------------------------------------------------------
 
-public static class mjuiDef_ extends Pointer {
+public static class mjuiDef extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjuiDef_() { super((Pointer)null); allocate(); }
+    public mjuiDef() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjuiDef_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjuiDef_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjuiDef_ position(long position) {
-        return (mjuiDef_)super.position(position);
-    }
-    @Override public mjuiDef_ getPointer(long i) {
-        return new mjuiDef_((Pointer)this).offsetAddress(i);
-    }
-                 // table passed to mjui_add()
-  public native int type(); public native mjuiDef_ type(int setter);                       // type (mjtItem); -1: section
-  public native @Cast("char") byte name(int i); public native mjuiDef_ name(int i, byte setter);
-  @MemberGetter public native @Cast("char*") BytePointer name();         // name
-  public native int state(); public native mjuiDef_ state(int setter);                      // state
-  public native Pointer pdata(); public native mjuiDef_ pdata(Pointer setter);                    // pointer to data
-  public native @Cast("char") byte other(int i); public native mjuiDef_ other(int i, byte setter);
-  @MemberGetter public native @Cast("char*") BytePointer other();        // string with type-specific properties
-}
-@Opaque public static class mjuiDef extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjuiDef() { super((Pointer)null); }
+    public mjuiDef(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjuiDef(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjuiDef position(long position) {
+        return (mjuiDef)super.position(position);
+    }
+    @Override public mjuiDef getPointer(long i) {
+        return new mjuiDef((Pointer)this).offsetAddress(i);
+    }
+         // table passed to mjui_add()
+  public native int type(); public native mjuiDef type(int setter);                       // type (mjtItem); -1: section
+  public native @Cast("char") byte name(int i); public native mjuiDef name(int i, byte setter);
+  @MemberGetter public native @Cast("char*") BytePointer name();         // name
+  public native int state(); public native mjuiDef state(int setter);                      // state
+  public native Pointer pdata(); public native mjuiDef pdata(Pointer setter);                    // pointer to data
+  public native @Cast("char") byte other(int i); public native mjuiDef other(int i, byte setter);
+  @MemberGetter public native @Cast("char*") BytePointer other();        // string with type-specific properties
+  public native int otherint(); public native mjuiDef otherint(int setter);                   // int with type-specific properties
 }
 
 // #endif  // MUJOCO_MJUI_H_
@@ -4428,14 +7294,14 @@ public static class mjuiDef_ extends Pointer {
 
 // #include <mujoco/mjdata.h>
 // #include <mujoco/mjmodel.h>
-// #include <mujoco/mjtnum.h>
+// #include <mujoco/mjtype.h>
 
 
 public static final int mjNGROUP =        6;         // number of geom, site, joint, skin groups with visflags
 public static final int mjMAXLIGHT =      100;       // maximum number of lights in a scene
 public static final int mjMAXOVERLAY =    500;       // maximum number of characters in overlay text
 public static final int mjMAXLINE =       100;       // maximum number of lines per plot
-public static final int mjMAXLINEPNT =    1000;      // maximum number points per line
+public static final int mjMAXLINEPNT =    1001;      // maximum number points per line
 public static final int mjMAXPLANEGRID =  200;       // maximum number of grid divisions for plane
 
 
@@ -4452,12 +7318,15 @@ public static final int         // bitflags for mjvGeom category
 /** enum mjtMouse */
 public static final int          // mouse interaction mode
   mjMOUSE_NONE        = 0,        // no action
-  mjMOUSE_ROTATE_V = 1,               // rotate, vertical plane
-  mjMOUSE_ROTATE_H = 2,               // rotate, horizontal plane
-  mjMOUSE_MOVE_V = 3,                 // move, vertical plane
-  mjMOUSE_MOVE_H = 4,                 // move, horizontal plane
-  mjMOUSE_ZOOM = 5,                   // zoom
-  mjMOUSE_SELECT = 6;                  // selection
+  mjMOUSE_ROTATE_V = 1,               // rotate (orbit) vertically
+  mjMOUSE_ROTATE_H = 2,               // rotate (orbit) horizontally
+  mjMOUSE_MOVE_V = 3,                 // move along vertical plane
+  mjMOUSE_MOVE_H = 4,                 // move along horizontal plane
+  mjMOUSE_ZOOM = 5,                   // zoom (towards/away from lookat point)
+  mjMOUSE_MOVE_V_REL = 6,             // move (truck, pedestal), vertical plane rel. to target
+  mjMOUSE_MOVE_H_REL = 7,             // move (truck, dolly), horizontal plane rel. to target
+  mjMOUSE_TURN_V = 8,                 // turn (tilt) vertically
+  mjMOUSE_TURN_H = 9;                 // turn (pan) horizontally
 
 
 /** enum mjtPertBit */
@@ -4542,11 +7411,10 @@ public static final int        // flags enabling model element visualization
   mjVIS_FLEXFACE = 26,                 // flex element faces
   mjVIS_FLEXSKIN = 27,                 // flex smooth skin (disables the rest)
   mjVIS_BODYBVH = 28,                  // body bounding volume hierarchy
-  mjVIS_FLEXBVH = 29,                  // flex bounding volume hierarchy
-  mjVIS_MESHBVH = 30,                  // mesh bounding volume hierarchy
-  mjVIS_SDFITER = 31,                  // iterations of SDF gradient descent
+  mjVIS_MESHBVH = 29,                  // mesh bounding volume hierarchy
+  mjVIS_SDFITER = 30,                  // iterations of SDF gradient descent
 
-  mjNVISFLAG = 32;                      // number of visualization flags
+  mjNVISFLAG = 31;                      // number of visualization flags
 
 
 /** enum mjtRndFlag */
@@ -4558,11 +7426,13 @@ public static final int        // flags enabling rendering effects
   mjRND_SKYBOX = 4,                   // skybox
   mjRND_FOG = 5,                      // fog
   mjRND_HAZE = 6,                     // haze
-  mjRND_SEGMENT = 7,                  // segmentation with random color
-  mjRND_IDCOLOR = 8,                  // segmentation with segid+1 color
-  mjRND_CULL_FACE = 9,                // cull backward faces
+  mjRND_DEPTH = 7,                    // depth
+  mjRND_SEGMENT = 8,                  // segmentation with random color
+  mjRND_IDCOLOR = 9,                  // segmentation with segid+1 color
+  mjRND_CULL_FACE = 10,                // cull backward faces
+  mjRND_POST_PROCESSING = 11,          // post-processing (e.g. color grading, bloom, etc.)
 
-  mjNRNDFLAG = 10;                      // number of rendering flags
+  mjNRNDFLAG = 12;                      // number of rendering flags
 
 
 /** enum mjtStereo */
@@ -4574,750 +7444,434 @@ public static final int         // type of stereo rendering
 
 //---------------------------------- mjvPerturb ----------------------------------------------------
 
-public static class mjvPerturb_ extends Pointer {
+public static class mjvPerturb extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjvPerturb_() { super((Pointer)null); allocate(); }
+    public mjvPerturb() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjvPerturb_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvPerturb_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjvPerturb_ position(long position) {
-        return (mjvPerturb_)super.position(position);
-    }
-    @Override public mjvPerturb_ getPointer(long i) {
-        return new mjvPerturb_((Pointer)this).offsetAddress(i);
-    }
-              // object selection and perturbation
-  public native int select(); public native mjvPerturb_ select(int setter);                // selected body id; non-positive: none
-  public native int flexselect(); public native mjvPerturb_ flexselect(int setter);            // selected flex id; negative: none
-  public native int skinselect(); public native mjvPerturb_ skinselect(int setter);            // selected skin id; negative: none
-  public native int active(); public native mjvPerturb_ active(int setter);                // perturbation bitmask (mjtPertBit)
-  public native int active2(); public native mjvPerturb_ active2(int setter);               // secondary perturbation bitmask (mjtPertBit)
-  public native @Cast("mjtNum") double refpos(int i); public native mjvPerturb_ refpos(int i, double setter);
-  @MemberGetter public native @Cast("mjtNum*") DoublePointer refpos();             // reference position for selected object
-  public native @Cast("mjtNum") double refquat(int i); public native mjvPerturb_ refquat(int i, double setter);
-  @MemberGetter public native @Cast("mjtNum*") DoublePointer refquat();            // reference orientation for selected object
-  public native @Cast("mjtNum") double refselpos(int i); public native mjvPerturb_ refselpos(int i, double setter);
-  @MemberGetter public native @Cast("mjtNum*") DoublePointer refselpos();          // reference position for selection point
-  public native @Cast("mjtNum") double localpos(int i); public native mjvPerturb_ localpos(int i, double setter);
-  @MemberGetter public native @Cast("mjtNum*") DoublePointer localpos();           // selection point in object coordinates
-  public native @Cast("mjtNum") double localmass(); public native mjvPerturb_ localmass(double setter);             // spatial inertia at selection point
-  public native @Cast("mjtNum") double scale(); public native mjvPerturb_ scale(double setter);                 // relative mouse motion-to-space scaling (set by initPerturb)
-}
-@Opaque public static class mjvPerturb extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjvPerturb() { super((Pointer)null); }
+    public mjvPerturb(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjvPerturb(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjvPerturb position(long position) {
+        return (mjvPerturb)super.position(position);
+    }
+    @Override public mjvPerturb getPointer(long i) {
+        return new mjvPerturb((Pointer)this).offsetAddress(i);
+    }
+      // object selection and perturbation
+  public native int select(); public native mjvPerturb select(int setter);                // selected body id; non-positive: none
+  public native int flexselect(); public native mjvPerturb flexselect(int setter);            // selected flex id; negative: none
+  public native int skinselect(); public native mjvPerturb skinselect(int setter);            // selected skin id; negative: none
+  public native int active(); public native mjvPerturb active(int setter);                // perturbation bitmask (mjtPertBit)
+  public native int active2(); public native mjvPerturb active2(int setter);               // secondary perturbation bitmask (mjtPertBit)
+  public native @Cast("mjtNum") double refpos(int i); public native mjvPerturb refpos(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer refpos();             // reference position for selected object
+  public native @Cast("mjtNum") double refquat(int i); public native mjvPerturb refquat(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer refquat();            // reference orientation for selected object
+  public native @Cast("mjtNum") double refselpos(int i); public native mjvPerturb refselpos(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer refselpos();          // reference position for selection point
+  public native @Cast("mjtNum") double localpos(int i); public native mjvPerturb localpos(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer localpos();           // selection point in object coordinates
+  public native @Cast("mjtNum") double localmass(); public native mjvPerturb localmass(double setter);             // spatial inertia at selection point
+  public native @Cast("mjtNum") double scale(); public native mjvPerturb scale(double setter);                 // relative mouse motion-to-space scaling (set by initPerturb)
 }
 
 
 //---------------------------------- mjvCamera -----------------------------------------------------
 
-public static class mjvCamera_ extends Pointer {
+public static class mjvCamera extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjvCamera_() { super((Pointer)null); allocate(); }
+    public mjvCamera() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjvCamera_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvCamera_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjvCamera_ position(long position) {
-        return (mjvCamera_)super.position(position);
-    }
-    @Override public mjvCamera_ getPointer(long i) {
-        return new mjvCamera_((Pointer)this).offsetAddress(i);
-    }
-               // abstract camera
-  // type and ids
-  public native int type(); public native mjvCamera_ type(int setter);                  // camera type (mjtCamera)
-  public native int fixedcamid(); public native mjvCamera_ fixedcamid(int setter);            // fixed camera id
-  public native int trackbodyid(); public native mjvCamera_ trackbodyid(int setter);           // body id to track
-
-  // abstract camera pose specification
-  public native @Cast("mjtNum") double lookat(int i); public native mjvCamera_ lookat(int i, double setter);
-  @MemberGetter public native @Cast("mjtNum*") DoublePointer lookat();             // lookat point
-  public native @Cast("mjtNum") double distance(); public native mjvCamera_ distance(double setter);              // distance to lookat point or tracked body
-  public native @Cast("mjtNum") double azimuth(); public native mjvCamera_ azimuth(double setter);               // camera azimuth (deg)
-  public native @Cast("mjtNum") double elevation(); public native mjvCamera_ elevation(double setter);             // camera elevation (deg)
-}
-@Opaque public static class mjvCamera extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjvCamera() { super((Pointer)null); }
+    public mjvCamera(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjvCamera(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjvCamera position(long position) {
+        return (mjvCamera)super.position(position);
+    }
+    @Override public mjvCamera getPointer(long i) {
+        return new mjvCamera((Pointer)this).offsetAddress(i);
+    }
+       // abstract camera
+  // type and ids
+  public native int type(); public native mjvCamera type(int setter);                  // camera type (mjtCamera)
+  public native int fixedcamid(); public native mjvCamera fixedcamid(int setter);            // fixed camera id
+  public native int trackbodyid(); public native mjvCamera trackbodyid(int setter);           // body id to track
+
+  // abstract camera pose specification
+  public native @Cast("mjtNum") double lookat(int i); public native mjvCamera lookat(int i, double setter);
+  @MemberGetter public native @Cast("mjtNum*") DoublePointer lookat();             // lookat point
+  public native @Cast("mjtNum") double distance(); public native mjvCamera distance(double setter);              // distance to lookat point or tracked body
+  public native @Cast("mjtNum") double azimuth(); public native mjvCamera azimuth(double setter);               // camera azimuth (deg)
+  public native @Cast("mjtNum") double elevation(); public native mjvCamera elevation(double setter);             // camera elevation (deg)
+
+  // orthographic / perspective
+  public native int orthographic(); public native mjvCamera orthographic(int setter);          // 0: perspective; 1: orthographic
 }
 
 
 //---------------------------------- mjvGLCamera ---------------------------------------------------
 
-public static class mjvGLCamera_ extends Pointer {
+public static class mjvGLCamera extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjvGLCamera_() { super((Pointer)null); allocate(); }
+    public mjvGLCamera() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjvGLCamera_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjvGLCamera(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvGLCamera_(Pointer p) { super(p); }
+    public mjvGLCamera(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjvGLCamera_ position(long position) {
-        return (mjvGLCamera_)super.position(position);
+    @Override public mjvGLCamera position(long position) {
+        return (mjvGLCamera)super.position(position);
     }
-    @Override public mjvGLCamera_ getPointer(long i) {
-        return new mjvGLCamera_((Pointer)this).offsetAddress(i);
+    @Override public mjvGLCamera getPointer(long i) {
+        return new mjvGLCamera((Pointer)this).offsetAddress(i);
     }
-             // OpenGL camera
+     // OpenGL camera
   // camera frame
-  public native float pos(int i); public native mjvGLCamera_ pos(int i, float setter);
+  public native float pos(int i); public native mjvGLCamera pos(int i, float setter);
   @MemberGetter public native FloatPointer pos();                // position
-  public native float forward(int i); public native mjvGLCamera_ forward(int i, float setter);
+  public native float forward(int i); public native mjvGLCamera forward(int i, float setter);
   @MemberGetter public native FloatPointer forward();            // forward direction
-  public native float up(int i); public native mjvGLCamera_ up(int i, float setter);
+  public native float up(int i); public native mjvGLCamera up(int i, float setter);
   @MemberGetter public native FloatPointer up();                 // up direction
 
   // camera projection
-  public native float frustum_center(); public native mjvGLCamera_ frustum_center(float setter);        // hor. center (left,right set to match aspect)
-  public native float frustum_width(); public native mjvGLCamera_ frustum_width(float setter);         // width (not used for rendering)
-  public native float frustum_bottom(); public native mjvGLCamera_ frustum_bottom(float setter);        // bottom
-  public native float frustum_top(); public native mjvGLCamera_ frustum_top(float setter);           // top
-  public native float frustum_near(); public native mjvGLCamera_ frustum_near(float setter);          // near
-  public native float frustum_far(); public native mjvGLCamera_ frustum_far(float setter);           // far
-}
-@Opaque public static class mjvGLCamera extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjvGLCamera() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvGLCamera(Pointer p) { super(p); }
+  public native float frustum_center(); public native mjvGLCamera frustum_center(float setter);        // hor. center (left,right set to match aspect)
+  public native float frustum_width(); public native mjvGLCamera frustum_width(float setter);         // width (not used for rendering)
+  public native float frustum_bottom(); public native mjvGLCamera frustum_bottom(float setter);        // bottom
+  public native float frustum_top(); public native mjvGLCamera frustum_top(float setter);           // top
+  public native float frustum_near(); public native mjvGLCamera frustum_near(float setter);          // near
+  public native float frustum_far(); public native mjvGLCamera frustum_far(float setter);           // far
+
+  // orthographic / perspective
+  public native int orthographic(); public native mjvGLCamera orthographic(int setter);          // 0: perspective; 1: orthographic
 }
 
 
 //---------------------------------- mjvGeom -------------------------------------------------------
 
-public static class mjvGeom_ extends Pointer {
+public static class mjvGeom extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjvGeom_() { super((Pointer)null); allocate(); }
+    public mjvGeom() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjvGeom_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjvGeom(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvGeom_(Pointer p) { super(p); }
+    public mjvGeom(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjvGeom_ position(long position) {
-        return (mjvGeom_)super.position(position);
+    @Override public mjvGeom position(long position) {
+        return (mjvGeom)super.position(position);
     }
-    @Override public mjvGeom_ getPointer(long i) {
-        return new mjvGeom_((Pointer)this).offsetAddress(i);
+    @Override public mjvGeom getPointer(long i) {
+        return new mjvGeom((Pointer)this).offsetAddress(i);
     }
-                 // abstract geom
+         // abstract geom
   // type info
-  public native int type(); public native mjvGeom_ type(int setter);                  // geom type (mjtGeom)
-  public native int dataid(); public native mjvGeom_ dataid(int setter);                // mesh, hfield or plane id; -1: none
-  public native int objtype(); public native mjvGeom_ objtype(int setter);               // mujoco object type; mjOBJ_UNKNOWN for decor
-  public native int objid(); public native mjvGeom_ objid(int setter);                 // mujoco object id; -1 for decor
-  public native int category(); public native mjvGeom_ category(int setter);              // visual category
-  public native int texid(); public native mjvGeom_ texid(int setter);                 // texture id; -1: no texture
-  public native int texuniform(); public native mjvGeom_ texuniform(int setter);            // uniform cube mapping
-  public native int texcoord(); public native mjvGeom_ texcoord(int setter);              // mesh or flex geom has texture coordinates
-  public native int segid(); public native mjvGeom_ segid(int setter);                 // segmentation id; -1: not shown
+  public native int type(); public native mjvGeom type(int setter);                  // geom type (mjtGeom)
+  public native int dataid(); public native mjvGeom dataid(int setter);                // mesh, hfield or plane id; -1: none; mesh: 2*id or 2*id+1 (hull);
+                                  // multi-material flex: material slice index
+  public native int objtype(); public native mjvGeom objtype(int setter);               // mujoco object type; mjOBJ_UNKNOWN for decor
+  public native int objid(); public native mjvGeom objid(int setter);                 // mujoco object id; -1 for decor
+  public native int category(); public native mjvGeom category(int setter);              // visual category
+  public native int matid(); public native mjvGeom matid(int setter);                 // material id; -1: no textured material
+  public native int texid(); public native mjvGeom texid(int setter);                 // texture id; -1: none
+  public native int texuniform(); public native mjvGeom texuniform(int setter);            // uniform cube mapping
+  public native int texcoord(); public native mjvGeom texcoord(int setter);              // mesh or flex geom has texture coordinates
+  public native int segid(); public native mjvGeom segid(int setter);                 // segmentation id; -1: not shown
 
-  // OpenGL info
-  public native float texrepeat(int i); public native mjvGeom_ texrepeat(int i, float setter);
-  @MemberGetter public native FloatPointer texrepeat();          // texture repetition for 2D mapping
-  public native float size(int i); public native mjvGeom_ size(int i, float setter);
-  @MemberGetter public native FloatPointer size();               // size parameters
-  public native float pos(int i); public native mjvGeom_ pos(int i, float setter);
+  // spatial transform
+  public native float size(int i); public native mjvGeom size(int i, float setter);
+  @MemberGetter public native FloatPointer size();               // size parameters; multi-material flex: (radius, face offset, face count)
+  public native float pos(int i); public native mjvGeom pos(int i, float setter);
   @MemberGetter public native FloatPointer pos();                // Cartesian position
-  public native float mat(int i); public native mjvGeom_ mat(int i, float setter);
+  public native float mat(int i); public native mjvGeom mat(int i, float setter);
   @MemberGetter public native FloatPointer mat();                // Cartesian orientation
-  public native float rgba(int i); public native mjvGeom_ rgba(int i, float setter);
+
+  // material properties
+  public native float rgba(int i); public native mjvGeom rgba(int i, float setter);
   @MemberGetter public native FloatPointer rgba();               // color and transparency
-  public native float emission(); public native mjvGeom_ emission(float setter);              // emission coef
-  public native float specular(); public native mjvGeom_ specular(float setter);              // specular coef
-  public native float shininess(); public native mjvGeom_ shininess(float setter);             // shininess coef
-  public native float reflectance(); public native mjvGeom_ reflectance(float setter);           // reflectance coef
-  public native @Cast("char") byte label(int i); public native mjvGeom_ label(int i, byte setter);
+  public native float emission(); public native mjvGeom emission(float setter);              // emission coef
+  public native float specular(); public native mjvGeom specular(float setter);              // specular coef
+  public native float shininess(); public native mjvGeom shininess(float setter);             // shininess coef
+  public native float reflectance(); public native mjvGeom reflectance(float setter);           // reflectance coef
+  public native float texrepeat(int i); public native mjvGeom texrepeat(int i, float setter);
+  @MemberGetter public native FloatPointer texrepeat();          // texture repetition for 2d mapping
+  public native @Cast("mjtByte") byte castshadow(); public native mjvGeom castshadow(byte setter);            // does geom cast shadows
+
+  public native @Cast("char") byte label(int i); public native mjvGeom label(int i, byte setter);
   @MemberGetter public native @Cast("char*") BytePointer label();            // text label
 
   // transparency rendering (set internally)
-  public native float camdist(); public native mjvGeom_ camdist(float setter);               // distance to camera (used by sorter)
-  public native float modelrbound(); public native mjvGeom_ modelrbound(float setter);           // geom rbound from model, 0 if not model geom
-  public native @Cast("mjtByte") byte transparent(); public native mjvGeom_ transparent(byte setter);           // treat geom as transparent
-}
-@Opaque public static class mjvGeom extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjvGeom() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvGeom(Pointer p) { super(p); }
+  public native float camdist(); public native mjvGeom camdist(float setter);               // distance to camera (used by sorter)
+  public native float modelrbound(); public native mjvGeom modelrbound(float setter);           // geom rbound from model, 0 if not model geom
+  public native @Cast("mjtByte") byte transparent(); public native mjvGeom transparent(byte setter);           // treat geom as transparent
 }
 
 
 //---------------------------------- mjvLight ------------------------------------------------------
 
-public static class mjvLight_ extends Pointer {
+public static class mjvLight extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjvLight_() { super((Pointer)null); allocate(); }
+    public mjvLight() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjvLight_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvLight_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjvLight_ position(long position) {
-        return (mjvLight_)super.position(position);
-    }
-    @Override public mjvLight_ getPointer(long i) {
-        return new mjvLight_((Pointer)this).offsetAddress(i);
-    }
-                // OpenGL light
-  public native float pos(int i); public native mjvLight_ pos(int i, float setter);
-  @MemberGetter public native FloatPointer pos();                // position rel. to body frame
-  public native float dir(int i); public native mjvLight_ dir(int i, float setter);
-  @MemberGetter public native FloatPointer dir();                // direction rel. to body frame
-  public native float attenuation(int i); public native mjvLight_ attenuation(int i, float setter);
-  @MemberGetter public native FloatPointer attenuation();        // OpenGL attenuation (quadratic model)
-  public native float cutoff(); public native mjvLight_ cutoff(float setter);                // OpenGL cutoff
-  public native float exponent(); public native mjvLight_ exponent(float setter);              // OpenGL exponent
-  public native float ambient(int i); public native mjvLight_ ambient(int i, float setter);
-  @MemberGetter public native FloatPointer ambient();            // ambient rgb (alpha=1)
-  public native float diffuse(int i); public native mjvLight_ diffuse(int i, float setter);
-  @MemberGetter public native FloatPointer diffuse();            // diffuse rgb (alpha=1)
-  public native float specular(int i); public native mjvLight_ specular(int i, float setter);
-  @MemberGetter public native FloatPointer specular();           // specular rgb (alpha=1)
-  public native @Cast("mjtByte") byte headlight(); public native mjvLight_ headlight(byte setter);             // headlight
-  public native @Cast("mjtByte") byte directional(); public native mjvLight_ directional(byte setter);           // directional light
-  public native @Cast("mjtByte") byte castshadow(); public native mjvLight_ castshadow(byte setter);            // does light cast shadows
-}
-@Opaque public static class mjvLight extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjvLight() { super((Pointer)null); }
+    public mjvLight(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjvLight(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjvLight position(long position) {
+        return (mjvLight)super.position(position);
+    }
+    @Override public mjvLight getPointer(long i) {
+        return new mjvLight((Pointer)this).offsetAddress(i);
+    }
+        // OpenGL light
+  public native int id(); public native mjvLight id(int setter);                    // light id, -1 for headlight
+  public native float pos(int i); public native mjvLight pos(int i, float setter);
+  @MemberGetter public native FloatPointer pos();                // position rel. to body frame
+  public native float dir(int i); public native mjvLight dir(int i, float setter);
+  @MemberGetter public native FloatPointer dir();                // direction rel. to body frame
+  public native int type(); public native mjvLight type(int setter);                  // type (mjtLightType)
+  public native int texid(); public native mjvLight texid(int setter);                 // texture id for image lights
+  public native float attenuation(int i); public native mjvLight attenuation(int i, float setter);
+  @MemberGetter public native FloatPointer attenuation();        // OpenGL attenuation (quadratic model)
+  public native float cutoff(); public native mjvLight cutoff(float setter);                // OpenGL cutoff
+  public native float exponent(); public native mjvLight exponent(float setter);              // OpenGL exponent
+  public native float ambient(int i); public native mjvLight ambient(int i, float setter);
+  @MemberGetter public native FloatPointer ambient();            // ambient rgb (alpha=1)
+  public native float diffuse(int i); public native mjvLight diffuse(int i, float setter);
+  @MemberGetter public native FloatPointer diffuse();            // diffuse rgb (alpha=1)
+  public native float specular(int i); public native mjvLight specular(int i, float setter);
+  @MemberGetter public native FloatPointer specular();           // specular rgb (alpha=1)
+  public native @Cast("mjtByte") byte headlight(); public native mjvLight headlight(byte setter);             // headlight
+  public native @Cast("mjtByte") byte castshadow(); public native mjvLight castshadow(byte setter);            // does light cast shadows
+  public native float bulbradius(); public native mjvLight bulbradius(float setter);            // bulb radius for soft shadows
+  public native float intensity(); public native mjvLight intensity(float setter);             // intensity, in candelas
+  public native float range(); public native mjvLight range(float setter);                 // range of effectiveness
+  public native float softness(); public native mjvLight softness(float setter);              // spotlight edge softness
 }
 
 
 //---------------------------------- mjvOption -----------------------------------------------------
 
-public static class mjvOption_ extends Pointer {
+public static class mjvOption extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjvOption_() { super((Pointer)null); allocate(); }
+    public mjvOption() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjvOption_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvOption_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjvOption_ position(long position) {
-        return (mjvOption_)super.position(position);
-    }
-    @Override public mjvOption_ getPointer(long i) {
-        return new mjvOption_((Pointer)this).offsetAddress(i);
-    }
-                  // abstract visualization options
-  public native int label(); public native mjvOption_ label(int setter);                    // what objects to label (mjtLabel)
-  public native int frame(); public native mjvOption_ frame(int setter);                    // which frame to show (mjtFrame)
-  public native @Cast("mjtByte") byte geomgroup(int i); public native mjvOption_ geomgroup(int i, byte setter);
-  @MemberGetter public native @Cast("mjtByte*") BytePointer geomgroup();      // geom visualization by group
-  public native @Cast("mjtByte") byte sitegroup(int i); public native mjvOption_ sitegroup(int i, byte setter);
-  @MemberGetter public native @Cast("mjtByte*") BytePointer sitegroup();      // site visualization by group
-  public native @Cast("mjtByte") byte jointgroup(int i); public native mjvOption_ jointgroup(int i, byte setter);
-  @MemberGetter public native @Cast("mjtByte*") BytePointer jointgroup();     // joint visualization by group
-  public native @Cast("mjtByte") byte tendongroup(int i); public native mjvOption_ tendongroup(int i, byte setter);
-  @MemberGetter public native @Cast("mjtByte*") BytePointer tendongroup();    // tendon visualization by group
-  public native @Cast("mjtByte") byte actuatorgroup(int i); public native mjvOption_ actuatorgroup(int i, byte setter);
-  @MemberGetter public native @Cast("mjtByte*") BytePointer actuatorgroup();  // actuator visualization by group
-  public native @Cast("mjtByte") byte flexgroup(int i); public native mjvOption_ flexgroup(int i, byte setter);
-  @MemberGetter public native @Cast("mjtByte*") BytePointer flexgroup();      // flex visualization by group
-  public native @Cast("mjtByte") byte skingroup(int i); public native mjvOption_ skingroup(int i, byte setter);
-  @MemberGetter public native @Cast("mjtByte*") BytePointer skingroup();      // skin visualization by group
-  public native @Cast("mjtByte") byte flags(int i); public native mjvOption_ flags(int i, byte setter);
-  @MemberGetter public native @Cast("mjtByte*") BytePointer flags();        // visualization flags (indexed by mjtVisFlag)
-  public native int bvh_depth(); public native mjvOption_ bvh_depth(int setter);                // depth of the bounding volume hierarchy to be visualized
-  public native int flex_layer(); public native mjvOption_ flex_layer(int setter);               // element layer to be visualized for 3D flex
-}
-@Opaque public static class mjvOption extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjvOption() { super((Pointer)null); }
+    public mjvOption(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjvOption(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjvOption position(long position) {
+        return (mjvOption)super.position(position);
+    }
+    @Override public mjvOption getPointer(long i) {
+        return new mjvOption((Pointer)this).offsetAddress(i);
+    }
+          // abstract visualization options
+  public native int label(); public native mjvOption label(int setter);                    // what objects to label (mjtLabel)
+  public native int frame(); public native mjvOption frame(int setter);                    // which frame to show (mjtFrame)
+  public native @Cast("mjtByte") byte geomgroup(int i); public native mjvOption geomgroup(int i, byte setter);
+  @MemberGetter public native @Cast("mjtByte*") BytePointer geomgroup();      // geom visualization by group
+  public native @Cast("mjtByte") byte sitegroup(int i); public native mjvOption sitegroup(int i, byte setter);
+  @MemberGetter public native @Cast("mjtByte*") BytePointer sitegroup();      // site visualization by group
+  public native @Cast("mjtByte") byte jointgroup(int i); public native mjvOption jointgroup(int i, byte setter);
+  @MemberGetter public native @Cast("mjtByte*") BytePointer jointgroup();     // joint visualization by group
+  public native @Cast("mjtByte") byte tendongroup(int i); public native mjvOption tendongroup(int i, byte setter);
+  @MemberGetter public native @Cast("mjtByte*") BytePointer tendongroup();    // tendon visualization by group
+  public native @Cast("mjtByte") byte actuatorgroup(int i); public native mjvOption actuatorgroup(int i, byte setter);
+  @MemberGetter public native @Cast("mjtByte*") BytePointer actuatorgroup();  // actuator visualization by group
+  public native @Cast("mjtByte") byte flexgroup(int i); public native mjvOption flexgroup(int i, byte setter);
+  @MemberGetter public native @Cast("mjtByte*") BytePointer flexgroup();      // flex visualization by group
+  public native @Cast("mjtByte") byte skingroup(int i); public native mjvOption skingroup(int i, byte setter);
+  @MemberGetter public native @Cast("mjtByte*") BytePointer skingroup();      // skin visualization by group
+  public native @Cast("mjtByte") byte flags(int i); public native mjvOption flags(int i, byte setter);
+  @MemberGetter public native @Cast("mjtByte*") BytePointer flags();        // visualization flags (indexed by mjtVisFlag)
+  public native int bvh_depth(); public native mjvOption bvh_depth(int setter);                // depth of the bounding volume hierarchy to be visualized
+  public native int flex_layer(); public native mjvOption flex_layer(int setter);               // element layer to be visualized for 3D flex
 }
 
 
 //---------------------------------- mjvScene ------------------------------------------------------
 
-public static class mjvScene_ extends Pointer {
+public static class mjvScene extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjvScene_() { super((Pointer)null); allocate(); }
+    public mjvScene() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjvScene_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjvScene(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvScene_(Pointer p) { super(p); }
+    public mjvScene(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjvScene_ position(long position) {
-        return (mjvScene_)super.position(position);
+    @Override public mjvScene position(long position) {
+        return (mjvScene)super.position(position);
     }
-    @Override public mjvScene_ getPointer(long i) {
-        return new mjvScene_((Pointer)this).offsetAddress(i);
+    @Override public mjvScene getPointer(long i) {
+        return new mjvScene((Pointer)this).offsetAddress(i);
     }
-                // abstract scene passed to OpenGL renderer
+        // abstract scene passed to OpenGL renderer
   // abstract geoms
-  public native int maxgeom(); public native mjvScene_ maxgeom(int setter);               // size of allocated geom buffer
-  public native int ngeom(); public native mjvScene_ ngeom(int setter);                 // number of geoms currently in buffer
-  public native mjvGeom geoms(); public native mjvScene_ geoms(mjvGeom setter);                 // buffer for geoms (ngeom)
-  public native IntPointer geomorder(); public native mjvScene_ geomorder(IntPointer setter);             // buffer for ordering geoms by distance to camera (ngeom)
+  public native int maxgeom(); public native mjvScene maxgeom(int setter);               // size of allocated geom buffer
+  public native int ngeom(); public native mjvScene ngeom(int setter);                 // number of geoms currently in buffer
+  public native mjvGeom geoms(); public native mjvScene geoms(mjvGeom setter);                 // buffer for geoms (ngeom)
+  public native IntPointer geomorder(); public native mjvScene geomorder(IntPointer setter);             // buffer for ordering geoms by distance to camera (ngeom)
 
   // flex data
-  public native int nflex(); public native mjvScene_ nflex(int setter);                 // number of flexes
-  public native IntPointer flexedgeadr(); public native mjvScene_ flexedgeadr(IntPointer setter);           // address of flex edges (nflex)
-  public native IntPointer flexedgenum(); public native mjvScene_ flexedgenum(IntPointer setter);           // number of edges in flex (nflex)
-  public native IntPointer flexvertadr(); public native mjvScene_ flexvertadr(IntPointer setter);           // address of flex vertices (nflex)
-  public native IntPointer flexvertnum(); public native mjvScene_ flexvertnum(IntPointer setter);           // number of vertices in flex (nflex)
-  public native IntPointer flexfaceadr(); public native mjvScene_ flexfaceadr(IntPointer setter);           // address of flex faces (nflex)
-  public native IntPointer flexfacenum(); public native mjvScene_ flexfacenum(IntPointer setter);           // number of flex faces allocated (nflex)
-  public native IntPointer flexfaceused(); public native mjvScene_ flexfaceused(IntPointer setter);          // number of flex faces currently in use (nflex)
-  public native IntPointer flexedge(); public native mjvScene_ flexedge(IntPointer setter);              // flex edge data (2*nflexedge)
-  public native FloatPointer flexvert(); public native mjvScene_ flexvert(FloatPointer setter);              // flex vertices (3*nflexvert)
-  public native FloatPointer flexface(); public native mjvScene_ flexface(FloatPointer setter);              // flex faces vertices (9*sum(flexfacenum))
-  public native FloatPointer flexnormal(); public native mjvScene_ flexnormal(FloatPointer setter);            // flex face normals (9*sum(flexfacenum))
-  public native FloatPointer flextexcoord(); public native mjvScene_ flextexcoord(FloatPointer setter);          // flex face texture coordinates (6*sum(flexfacenum))
-  public native @Cast("mjtByte") byte flexvertopt(); public native mjvScene_ flexvertopt(byte setter);           // copy of mjVIS_FLEXVERT mjvOption flag
-  public native @Cast("mjtByte") byte flexedgeopt(); public native mjvScene_ flexedgeopt(byte setter);           // copy of mjVIS_FLEXEDGE mjvOption flag
-  public native @Cast("mjtByte") byte flexfaceopt(); public native mjvScene_ flexfaceopt(byte setter);           // copy of mjVIS_FLEXFACE mjvOption flag
-  public native @Cast("mjtByte") byte flexskinopt(); public native mjvScene_ flexskinopt(byte setter);           // copy of mjVIS_FLEXSKIN mjvOption flag
+  public native int nflex(); public native mjvScene nflex(int setter);                 // number of flexes
+  public native IntPointer flexedgeadr(); public native mjvScene flexedgeadr(IntPointer setter);           // address of flex edges (nflex)
+  public native IntPointer flexedgenum(); public native mjvScene flexedgenum(IntPointer setter);           // number of edges in flex (nflex)
+  public native IntPointer flexvertadr(); public native mjvScene flexvertadr(IntPointer setter);           // address of flex vertices (nflex)
+  public native IntPointer flexvertnum(); public native mjvScene flexvertnum(IntPointer setter);           // number of vertices in flex (nflex)
+  public native IntPointer flexfaceadr(); public native mjvScene flexfaceadr(IntPointer setter);           // address of flex faces (nflex)
+  public native IntPointer flexfacenum(); public native mjvScene flexfacenum(IntPointer setter);           // number of flex faces allocated (nflex)
+  public native IntPointer flexfaceused(); public native mjvScene flexfaceused(IntPointer setter);          // number of flex faces currently in use (nflex)
+  public native IntPointer flexedge(); public native mjvScene flexedge(IntPointer setter);              // flex edge data (2*nflexedge)
+  public native FloatPointer flexvert(); public native mjvScene flexvert(FloatPointer setter);              // flex vertices (3*nflexvert)
+  public native FloatPointer flexface(); public native mjvScene flexface(FloatPointer setter);              // flex faces vertices (9*sum(flexfacenum))
+  public native FloatPointer flexnormal(); public native mjvScene flexnormal(FloatPointer setter);            // flex face normals (9*sum(flexfacenum))
+  public native FloatPointer flextexcoord(); public native mjvScene flextexcoord(FloatPointer setter);          // flex face texture coordinates (6*sum(flexfacenum))
+  public native @Cast("mjtByte") byte flexvertopt(); public native mjvScene flexvertopt(byte setter);           // copy of mjVIS_FLEXVERT mjvOption flag
+  public native @Cast("mjtByte") byte flexedgeopt(); public native mjvScene flexedgeopt(byte setter);           // copy of mjVIS_FLEXEDGE mjvOption flag
+  public native @Cast("mjtByte") byte flexfaceopt(); public native mjvScene flexfaceopt(byte setter);           // copy of mjVIS_FLEXFACE mjvOption flag
+  public native @Cast("mjtByte") byte flexskinopt(); public native mjvScene flexskinopt(byte setter);           // copy of mjVIS_FLEXSKIN mjvOption flag
 
   // skin data
-  public native int nskin(); public native mjvScene_ nskin(int setter);                 // number of skins
-  public native IntPointer skinfacenum(); public native mjvScene_ skinfacenum(IntPointer setter);           // number of faces in skin (nskin)
-  public native IntPointer skinvertadr(); public native mjvScene_ skinvertadr(IntPointer setter);           // address of skin vertices (nskin)
-  public native IntPointer skinvertnum(); public native mjvScene_ skinvertnum(IntPointer setter);           // number of vertices in skin (nskin)
-  public native FloatPointer skinvert(); public native mjvScene_ skinvert(FloatPointer setter);              // skin vertex data (3*nskinvert)
-  public native FloatPointer skinnormal(); public native mjvScene_ skinnormal(FloatPointer setter);            // skin normal data (3*nskinvert)
+  public native int nskin(); public native mjvScene nskin(int setter);                 // number of skins
+  public native IntPointer skinfacenum(); public native mjvScene skinfacenum(IntPointer setter);           // number of faces in skin (nskin)
+  public native IntPointer skinvertadr(); public native mjvScene skinvertadr(IntPointer setter);           // address of skin vertices (nskin)
+  public native IntPointer skinvertnum(); public native mjvScene skinvertnum(IntPointer setter);           // number of vertices in skin (nskin)
+  public native FloatPointer skinvert(); public native mjvScene skinvert(FloatPointer setter);              // skin vertex data (3*nskinvert)
+  public native FloatPointer skinnormal(); public native mjvScene skinnormal(FloatPointer setter);            // skin normal data (3*nskinvert)
 
   // OpenGL lights
-  public native int nlight(); public native mjvScene_ nlight(int setter);                // number of lights currently in buffer
-  public native @ByRef mjvLight lights(int i); public native mjvScene_ lights(int i, mjvLight setter);
+  public native int nlight(); public native mjvScene nlight(int setter);                // number of lights currently in buffer
+  public native @ByRef mjvLight lights(int i); public native mjvScene lights(int i, mjvLight setter);
   @MemberGetter public native mjvLight lights();    // buffer for lights (nlight)
 
   // OpenGL cameras
-  public native @ByRef mjvGLCamera camera(int i); public native mjvScene_ camera(int i, mjvGLCamera setter);
+  public native @ByRef mjvGLCamera camera(int i); public native mjvScene camera(int i, mjvGLCamera setter);
   @MemberGetter public native mjvGLCamera camera();          // left and right camera
 
   // OpenGL model transformation
-  public native @Cast("mjtByte") byte enabletransform(); public native mjvScene_ enabletransform(byte setter);       // enable model transformation
-  public native float translate(int i); public native mjvScene_ translate(int i, float setter);
+  public native @Cast("mjtByte") byte enabletransform(); public native mjvScene enabletransform(byte setter);       // enable model transformation
+  public native float translate(int i); public native mjvScene translate(int i, float setter);
   @MemberGetter public native FloatPointer translate();          // model translation
-  public native float rotate(int i); public native mjvScene_ rotate(int i, float setter);
+  public native float rotate(int i); public native mjvScene rotate(int i, float setter);
   @MemberGetter public native FloatPointer rotate();             // model quaternion rotation
-  public native float scale(); public native mjvScene_ scale(float setter);                 // model scaling
+  public native float scale(); public native mjvScene scale(float setter);                 // model scaling
 
   // OpenGL rendering effects
-  public native int stereo(); public native mjvScene_ stereo(int setter);                // stereoscopic rendering (mjtStereo)
-  public native @Cast("mjtByte") byte flags(int i); public native mjvScene_ flags(int i, byte setter);
+  public native int stereo(); public native mjvScene stereo(int setter);                // stereoscopic rendering (mjtStereo)
+  public native @Cast("mjtByte") byte flags(int i); public native mjvScene flags(int i, byte setter);
   @MemberGetter public native @Cast("mjtByte*") BytePointer flags();     // rendering flags (indexed by mjtRndFlag)
 
   // framing
-  public native int framewidth(); public native mjvScene_ framewidth(int setter);            // frame pixel width; 0: disable framing
-  public native float framergb(int i); public native mjvScene_ framergb(int i, float setter);
+  public native int framewidth(); public native mjvScene framewidth(int setter);            // frame pixel width; 0: disable framing
+  public native float framergb(int i); public native mjvScene framergb(int i, float setter);
   @MemberGetter public native FloatPointer framergb();           // frame color
-}
-@Opaque public static class mjvScene extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjvScene() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvScene(Pointer p) { super(p); }
+
+  // geom buffer status
+  public native int status(); public native mjvScene status(int setter);                // 0: ok, 1: geoms exhausted, warning issued
 }
 
 
 //---------------------------------- mjvFigure -----------------------------------------------------
 
-public static class mjvFigure_ extends Pointer {
+public static class mjvFigure extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjvFigure_() { super((Pointer)null); allocate(); }
+    public mjvFigure() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjvFigure_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjvFigure(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvFigure_(Pointer p) { super(p); }
+    public mjvFigure(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjvFigure_ position(long position) {
-        return (mjvFigure_)super.position(position);
+    @Override public mjvFigure position(long position) {
+        return (mjvFigure)super.position(position);
     }
-    @Override public mjvFigure_ getPointer(long i) {
-        return new mjvFigure_((Pointer)this).offsetAddress(i);
+    @Override public mjvFigure getPointer(long i) {
+        return new mjvFigure((Pointer)this).offsetAddress(i);
     }
-               // abstract 2D figure passed to OpenGL renderer
+       // abstract 2D figure passed to OpenGL renderer
   // enable flags
-  public native int flg_legend(); public native mjvFigure_ flg_legend(int setter);             // show legend
-  public native int flg_ticklabel(int i); public native mjvFigure_ flg_ticklabel(int i, int setter);
+  public native int flg_legend(); public native mjvFigure flg_legend(int setter);             // show legend
+  public native int flg_ticklabel(int i); public native mjvFigure flg_ticklabel(int i, int setter);
   @MemberGetter public native IntPointer flg_ticklabel();       // show grid tick labels (x,y)
-  public native int flg_extend(); public native mjvFigure_ flg_extend(int setter);             // automatically extend axis ranges to fit data
-  public native int flg_barplot(); public native mjvFigure_ flg_barplot(int setter);            // isolated line segments (i.e. GL_LINES)
-  public native int flg_selection(); public native mjvFigure_ flg_selection(int setter);          // vertical selection line
-  public native int flg_symmetric(); public native mjvFigure_ flg_symmetric(int setter);          // symmetric y-axis
+  public native int flg_extend(); public native mjvFigure flg_extend(int setter);             // automatically extend axis ranges to fit data
+  public native int flg_barplot(); public native mjvFigure flg_barplot(int setter);            // isolated line segments (i.e. GL_LINES)
+  public native int flg_selection(); public native mjvFigure flg_selection(int setter);          // vertical selection line
+  public native int flg_symmetric(); public native mjvFigure flg_symmetric(int setter);          // symmetric y-axis
 
   // style settings
-  public native float linewidth(); public native mjvFigure_ linewidth(float setter);              // line width
-  public native float gridwidth(); public native mjvFigure_ gridwidth(float setter);              // grid line width
-  public native int gridsize(int i); public native mjvFigure_ gridsize(int i, int setter);
+  public native float linewidth(); public native mjvFigure linewidth(float setter);              // line width
+  public native float gridwidth(); public native mjvFigure gridwidth(float setter);              // grid line width
+  public native int gridsize(int i); public native mjvFigure gridsize(int i, int setter);
   @MemberGetter public native IntPointer gridsize();            // number of grid points in (x,y)
-  public native float gridrgb(int i); public native mjvFigure_ gridrgb(int i, float setter);
+  public native float gridrgb(int i); public native mjvFigure gridrgb(int i, float setter);
   @MemberGetter public native FloatPointer gridrgb();             // grid line rgb
-  public native float figurergba(int i); public native mjvFigure_ figurergba(int i, float setter);
+  public native float figurergba(int i); public native mjvFigure figurergba(int i, float setter);
   @MemberGetter public native FloatPointer figurergba();          // figure color and alpha
-  public native float panergba(int i); public native mjvFigure_ panergba(int i, float setter);
+  public native float panergba(int i); public native mjvFigure panergba(int i, float setter);
   @MemberGetter public native FloatPointer panergba();            // pane color and alpha
-  public native float legendrgba(int i); public native mjvFigure_ legendrgba(int i, float setter);
+  public native float legendrgba(int i); public native mjvFigure legendrgba(int i, float setter);
   @MemberGetter public native FloatPointer legendrgba();          // legend color and alpha
-  public native float textrgb(int i); public native mjvFigure_ textrgb(int i, float setter);
+  public native float textrgb(int i); public native mjvFigure textrgb(int i, float setter);
   @MemberGetter public native FloatPointer textrgb();             // text color
-  public native float linergb(int i, int j); public native mjvFigure_ linergb(int i, int j, float setter);
+  public native float linergb(int i, int j); public native mjvFigure linergb(int i, int j, float setter);
   @MemberGetter public native @Cast("float(*)[3]") FloatPointer linergb();  // line colors
-  public native float range(int i, int j); public native mjvFigure_ range(int i, int j, float setter);
+  public native float range(int i, int j); public native mjvFigure range(int i, int j, float setter);
   @MemberGetter public native @Cast("float(* /*[2]*/ )[2]") FloatPointer range();            // axis ranges; (min>=max) automatic
-  public native @Cast("char") byte xformat(int i); public native mjvFigure_ xformat(int i, byte setter);
+  public native @Cast("char") byte xformat(int i); public native mjvFigure xformat(int i, byte setter);
   @MemberGetter public native @Cast("char*") BytePointer xformat();            // x-tick label format for sprintf
-  public native @Cast("char") byte yformat(int i); public native mjvFigure_ yformat(int i, byte setter);
+  public native @Cast("char") byte yformat(int i); public native mjvFigure yformat(int i, byte setter);
   @MemberGetter public native @Cast("char*") BytePointer yformat();            // y-tick label format for sprintf
-  public native @Cast("char") byte minwidth(int i); public native mjvFigure_ minwidth(int i, byte setter);
+  public native @Cast("char") byte minwidth(int i); public native mjvFigure minwidth(int i, byte setter);
   @MemberGetter public native @Cast("char*") BytePointer minwidth();           // string used to determine min y-tick width
 
   // text labels
-  public native @Cast("char") byte title(int i); public native mjvFigure_ title(int i, byte setter);
+  public native @Cast("char") byte title(int i); public native mjvFigure title(int i, byte setter);
   @MemberGetter public native @Cast("char*") BytePointer title();            // figure title; subplots separated with 2+ spaces
-  public native @Cast("char") byte xlabel(int i); public native mjvFigure_ xlabel(int i, byte setter);
+  public native @Cast("char") byte xlabel(int i); public native mjvFigure xlabel(int i, byte setter);
   @MemberGetter public native @Cast("char*") BytePointer xlabel();            // x-axis label
-  public native @Cast("char") byte linename(int i, int j); public native mjvFigure_ linename(int i, int j, byte setter);
+  public native @Cast("char") byte linename(int i, int j); public native mjvFigure linename(int i, int j, byte setter);
   @MemberGetter public native @Cast("char(*)[100]") BytePointer linename();  // line names for legend
 
   // dynamic settings
-  public native int legendoffset(); public native mjvFigure_ legendoffset(int setter);           // number of lines to offset legend
-  public native int subplot(); public native mjvFigure_ subplot(int setter);                // selected subplot (for title rendering)
-  public native int highlight(int i); public native mjvFigure_ highlight(int i, int setter);
+  public native int legendoffset(); public native mjvFigure legendoffset(int setter);           // number of lines to offset legend
+  public native int subplot(); public native mjvFigure subplot(int setter);                // selected subplot (for title rendering)
+  public native int highlight(int i); public native mjvFigure highlight(int i, int setter);
   @MemberGetter public native IntPointer highlight();           // if point is in legend rect, highlight line
-  public native int highlightid(); public native mjvFigure_ highlightid(int setter);            // if id>=0 and no point, highlight id
-  public native float selection(); public native mjvFigure_ selection(float setter);              // selection line x-value
+  public native int highlightid(); public native mjvFigure highlightid(int setter);            // if id>=0 and no point, highlight id
+  public native float selection(); public native mjvFigure selection(float setter);              // selection line x-value
 
   // line data
-  public native int linepnt(int i); public native mjvFigure_ linepnt(int i, int setter);
+  public native int linepnt(int i); public native mjvFigure linepnt(int i, int setter);
   @MemberGetter public native IntPointer linepnt();     // number of points in line; (0) disable
-  public native float linedata(int i, int j); public native mjvFigure_ linedata(int i, int j, float setter);
-  @MemberGetter public native @Cast("float(*)[2]") FloatPointer linedata(); // line data (x,y)
+  public native float linedata(int i, int j); public native mjvFigure linedata(int i, int j, float setter);
+  @MemberGetter public native @Cast("float(*)[2]") FloatPointer linedata();  // line data (x,y)
 
   // output from renderer
-  public native int xaxispixel(int i); public native mjvFigure_ xaxispixel(int i, int setter);
+  public native int xaxispixel(int i); public native mjvFigure xaxispixel(int i, int setter);
   @MemberGetter public native IntPointer xaxispixel();          // range of x-axis in pixels
-  public native int yaxispixel(int i); public native mjvFigure_ yaxispixel(int i, int setter);
+  public native int yaxispixel(int i); public native mjvFigure yaxispixel(int i, int setter);
   @MemberGetter public native IntPointer yaxispixel();          // range of y-axis in pixels
-  public native float xaxisdata(int i); public native mjvFigure_ xaxisdata(int i, float setter);
+  public native float xaxisdata(int i); public native mjvFigure xaxisdata(int i, float setter);
   @MemberGetter public native FloatPointer xaxisdata();           // range of x-axis in data units
-  public native float yaxisdata(int i); public native mjvFigure_ yaxisdata(int i, float setter);
+  public native float yaxisdata(int i); public native mjvFigure yaxisdata(int i, float setter);
   @MemberGetter public native FloatPointer yaxisdata();           // range of y-axis in data units
-}
-@Opaque public static class mjvFigure extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjvFigure() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvFigure(Pointer p) { super(p); }
-}
-
-
-//---------------------------------- mjvSceneState -------------------------------------------------
-
-public static class mjvSceneState_ extends Pointer {
-    static { Loader.load(); }
-    /** Default native constructor. */
-    public mjvSceneState_() { super((Pointer)null); allocate(); }
-    /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjvSceneState_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvSceneState_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjvSceneState_ position(long position) {
-        return (mjvSceneState_)super.position(position);
-    }
-    @Override public mjvSceneState_ getPointer(long i) {
-        return new mjvSceneState_((Pointer)this).offsetAddress(i);
-    }
-
-  public native int nbuffer(); public native mjvSceneState_ nbuffer(int setter);                     // size of the buffer in bytes
-  public native Pointer buffer(); public native mjvSceneState_ buffer(Pointer setter);                    // heap-allocated memory for all arrays in this struct
-  public native int maxgeom(); public native mjvSceneState_ maxgeom(int setter);                     // maximum number of mjvGeom supported by this state object
-  public native @ByRef mjvScene scratch(); public native mjvSceneState_ scratch(mjvScene setter);                // scratch space for vis geoms inserted by the user and plugins
-
-  // fields in mjModel that are necessary to re-render a scene
-    @Name("model.nv") public native int model_nv(); public native mjvSceneState_ model_nv(int setter);
-    @Name("model.nu") public native int model_nu(); public native mjvSceneState_ model_nu(int setter);
-    @Name("model.na") public native int model_na(); public native mjvSceneState_ model_na(int setter);
-    @Name("model.nbody") public native int model_nbody(); public native mjvSceneState_ model_nbody(int setter);
-    @Name("model.nbvh") public native int model_nbvh(); public native mjvSceneState_ model_nbvh(int setter);
-    @Name("model.nbvhstatic") public native int model_nbvhstatic(); public native mjvSceneState_ model_nbvhstatic(int setter);
-    @Name("model.njnt") public native int model_njnt(); public native mjvSceneState_ model_njnt(int setter);
-    @Name("model.ngeom") public native int model_ngeom(); public native mjvSceneState_ model_ngeom(int setter);
-    @Name("model.nsite") public native int model_nsite(); public native mjvSceneState_ model_nsite(int setter);
-    @Name("model.ncam") public native int model_ncam(); public native mjvSceneState_ model_ncam(int setter);
-    @Name("model.nlight") public native int model_nlight(); public native mjvSceneState_ model_nlight(int setter);
-    @Name("model.nmesh") public native int model_nmesh(); public native mjvSceneState_ model_nmesh(int setter);
-    @Name("model.nskin") public native int model_nskin(); public native mjvSceneState_ model_nskin(int setter);
-    @Name("model.nflex") public native int model_nflex(); public native mjvSceneState_ model_nflex(int setter);
-    @Name("model.nflexvert") public native int model_nflexvert(); public native mjvSceneState_ model_nflexvert(int setter);
-    @Name("model.nflextexcoord") public native int model_nflextexcoord(); public native mjvSceneState_ model_nflextexcoord(int setter);
-    @Name("model.nskinvert") public native int model_nskinvert(); public native mjvSceneState_ model_nskinvert(int setter);
-    @Name("model.nskinface") public native int model_nskinface(); public native mjvSceneState_ model_nskinface(int setter);
-    @Name("model.nskinbone") public native int model_nskinbone(); public native mjvSceneState_ model_nskinbone(int setter);
-    @Name("model.nskinbonevert") public native int model_nskinbonevert(); public native mjvSceneState_ model_nskinbonevert(int setter);
-    @Name("model.nmat") public native int model_nmat(); public native mjvSceneState_ model_nmat(int setter);
-    @Name("model.neq") public native int model_neq(); public native mjvSceneState_ model_neq(int setter);
-    @Name("model.ntendon") public native int model_ntendon(); public native mjvSceneState_ model_ntendon(int setter);
-    @Name("model.ntree") public native int model_ntree(); public native mjvSceneState_ model_ntree(int setter);
-    @Name("model.nwrap") public native int model_nwrap(); public native mjvSceneState_ model_nwrap(int setter);
-    @Name("model.nsensor") public native int model_nsensor(); public native mjvSceneState_ model_nsensor(int setter);
-    @Name("model.nnames") public native int model_nnames(); public native mjvSceneState_ model_nnames(int setter);
-    @Name("model.npaths") public native int model_npaths(); public native mjvSceneState_ model_npaths(int setter);
-    @Name("model.nsensordata") public native int model_nsensordata(); public native mjvSceneState_ model_nsensordata(int setter);
-    @Name("model.narena") public native int model_narena(); public native mjvSceneState_ model_narena(int setter);
-
-    @Name("model.opt") public native @ByRef mjOption model_opt(); public native mjvSceneState_ model_opt(mjOption setter);
-    @Name("model.vis") public native @ByRef mjVisual model_vis(); public native mjvSceneState_ model_vis(mjVisual setter);
-    @Name("model.stat") public native @ByRef mjStatistic model_stat(); public native mjvSceneState_ model_stat(mjStatistic setter);
-
-    @Name("model.body_parentid") public native IntPointer model_body_parentid(); public native mjvSceneState_ model_body_parentid(IntPointer setter);
-    @Name("model.body_rootid") public native IntPointer model_body_rootid(); public native mjvSceneState_ model_body_rootid(IntPointer setter);
-    @Name("model.body_weldid") public native IntPointer model_body_weldid(); public native mjvSceneState_ model_body_weldid(IntPointer setter);
-    @Name("model.body_mocapid") public native IntPointer model_body_mocapid(); public native mjvSceneState_ model_body_mocapid(IntPointer setter);
-    @Name("model.body_jntnum") public native IntPointer model_body_jntnum(); public native mjvSceneState_ model_body_jntnum(IntPointer setter);
-    @Name("model.body_jntadr") public native IntPointer model_body_jntadr(); public native mjvSceneState_ model_body_jntadr(IntPointer setter);
-    @Name("model.body_dofnum") public native IntPointer model_body_dofnum(); public native mjvSceneState_ model_body_dofnum(IntPointer setter);
-    @Name("model.body_dofadr") public native IntPointer model_body_dofadr(); public native mjvSceneState_ model_body_dofadr(IntPointer setter);
-    @Name("model.body_geomnum") public native IntPointer model_body_geomnum(); public native mjvSceneState_ model_body_geomnum(IntPointer setter);
-    @Name("model.body_geomadr") public native IntPointer model_body_geomadr(); public native mjvSceneState_ model_body_geomadr(IntPointer setter);
-    @Name("model.body_iquat") public native @Cast("mjtNum*") DoublePointer model_body_iquat(); public native mjvSceneState_ model_body_iquat(DoublePointer setter);
-    @Name("model.body_mass") public native @Cast("mjtNum*") DoublePointer model_body_mass(); public native mjvSceneState_ model_body_mass(DoublePointer setter);
-    @Name("model.body_inertia") public native @Cast("mjtNum*") DoublePointer model_body_inertia(); public native mjvSceneState_ model_body_inertia(DoublePointer setter);
-    @Name("model.body_bvhadr") public native IntPointer model_body_bvhadr(); public native mjvSceneState_ model_body_bvhadr(IntPointer setter);
-    @Name("model.body_bvhnum") public native IntPointer model_body_bvhnum(); public native mjvSceneState_ model_body_bvhnum(IntPointer setter);
-
-    @Name("model.bvh_depth") public native IntPointer model_bvh_depth(); public native mjvSceneState_ model_bvh_depth(IntPointer setter);
-    @Name("model.bvh_child") public native IntPointer model_bvh_child(); public native mjvSceneState_ model_bvh_child(IntPointer setter);
-    @Name("model.bvh_nodeid") public native IntPointer model_bvh_nodeid(); public native mjvSceneState_ model_bvh_nodeid(IntPointer setter);
-    @Name("model.bvh_aabb") public native @Cast("mjtNum*") DoublePointer model_bvh_aabb(); public native mjvSceneState_ model_bvh_aabb(DoublePointer setter);
-
-    @Name("model.jnt_type") public native IntPointer model_jnt_type(); public native mjvSceneState_ model_jnt_type(IntPointer setter);
-    @Name("model.jnt_bodyid") public native IntPointer model_jnt_bodyid(); public native mjvSceneState_ model_jnt_bodyid(IntPointer setter);
-    @Name("model.jnt_group") public native IntPointer model_jnt_group(); public native mjvSceneState_ model_jnt_group(IntPointer setter);
-
-    @Name("model.geom_type") public native IntPointer model_geom_type(); public native mjvSceneState_ model_geom_type(IntPointer setter);
-    @Name("model.geom_bodyid") public native IntPointer model_geom_bodyid(); public native mjvSceneState_ model_geom_bodyid(IntPointer setter);
-    @Name("model.geom_contype") public native IntPointer model_geom_contype(); public native mjvSceneState_ model_geom_contype(IntPointer setter);
-    @Name("model.geom_conaffinity") public native IntPointer model_geom_conaffinity(); public native mjvSceneState_ model_geom_conaffinity(IntPointer setter);
-    @Name("model.geom_dataid") public native IntPointer model_geom_dataid(); public native mjvSceneState_ model_geom_dataid(IntPointer setter);
-    @Name("model.geom_matid") public native IntPointer model_geom_matid(); public native mjvSceneState_ model_geom_matid(IntPointer setter);
-    @Name("model.geom_group") public native IntPointer model_geom_group(); public native mjvSceneState_ model_geom_group(IntPointer setter);
-    @Name("model.geom_size") public native @Cast("mjtNum*") DoublePointer model_geom_size(); public native mjvSceneState_ model_geom_size(DoublePointer setter);
-    @Name("model.geom_aabb") public native @Cast("mjtNum*") DoublePointer model_geom_aabb(); public native mjvSceneState_ model_geom_aabb(DoublePointer setter);
-    @Name("model.geom_rbound") public native @Cast("mjtNum*") DoublePointer model_geom_rbound(); public native mjvSceneState_ model_geom_rbound(DoublePointer setter);
-    @Name("model.geom_rgba") public native FloatPointer model_geom_rgba(); public native mjvSceneState_ model_geom_rgba(FloatPointer setter);
-
-    @Name("model.site_type") public native IntPointer model_site_type(); public native mjvSceneState_ model_site_type(IntPointer setter);
-    @Name("model.site_bodyid") public native IntPointer model_site_bodyid(); public native mjvSceneState_ model_site_bodyid(IntPointer setter);
-    @Name("model.site_matid") public native IntPointer model_site_matid(); public native mjvSceneState_ model_site_matid(IntPointer setter);
-    @Name("model.site_group") public native IntPointer model_site_group(); public native mjvSceneState_ model_site_group(IntPointer setter);
-    @Name("model.site_size") public native @Cast("mjtNum*") DoublePointer model_site_size(); public native mjvSceneState_ model_site_size(DoublePointer setter);
-    @Name("model.site_rgba") public native FloatPointer model_site_rgba(); public native mjvSceneState_ model_site_rgba(FloatPointer setter);
-
-    @Name("model.cam_fovy") public native @Cast("mjtNum*") DoublePointer model_cam_fovy(); public native mjvSceneState_ model_cam_fovy(DoublePointer setter);
-    @Name("model.cam_ipd") public native @Cast("mjtNum*") DoublePointer model_cam_ipd(); public native mjvSceneState_ model_cam_ipd(DoublePointer setter);
-    @Name("model.cam_intrinsic") public native FloatPointer model_cam_intrinsic(); public native mjvSceneState_ model_cam_intrinsic(FloatPointer setter);
-    @Name("model.cam_sensorsize") public native FloatPointer model_cam_sensorsize(); public native mjvSceneState_ model_cam_sensorsize(FloatPointer setter);
-
-    @Name("model.light_directional") public native @Cast("mjtByte*") BytePointer model_light_directional(); public native mjvSceneState_ model_light_directional(BytePointer setter);
-    @Name("model.light_castshadow") public native @Cast("mjtByte*") BytePointer model_light_castshadow(); public native mjvSceneState_ model_light_castshadow(BytePointer setter);
-    @Name("model.light_active") public native @Cast("mjtByte*") BytePointer model_light_active(); public native mjvSceneState_ model_light_active(BytePointer setter);
-    @Name("model.light_attenuation") public native FloatPointer model_light_attenuation(); public native mjvSceneState_ model_light_attenuation(FloatPointer setter);
-    @Name("model.light_cutoff") public native FloatPointer model_light_cutoff(); public native mjvSceneState_ model_light_cutoff(FloatPointer setter);
-    @Name("model.light_exponent") public native FloatPointer model_light_exponent(); public native mjvSceneState_ model_light_exponent(FloatPointer setter);
-    @Name("model.light_ambient") public native FloatPointer model_light_ambient(); public native mjvSceneState_ model_light_ambient(FloatPointer setter);
-    @Name("model.light_diffuse") public native FloatPointer model_light_diffuse(); public native mjvSceneState_ model_light_diffuse(FloatPointer setter);
-    @Name("model.light_specular") public native FloatPointer model_light_specular(); public native mjvSceneState_ model_light_specular(FloatPointer setter);
-
-    @Name("model.flex_flatskin") public native @Cast("mjtByte*") BytePointer model_flex_flatskin(); public native mjvSceneState_ model_flex_flatskin(BytePointer setter);
-    @Name("model.flex_dim") public native IntPointer model_flex_dim(); public native mjvSceneState_ model_flex_dim(IntPointer setter);
-    @Name("model.flex_matid") public native IntPointer model_flex_matid(); public native mjvSceneState_ model_flex_matid(IntPointer setter);
-    @Name("model.flex_group") public native IntPointer model_flex_group(); public native mjvSceneState_ model_flex_group(IntPointer setter);
-    @Name("model.flex_vertadr") public native IntPointer model_flex_vertadr(); public native mjvSceneState_ model_flex_vertadr(IntPointer setter);
-    @Name("model.flex_vertnum") public native IntPointer model_flex_vertnum(); public native mjvSceneState_ model_flex_vertnum(IntPointer setter);
-    @Name("model.flex_elem") public native IntPointer model_flex_elem(); public native mjvSceneState_ model_flex_elem(IntPointer setter);
-    @Name("model.flex_elemlayer") public native IntPointer model_flex_elemlayer(); public native mjvSceneState_ model_flex_elemlayer(IntPointer setter);
-    @Name("model.flex_elemadr") public native IntPointer model_flex_elemadr(); public native mjvSceneState_ model_flex_elemadr(IntPointer setter);
-    @Name("model.flex_elemnum") public native IntPointer model_flex_elemnum(); public native mjvSceneState_ model_flex_elemnum(IntPointer setter);
-    @Name("model.flex_elemdataadr") public native IntPointer model_flex_elemdataadr(); public native mjvSceneState_ model_flex_elemdataadr(IntPointer setter);
-    @Name("model.flex_shell") public native IntPointer model_flex_shell(); public native mjvSceneState_ model_flex_shell(IntPointer setter);
-    @Name("model.flex_shellnum") public native IntPointer model_flex_shellnum(); public native mjvSceneState_ model_flex_shellnum(IntPointer setter);
-    @Name("model.flex_shelldataadr") public native IntPointer model_flex_shelldataadr(); public native mjvSceneState_ model_flex_shelldataadr(IntPointer setter);
-    @Name("model.flex_texcoordadr") public native IntPointer model_flex_texcoordadr(); public native mjvSceneState_ model_flex_texcoordadr(IntPointer setter);
-    @Name("model.flex_bvhadr") public native IntPointer model_flex_bvhadr(); public native mjvSceneState_ model_flex_bvhadr(IntPointer setter);
-    @Name("model.flex_bvhnum") public native IntPointer model_flex_bvhnum(); public native mjvSceneState_ model_flex_bvhnum(IntPointer setter);
-    @Name("model.flex_radius") public native @Cast("mjtNum*") DoublePointer model_flex_radius(); public native mjvSceneState_ model_flex_radius(DoublePointer setter);
-    @Name("model.flex_rgba") public native FloatPointer model_flex_rgba(); public native mjvSceneState_ model_flex_rgba(FloatPointer setter);
-
-    @Name("model.hfield_pathadr") public native IntPointer model_hfield_pathadr(); public native mjvSceneState_ model_hfield_pathadr(IntPointer setter);
-
-    @Name("model.mesh_bvhadr") public native IntPointer model_mesh_bvhadr(); public native mjvSceneState_ model_mesh_bvhadr(IntPointer setter);
-    @Name("model.mesh_bvhnum") public native IntPointer model_mesh_bvhnum(); public native mjvSceneState_ model_mesh_bvhnum(IntPointer setter);
-    @Name("model.mesh_texcoordadr") public native IntPointer model_mesh_texcoordadr(); public native mjvSceneState_ model_mesh_texcoordadr(IntPointer setter);
-    @Name("model.mesh_graphadr") public native IntPointer model_mesh_graphadr(); public native mjvSceneState_ model_mesh_graphadr(IntPointer setter);
-    @Name("model.mesh_pathadr") public native IntPointer model_mesh_pathadr(); public native mjvSceneState_ model_mesh_pathadr(IntPointer setter);
-
-    @Name("model.skin_matid") public native IntPointer model_skin_matid(); public native mjvSceneState_ model_skin_matid(IntPointer setter);
-    @Name("model.skin_group") public native IntPointer model_skin_group(); public native mjvSceneState_ model_skin_group(IntPointer setter);
-    @Name("model.skin_rgba") public native FloatPointer model_skin_rgba(); public native mjvSceneState_ model_skin_rgba(FloatPointer setter);
-    @Name("model.skin_inflate") public native FloatPointer model_skin_inflate(); public native mjvSceneState_ model_skin_inflate(FloatPointer setter);
-    @Name("model.skin_vertadr") public native IntPointer model_skin_vertadr(); public native mjvSceneState_ model_skin_vertadr(IntPointer setter);
-    @Name("model.skin_vertnum") public native IntPointer model_skin_vertnum(); public native mjvSceneState_ model_skin_vertnum(IntPointer setter);
-    @Name("model.skin_texcoordadr") public native IntPointer model_skin_texcoordadr(); public native mjvSceneState_ model_skin_texcoordadr(IntPointer setter);
-    @Name("model.skin_faceadr") public native IntPointer model_skin_faceadr(); public native mjvSceneState_ model_skin_faceadr(IntPointer setter);
-    @Name("model.skin_facenum") public native IntPointer model_skin_facenum(); public native mjvSceneState_ model_skin_facenum(IntPointer setter);
-    @Name("model.skin_boneadr") public native IntPointer model_skin_boneadr(); public native mjvSceneState_ model_skin_boneadr(IntPointer setter);
-    @Name("model.skin_bonenum") public native IntPointer model_skin_bonenum(); public native mjvSceneState_ model_skin_bonenum(IntPointer setter);
-    @Name("model.skin_vert") public native FloatPointer model_skin_vert(); public native mjvSceneState_ model_skin_vert(FloatPointer setter);
-    @Name("model.skin_face") public native IntPointer model_skin_face(); public native mjvSceneState_ model_skin_face(IntPointer setter);
-    @Name("model.skin_bonevertadr") public native IntPointer model_skin_bonevertadr(); public native mjvSceneState_ model_skin_bonevertadr(IntPointer setter);
-    @Name("model.skin_bonevertnum") public native IntPointer model_skin_bonevertnum(); public native mjvSceneState_ model_skin_bonevertnum(IntPointer setter);
-    @Name("model.skin_bonebindpos") public native FloatPointer model_skin_bonebindpos(); public native mjvSceneState_ model_skin_bonebindpos(FloatPointer setter);
-    @Name("model.skin_bonebindquat") public native FloatPointer model_skin_bonebindquat(); public native mjvSceneState_ model_skin_bonebindquat(FloatPointer setter);
-    @Name("model.skin_bonebodyid") public native IntPointer model_skin_bonebodyid(); public native mjvSceneState_ model_skin_bonebodyid(IntPointer setter);
-    @Name("model.skin_bonevertid") public native IntPointer model_skin_bonevertid(); public native mjvSceneState_ model_skin_bonevertid(IntPointer setter);
-    @Name("model.skin_bonevertweight") public native FloatPointer model_skin_bonevertweight(); public native mjvSceneState_ model_skin_bonevertweight(FloatPointer setter);
-    @Name("model.skin_pathadr") public native IntPointer model_skin_pathadr(); public native mjvSceneState_ model_skin_pathadr(IntPointer setter);
-
-    @Name("model.tex_pathadr") public native IntPointer model_tex_pathadr(); public native mjvSceneState_ model_tex_pathadr(IntPointer setter);
-
-    @Name("model.mat_texid") public native IntPointer model_mat_texid(); public native mjvSceneState_ model_mat_texid(IntPointer setter);
-    @Name("model.mat_texuniform") public native @Cast("mjtByte*") BytePointer model_mat_texuniform(); public native mjvSceneState_ model_mat_texuniform(BytePointer setter);
-    @Name("model.mat_texrepeat") public native FloatPointer model_mat_texrepeat(); public native mjvSceneState_ model_mat_texrepeat(FloatPointer setter);
-    @Name("model.mat_emission") public native FloatPointer model_mat_emission(); public native mjvSceneState_ model_mat_emission(FloatPointer setter);
-    @Name("model.mat_specular") public native FloatPointer model_mat_specular(); public native mjvSceneState_ model_mat_specular(FloatPointer setter);
-    @Name("model.mat_shininess") public native FloatPointer model_mat_shininess(); public native mjvSceneState_ model_mat_shininess(FloatPointer setter);
-    @Name("model.mat_reflectance") public native FloatPointer model_mat_reflectance(); public native mjvSceneState_ model_mat_reflectance(FloatPointer setter);
-    @Name("model.mat_rgba") public native FloatPointer model_mat_rgba(); public native mjvSceneState_ model_mat_rgba(FloatPointer setter);
-
-    @Name("model.eq_type") public native IntPointer model_eq_type(); public native mjvSceneState_ model_eq_type(IntPointer setter);
-    @Name("model.eq_obj1id") public native IntPointer model_eq_obj1id(); public native mjvSceneState_ model_eq_obj1id(IntPointer setter);
-    @Name("model.eq_obj2id") public native IntPointer model_eq_obj2id(); public native mjvSceneState_ model_eq_obj2id(IntPointer setter);
-    @Name("model.eq_data") public native @Cast("mjtNum*") DoublePointer model_eq_data(); public native mjvSceneState_ model_eq_data(DoublePointer setter);
-
-    @Name("model.tendon_num") public native IntPointer model_tendon_num(); public native mjvSceneState_ model_tendon_num(IntPointer setter);
-    @Name("model.tendon_matid") public native IntPointer model_tendon_matid(); public native mjvSceneState_ model_tendon_matid(IntPointer setter);
-    @Name("model.tendon_group") public native IntPointer model_tendon_group(); public native mjvSceneState_ model_tendon_group(IntPointer setter);
-    @Name("model.tendon_limited") public native @Cast("mjtByte*") BytePointer model_tendon_limited(); public native mjvSceneState_ model_tendon_limited(BytePointer setter);
-    @Name("model.tendon_width") public native @Cast("mjtNum*") DoublePointer model_tendon_width(); public native mjvSceneState_ model_tendon_width(DoublePointer setter);
-    @Name("model.tendon_range") public native @Cast("mjtNum*") DoublePointer model_tendon_range(); public native mjvSceneState_ model_tendon_range(DoublePointer setter);
-    @Name("model.tendon_stiffness") public native @Cast("mjtNum*") DoublePointer model_tendon_stiffness(); public native mjvSceneState_ model_tendon_stiffness(DoublePointer setter);
-    @Name("model.tendon_damping") public native @Cast("mjtNum*") DoublePointer model_tendon_damping(); public native mjvSceneState_ model_tendon_damping(DoublePointer setter);
-    @Name("model.tendon_frictionloss") public native @Cast("mjtNum*") DoublePointer model_tendon_frictionloss(); public native mjvSceneState_ model_tendon_frictionloss(DoublePointer setter);
-    @Name("model.tendon_lengthspring") public native @Cast("mjtNum*") DoublePointer model_tendon_lengthspring(); public native mjvSceneState_ model_tendon_lengthspring(DoublePointer setter);
-    @Name("model.tendon_rgba") public native FloatPointer model_tendon_rgba(); public native mjvSceneState_ model_tendon_rgba(FloatPointer setter);
-
-    @Name("model.actuator_trntype") public native IntPointer model_actuator_trntype(); public native mjvSceneState_ model_actuator_trntype(IntPointer setter);
-    @Name("model.actuator_dyntype") public native IntPointer model_actuator_dyntype(); public native mjvSceneState_ model_actuator_dyntype(IntPointer setter);
-    @Name("model.actuator_trnid") public native IntPointer model_actuator_trnid(); public native mjvSceneState_ model_actuator_trnid(IntPointer setter);
-    @Name("model.actuator_actadr") public native IntPointer model_actuator_actadr(); public native mjvSceneState_ model_actuator_actadr(IntPointer setter);
-    @Name("model.actuator_actnum") public native IntPointer model_actuator_actnum(); public native mjvSceneState_ model_actuator_actnum(IntPointer setter);
-    @Name("model.actuator_group") public native IntPointer model_actuator_group(); public native mjvSceneState_ model_actuator_group(IntPointer setter);
-    @Name("model.actuator_ctrllimited") public native @Cast("mjtByte*") BytePointer model_actuator_ctrllimited(); public native mjvSceneState_ model_actuator_ctrllimited(BytePointer setter);
-    @Name("model.actuator_actlimited") public native @Cast("mjtByte*") BytePointer model_actuator_actlimited(); public native mjvSceneState_ model_actuator_actlimited(BytePointer setter);
-    @Name("model.actuator_ctrlrange") public native @Cast("mjtNum*") DoublePointer model_actuator_ctrlrange(); public native mjvSceneState_ model_actuator_ctrlrange(DoublePointer setter);
-    @Name("model.actuator_actrange") public native @Cast("mjtNum*") DoublePointer model_actuator_actrange(); public native mjvSceneState_ model_actuator_actrange(DoublePointer setter);
-    @Name("model.actuator_cranklength") public native @Cast("mjtNum*") DoublePointer model_actuator_cranklength(); public native mjvSceneState_ model_actuator_cranklength(DoublePointer setter);
-
-    @Name("model.sensor_type") public native IntPointer model_sensor_type(); public native mjvSceneState_ model_sensor_type(IntPointer setter);
-    @Name("model.sensor_objid") public native IntPointer model_sensor_objid(); public native mjvSceneState_ model_sensor_objid(IntPointer setter);
-    @Name("model.sensor_adr") public native IntPointer model_sensor_adr(); public native mjvSceneState_ model_sensor_adr(IntPointer setter);
-
-    @Name("model.name_bodyadr") public native IntPointer model_name_bodyadr(); public native mjvSceneState_ model_name_bodyadr(IntPointer setter);
-    @Name("model.name_jntadr") public native IntPointer model_name_jntadr(); public native mjvSceneState_ model_name_jntadr(IntPointer setter);
-    @Name("model.name_geomadr") public native IntPointer model_name_geomadr(); public native mjvSceneState_ model_name_geomadr(IntPointer setter);
-    @Name("model.name_siteadr") public native IntPointer model_name_siteadr(); public native mjvSceneState_ model_name_siteadr(IntPointer setter);
-    @Name("model.name_camadr") public native IntPointer model_name_camadr(); public native mjvSceneState_ model_name_camadr(IntPointer setter);
-    @Name("model.name_lightadr") public native IntPointer model_name_lightadr(); public native mjvSceneState_ model_name_lightadr(IntPointer setter);
-    @Name("model.name_eqadr") public native IntPointer model_name_eqadr(); public native mjvSceneState_ model_name_eqadr(IntPointer setter);
-    @Name("model.name_tendonadr") public native IntPointer model_name_tendonadr(); public native mjvSceneState_ model_name_tendonadr(IntPointer setter);
-    @Name("model.name_actuatoradr") public native IntPointer model_name_actuatoradr(); public native mjvSceneState_ model_name_actuatoradr(IntPointer setter);
-    @Name("model.names") public native @Cast("char*") BytePointer model_names(); public native mjvSceneState_ model_names(BytePointer setter);
-    @Name("model.paths") public native @Cast("char*") BytePointer model_paths(); public native mjvSceneState_ model_paths(BytePointer setter);
-
-  // fields in mjData that are necessary to re-render a scene
-    @Name("data.warning") public native @ByRef mjWarningStat data_warning(int i); public native mjvSceneState_ data_warning(int i, mjWarningStat setter);
-    @Name("data.warning") @MemberGetter public native mjWarningStat data_warning();
-
-    @Name("data.nefc") public native int data_nefc(); public native mjvSceneState_ data_nefc(int setter);
-    @Name("data.ncon") public native int data_ncon(); public native mjvSceneState_ data_ncon(int setter);
-    @Name("data.nisland") public native int data_nisland(); public native mjvSceneState_ data_nisland(int setter);
-
-    @Name("data.time") public native @Cast("mjtNum") double data_time(); public native mjvSceneState_ data_time(double setter);
-
-    @Name("data.act") public native @Cast("mjtNum*") DoublePointer data_act(); public native mjvSceneState_ data_act(DoublePointer setter);
-
-    @Name("data.ctrl") public native @Cast("mjtNum*") DoublePointer data_ctrl(); public native mjvSceneState_ data_ctrl(DoublePointer setter);
-    @Name("data.xfrc_applied") public native @Cast("mjtNum*") DoublePointer data_xfrc_applied(); public native mjvSceneState_ data_xfrc_applied(DoublePointer setter);
-    @Name("data.eq_active") public native @Cast("mjtByte*") BytePointer data_eq_active(); public native mjvSceneState_ data_eq_active(BytePointer setter);
-
-    @Name("data.sensordata") public native @Cast("mjtNum*") DoublePointer data_sensordata(); public native mjvSceneState_ data_sensordata(DoublePointer setter);
-
-    @Name("data.xpos") public native @Cast("mjtNum*") DoublePointer data_xpos(); public native mjvSceneState_ data_xpos(DoublePointer setter);
-    @Name("data.xquat") public native @Cast("mjtNum*") DoublePointer data_xquat(); public native mjvSceneState_ data_xquat(DoublePointer setter);
-    @Name("data.xmat") public native @Cast("mjtNum*") DoublePointer data_xmat(); public native mjvSceneState_ data_xmat(DoublePointer setter);
-    @Name("data.xipos") public native @Cast("mjtNum*") DoublePointer data_xipos(); public native mjvSceneState_ data_xipos(DoublePointer setter);
-    @Name("data.ximat") public native @Cast("mjtNum*") DoublePointer data_ximat(); public native mjvSceneState_ data_ximat(DoublePointer setter);
-    @Name("data.xanchor") public native @Cast("mjtNum*") DoublePointer data_xanchor(); public native mjvSceneState_ data_xanchor(DoublePointer setter);
-    @Name("data.xaxis") public native @Cast("mjtNum*") DoublePointer data_xaxis(); public native mjvSceneState_ data_xaxis(DoublePointer setter);
-    @Name("data.geom_xpos") public native @Cast("mjtNum*") DoublePointer data_geom_xpos(); public native mjvSceneState_ data_geom_xpos(DoublePointer setter);
-    @Name("data.geom_xmat") public native @Cast("mjtNum*") DoublePointer data_geom_xmat(); public native mjvSceneState_ data_geom_xmat(DoublePointer setter);
-    @Name("data.site_xpos") public native @Cast("mjtNum*") DoublePointer data_site_xpos(); public native mjvSceneState_ data_site_xpos(DoublePointer setter);
-    @Name("data.site_xmat") public native @Cast("mjtNum*") DoublePointer data_site_xmat(); public native mjvSceneState_ data_site_xmat(DoublePointer setter);
-    @Name("data.cam_xpos") public native @Cast("mjtNum*") DoublePointer data_cam_xpos(); public native mjvSceneState_ data_cam_xpos(DoublePointer setter);
-    @Name("data.cam_xmat") public native @Cast("mjtNum*") DoublePointer data_cam_xmat(); public native mjvSceneState_ data_cam_xmat(DoublePointer setter);
-    @Name("data.light_xpos") public native @Cast("mjtNum*") DoublePointer data_light_xpos(); public native mjvSceneState_ data_light_xpos(DoublePointer setter);
-    @Name("data.light_xdir") public native @Cast("mjtNum*") DoublePointer data_light_xdir(); public native mjvSceneState_ data_light_xdir(DoublePointer setter);
-
-    @Name("data.subtree_com") public native @Cast("mjtNum*") DoublePointer data_subtree_com(); public native mjvSceneState_ data_subtree_com(DoublePointer setter);
-
-    @Name("data.ten_wrapadr") public native IntPointer data_ten_wrapadr(); public native mjvSceneState_ data_ten_wrapadr(IntPointer setter);
-    @Name("data.ten_wrapnum") public native IntPointer data_ten_wrapnum(); public native mjvSceneState_ data_ten_wrapnum(IntPointer setter);
-    @Name("data.wrap_obj") public native IntPointer data_wrap_obj(); public native mjvSceneState_ data_wrap_obj(IntPointer setter);
-    @Name("data.ten_length") public native @Cast("mjtNum*") DoublePointer data_ten_length(); public native mjvSceneState_ data_ten_length(DoublePointer setter);
-    @Name("data.wrap_xpos") public native @Cast("mjtNum*") DoublePointer data_wrap_xpos(); public native mjvSceneState_ data_wrap_xpos(DoublePointer setter);
-
-    @Name("data.bvh_aabb_dyn") public native @Cast("mjtNum*") DoublePointer data_bvh_aabb_dyn(); public native mjvSceneState_ data_bvh_aabb_dyn(DoublePointer setter);
-    @Name("data.bvh_active") public native @Cast("mjtByte*") BytePointer data_bvh_active(); public native mjvSceneState_ data_bvh_active(BytePointer setter);
-    @Name("data.island_dofadr") public native IntPointer data_island_dofadr(); public native mjvSceneState_ data_island_dofadr(IntPointer setter);
-    @Name("data.island_dofind") public native IntPointer data_island_dofind(); public native mjvSceneState_ data_island_dofind(IntPointer setter);
-    @Name("data.dof_island") public native IntPointer data_dof_island(); public native mjvSceneState_ data_dof_island(IntPointer setter);
-    @Name("data.efc_island") public native IntPointer data_efc_island(); public native mjvSceneState_ data_efc_island(IntPointer setter);
-    @Name("data.tendon_efcadr") public native IntPointer data_tendon_efcadr(); public native mjvSceneState_ data_tendon_efcadr(IntPointer setter);
-
-    @Name("data.flexvert_xpos") public native @Cast("mjtNum*") DoublePointer data_flexvert_xpos(); public native mjvSceneState_ data_flexvert_xpos(DoublePointer setter);
-
-    @Name("data.contact") public native mjContact data_contact(); public native mjvSceneState_ data_contact(mjContact setter);
-    @Name("data.efc_force") public native @Cast("mjtNum*") DoublePointer data_efc_force(); public native mjvSceneState_ data_efc_force(DoublePointer setter);
-    @Name("data.arena") public native Pointer data_arena(); public native mjvSceneState_ data_arena(Pointer setter);
-}
-@Opaque public static class mjvSceneState extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjvSceneState() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjvSceneState(Pointer p) { super(p); }
 }
 
 // #endif  // MUJOCO_MJVISUALIZE_H_
@@ -5344,43 +7898,44 @@ public static class mjvSceneState_ extends Pointer {
 
 // #include <mujoco/mjdata.h>
 // #include <mujoco/mjmodel.h>
-// #include <mujoco/mjtnum.h>
+// #include <mujoco/mjspec.h>
+// #include <mujoco/mjtype.h>
 // #include <mujoco/mjvisualize.h>
 
 
 //---------------------------------- Resource Provider ---------------------------------------------
 
-public static class mjResource_ extends Pointer {
+public static class mjResource extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjResource_() { super((Pointer)null); allocate(); }
+    public mjResource() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjResource_(long size) { super((Pointer)null); allocateArray(size); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjResource_(Pointer p) { super(p); }
-    private native void allocate();
-    private native void allocateArray(long size);
-    @Override public mjResource_ position(long position) {
-        return (mjResource_)super.position(position);
-    }
-    @Override public mjResource_ getPointer(long i) {
-        return new mjResource_((Pointer)this).offsetAddress(i);
-    }
-
-  public native @Cast("char*") BytePointer name(); public native mjResource_ name(BytePointer setter);                                   // name of resource (filename, etc)
-  public native Pointer data(); public native mjResource_ data(Pointer setter);                                   // opaque data pointer
-  public native @Cast("char") byte timestamp(int i); public native mjResource_ timestamp(int i, byte setter);
-  @MemberGetter public native @Cast("char*") BytePointer timestamp();                          // timestamp of the resource
-  public native @Const mjpResourceProvider provider(); public native mjResource_ provider(mjpResourceProvider setter);   // pointer to the provider
-}
-@Opaque public static class mjResource extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjResource() { super((Pointer)null); }
+    public mjResource(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
     public mjResource(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjResource position(long position) {
+        return (mjResource)super.position(position);
+    }
+    @Override public mjResource getPointer(long i) {
+        return new mjResource((Pointer)this).offsetAddress(i);
+    }
+
+  public native @Cast("char*") BytePointer name(); public native mjResource name(BytePointer setter);                                   // name of resource (filename, etc)
+  public native Pointer data(); public native mjResource data(Pointer setter);                                   // opaque data pointer
+  public native mjVFS vfs(); public native mjResource vfs(mjVFS setter);                                   // pointer to the VFS
+  public native @Cast("char") byte timestamp(int i); public native mjResource timestamp(int i, byte setter);
+  @MemberGetter public native @Cast("char*") BytePointer timestamp();                          // timestamp of the resource
+  public native @Const mjpResourceProvider provider(); public native mjResource provider(mjpResourceProvider setter);   // pointer to the provider
+  public native @Cast("const char*") BytePointer args(); public native mjResource args(BytePointer setter);  // resource arguments/hints, URI query format key=val&...
+                     // (optional)
 }
 
-// callback for opening a resource, returns zero on failure
+// callback for opening a resource, returns zero on failure.
+// Note: If opening fails, the close callback will not be called. Therefore, the
+// open callback is responsible for cleaning up any allocated memory before
+// returning 0.
 public static class mjfOpenResource extends FunctionPointer {
     static { Loader.load(); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
@@ -5411,21 +7966,30 @@ public static class mjfCloseResource extends FunctionPointer {
     public native void call(mjResource resource);
 }
 
-// callback for returning the directory of a resource
-// sets dir to directory string with ndir being size of directory string
-public static class mjfGetResourceDir extends FunctionPointer {
+// callback for mounting a resource (provider), returns zero on failure
+public static class mjfMountResource extends FunctionPointer {
     static { Loader.load(); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public    mjfGetResourceDir(Pointer p) { super(p); }
-    protected mjfGetResourceDir() { allocate(); }
+    public    mjfMountResource(Pointer p) { super(p); }
+    protected mjfMountResource() { allocate(); }
     private native void allocate();
-    public native void call(mjResource resource, @Cast("const char**") PointerPointer dir, IntPointer ndir);
+    public native int call(mjResource resource);
+}
+
+// callback for unmounting a resource (provider), returns zero on failure
+public static class mjfUnmountResource extends FunctionPointer {
+    static { Loader.load(); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public    mjfUnmountResource(Pointer p) { super(p); }
+    protected mjfUnmountResource() { allocate(); }
+    private native void allocate();
+    public native int call(mjResource resource);
 }
 
 // callback for checking if the current resource was modified from the time
 // specified by the timestamp
 // returns 0 if the resource's timestamp matches the provided timestamp
-// returns > 0 if the the resource is younger than the given timestamp
+// returns > 0 if the resource is younger than the given timestamp
 // returns < 0 if the resource is older than the given timestamp
 public static class mjfResourceModified extends FunctionPointer {
     static { Loader.load(); }
@@ -5434,6 +7998,17 @@ public static class mjfResourceModified extends FunctionPointer {
     protected mjfResourceModified() { allocate(); }
     private native void allocate();
     public native int call(@Const mjResource resource, @Cast("const char*") BytePointer timestamp);
+}
+
+// callback for writing bytes to a resource
+// return number of bytes written, return -1 if error
+public static class mjfWriteResource extends FunctionPointer {
+    static { Loader.load(); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public    mjfWriteResource(Pointer p) { super(p); }
+    protected mjfWriteResource() { allocate(); }
+    private native void allocate();
+    public native @Cast("mjtSize") long call(mjResource resource, @Const Pointer buffer, @Cast("mjtSize") long nbytes);
 }
 
 // struct describing a single resource provider
@@ -5458,11 +8033,97 @@ public static class mjpResourceProvider extends Pointer {
   public native mjfOpenResource open(); public native mjpResourceProvider open(mjfOpenResource setter);             // opening callback
   public native mjfReadResource read(); public native mjpResourceProvider read(mjfReadResource setter);             // reading callback
   public native @Name("close") mjfCloseResource _close(); public native mjpResourceProvider _close(mjfCloseResource setter);           // closing callback
-  public native mjfGetResourceDir getdir(); public native mjpResourceProvider getdir(mjfGetResourceDir setter);         // get directory callback (optional)
+  public native mjfMountResource mount(); public native mjpResourceProvider mount(mjfMountResource setter);           // mounting callback (optional)
+  public native mjfUnmountResource unmount(); public native mjpResourceProvider unmount(mjfUnmountResource setter);       // unmounting callback (optional)
   public native mjfResourceModified modified(); public native mjpResourceProvider modified(mjfResourceModified setter);     // resource modified callback (optional)
+  public native mjfWriteResource write(); public native mjpResourceProvider write(mjfWriteResource setter);           // writing callback (optional)
   public native Pointer data(); public native mjpResourceProvider data(Pointer setter);                       // opaque data pointer (resource invariant)
 }
 
+//---------------------------------- Decoder -------------------------------------------------------
+
+// function pointer types
+// return an mjSpec representing the decoded resource.
+// on failure, return NULL and write the reason to error (if not NULL).
+public static class mjfDecode extends FunctionPointer {
+    static { Loader.load(); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public    mjfDecode(Pointer p) { super(p); }
+    protected mjfDecode() { allocate(); }
+    private native void allocate();
+    public native mjSpec call(mjResource resource, @Const mjVFS vfs, @Cast("char*") BytePointer error, int error_sz);
+}
+// return true if the given resource can be decoded.
+public static class mjfCanDecode extends FunctionPointer {
+    static { Loader.load(); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public    mjfCanDecode(Pointer p) { super(p); }
+    protected mjfCanDecode() { allocate(); }
+    private native void allocate();
+    public native int call(@Const mjResource resource);
+}
+
+// the struct defining the decoder plugin's interface
+public static class mjpDecoder extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjpDecoder() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjpDecoder(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjpDecoder(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjpDecoder position(long position) {
+        return (mjpDecoder)super.position(position);
+    }
+    @Override public mjpDecoder getPointer(long i) {
+        return new mjpDecoder((Pointer)this).offsetAddress(i);
+    }
+
+  public native @Cast("const char*") BytePointer content_type(); public native mjpDecoder content_type(BytePointer setter);
+  public native @Cast("const char*") BytePointer extension(); public native mjpDecoder extension(BytePointer setter);
+  // user-facing functions
+  public native mjfCanDecode can_decode(); public native mjpDecoder can_decode(mjfCanDecode setter);  // quickly check if this decoder can handle the resource
+  public native mjfDecode decode(); public native mjpDecoder decode(mjfDecode setter);         // main decoding function
+  // the caller takes ownership of the spec returned by decode and is responsible
+  // for cleaning it up
+}
+
+//---------------------------------- Encoder -------------------------------------------------------
+
+public static class mjfEncode extends FunctionPointer {
+    static { Loader.load(); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public    mjfEncode(Pointer p) { super(p); }
+    protected mjfEncode() { allocate(); }
+    private native void allocate();
+    public native @Cast("mjtSize") long call(@Const mjSpec s, @Const mjModel m, @Const mjVFS vfs,
+                            mjResource resource);
+}
+
+public static class mjpEncoder extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjpEncoder() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjpEncoder(long size) { super((Pointer)null); allocateArray(size); }
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public mjpEncoder(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjpEncoder position(long position) {
+        return (mjpEncoder)super.position(position);
+    }
+    @Override public mjpEncoder getPointer(long i) {
+        return new mjpEncoder((Pointer)this).offsetAddress(i);
+    }
+
+  public native @Cast("const char*") BytePointer content_type(); public native mjpEncoder content_type(BytePointer setter);
+  public native @Cast("const char*") BytePointer extension(); public native mjpEncoder extension(BytePointer setter);
+  public native mjfEncode encode(); public native mjpEncoder encode(mjfEncode setter);  //  Function to encode an mjSpec and mjModel to a mjResource.
+  public native mjfCloseResource close_resource(); public native mjpEncoder close_resource(mjfCloseResource setter);  // Function to close/free the resource.
+}
 
 //---------------------------------- Plugins -------------------------------------------------------
 
@@ -5473,31 +8134,31 @@ public static final int
   mjPLUGIN_PASSIVE  = 1<<2,       // passive forces
   mjPLUGIN_SDF      = 1<<3;       // signed distance fields
 
-public static class mjpPlugin_ extends Pointer {
+public static class mjpPlugin extends Pointer {
     static { Loader.load(); }
     /** Default native constructor. */
-    public mjpPlugin_() { super((Pointer)null); allocate(); }
+    public mjpPlugin() { super((Pointer)null); allocate(); }
     /** Native array allocator. Access with {@link Pointer#position(long)}. */
-    public mjpPlugin_(long size) { super((Pointer)null); allocateArray(size); }
+    public mjpPlugin(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjpPlugin_(Pointer p) { super(p); }
+    public mjpPlugin(Pointer p) { super(p); }
     private native void allocate();
     private native void allocateArray(long size);
-    @Override public mjpPlugin_ position(long position) {
-        return (mjpPlugin_)super.position(position);
+    @Override public mjpPlugin position(long position) {
+        return (mjpPlugin)super.position(position);
     }
-    @Override public mjpPlugin_ getPointer(long i) {
-        return new mjpPlugin_((Pointer)this).offsetAddress(i);
+    @Override public mjpPlugin getPointer(long i) {
+        return new mjpPlugin((Pointer)this).offsetAddress(i);
     }
 
-  public native @Cast("const char*") BytePointer name(); public native mjpPlugin_ name(BytePointer setter);               // globally unique name identifying the plugin
+  public native @Cast("const char*") BytePointer name(); public native mjpPlugin name(BytePointer setter);               // globally unique name identifying the plugin
 
-  public native int nattribute(); public native mjpPlugin_ nattribute(int setter);                 // number of configuration attributes
+  public native int nattribute(); public native mjpPlugin nattribute(int setter);                 // number of configuration attributes
   @MemberGetter public native @Cast("const char*") BytePointer attributes(int i);
   @MemberGetter public native @Cast("const char*const*") PointerPointer attributes();  // name of configuration attributes
 
-  public native int capabilityflags(); public native mjpPlugin_ capabilityflags(int setter);            // plugin capabilities: bitfield of mjtPluginCapabilityBit
-  public native int needstage(); public native mjpPlugin_ needstage(int setter);                  // sensor computation stage (mjtStage)
+  public native int capabilityflags(); public native mjpPlugin capabilityflags(int setter);            // plugin capabilities: bitfield of mjtPluginCapabilityBit
+  public native int needstage(); public native mjpPlugin needstage(int setter);                  // sensor computation stage (mjtStage)
 
   // number of mjtNums needed to store the state of a plugin instance (required)
   public static class Nstate_mjModel_int extends FunctionPointer {
@@ -5508,7 +8169,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native int call(@Const mjModel m, int instance);
   }
-  public native Nstate_mjModel_int nstate(); public native mjpPlugin_ nstate(Nstate_mjModel_int setter);
+  public native Nstate_mjModel_int nstate(); public native mjpPlugin nstate(Nstate_mjModel_int setter);
 
   // dimension of the specified sensor's output (required only for sensor plugins)
   public static class Nsensordata_mjModel_int_int extends FunctionPointer {
@@ -5519,7 +8180,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native int call(@Const mjModel m, int instance, int sensor_id);
   }
-  public native Nsensordata_mjModel_int_int nsensordata(); public native mjpPlugin_ nsensordata(Nsensordata_mjModel_int_int setter);
+  public native Nsensordata_mjModel_int_int nsensordata(); public native mjpPlugin nsensordata(Nsensordata_mjModel_int_int setter);
 
   // called when a new mjData is being created (required), returns 0 on success or -1 on failure
   public static class Init_mjModel_mjData_int extends FunctionPointer {
@@ -5530,7 +8191,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native int call(@Const mjModel m, mjData d, int instance);
   }
-  public native Init_mjModel_mjData_int init(); public native mjpPlugin_ init(Init_mjModel_mjData_int setter);
+  public native Init_mjModel_mjData_int init(); public native mjpPlugin init(Init_mjModel_mjData_int setter);
 
   // called when an mjData is being freed (optional)
   public static class Destroy_mjData_int extends FunctionPointer {
@@ -5541,7 +8202,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native void call(mjData d, int instance);
   }
-  public native Destroy_mjData_int destroy(); public native mjpPlugin_ destroy(Destroy_mjData_int setter);
+  public native Destroy_mjData_int destroy(); public native mjpPlugin destroy(Destroy_mjData_int setter);
 
   // called when an mjData is being copied (optional)
   public static class Copy_mjData_mjModel_mjData_int extends FunctionPointer {
@@ -5552,7 +8213,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native void call(mjData dest, @Const mjModel m, @Const mjData src, int instance);
   }
-  public native Copy_mjData_mjModel_mjData_int copy(); public native mjpPlugin_ copy(Copy_mjData_mjModel_mjData_int setter);
+  public native Copy_mjData_mjModel_mjData_int copy(); public native mjpPlugin copy(Copy_mjData_mjModel_mjData_int setter);
 
   // called when an mjData is being reset (required)
   public static class Reset_mjModel_DoublePointer_Pointer_int extends FunctionPointer {
@@ -5561,9 +8222,9 @@ public static class mjpPlugin_ extends Pointer {
       public    Reset_mjModel_DoublePointer_Pointer_int(Pointer p) { super(p); }
       protected Reset_mjModel_DoublePointer_Pointer_int() { allocate(); }
       private native void allocate();
-      public native void call(@Const mjModel m, DoublePointer plugin_state, Pointer plugin_data, int instance);
+      public native void call(@Const mjModel m, @Cast("mjtNum*") DoublePointer plugin_state, Pointer plugin_data, int instance);
   }
-  public native Reset_mjModel_DoublePointer_Pointer_int reset(); public native mjpPlugin_ reset(Reset_mjModel_DoublePointer_Pointer_int setter);
+  public native Reset_mjModel_DoublePointer_Pointer_int reset(); public native mjpPlugin reset(Reset_mjModel_DoublePointer_Pointer_int setter);
 
   // called when the plugin needs to update its outputs (required)
   public static class Compute_mjModel_mjData_int_int extends FunctionPointer {
@@ -5574,7 +8235,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native void call(@Const mjModel m, mjData d, int instance, int capability_bit);
   }
-  public native Compute_mjModel_mjData_int_int compute(); public native mjpPlugin_ compute(Compute_mjModel_mjData_int_int setter);
+  public native Compute_mjModel_mjData_int_int compute(); public native mjpPlugin compute(Compute_mjModel_mjData_int_int setter);
 
   // called when time integration occurs (optional)
   public static class Advance_mjModel_mjData_int extends FunctionPointer {
@@ -5585,7 +8246,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native void call(@Const mjModel m, mjData d, int instance);
   }
-  public native Advance_mjModel_mjData_int advance(); public native mjpPlugin_ advance(Advance_mjModel_mjData_int setter);
+  public native Advance_mjModel_mjData_int advance(); public native mjpPlugin advance(Advance_mjModel_mjData_int setter);
 
   // called by mjv_updateScene (optional)
   public static class Visualize_mjModel_mjData_mjvOption_mjvScene_int extends FunctionPointer {
@@ -5596,20 +8257,9 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native void call(@Const mjModel m, mjData d, @Const mjvOption opt, mjvScene scn, int instance);
   }
-  public native Visualize_mjModel_mjData_mjvOption_mjvScene_int visualize(); public native mjpPlugin_ visualize(Visualize_mjModel_mjData_mjvOption_mjvScene_int setter);
+  public native Visualize_mjModel_mjData_mjvOption_mjvScene_int visualize(); public native mjpPlugin visualize(Visualize_mjModel_mjData_mjvOption_mjvScene_int setter);
 
   // methods specific to actuators (optional)
-
-  // dimension of the actuator state for the plugin (excluding state from actuator's dyntype)
-  public static class Actuator_actdim_mjModel_int_int extends FunctionPointer {
-      static { Loader.load(); }
-      /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-      public    Actuator_actdim_mjModel_int_int(Pointer p) { super(p); }
-      protected Actuator_actdim_mjModel_int_int() { allocate(); }
-      private native void allocate();
-      public native int call(@Const mjModel m, int instance, int actuator_id);
-  }
-  public native Actuator_actdim_mjModel_int_int actuator_actdim(); public native mjpPlugin_ actuator_actdim(Actuator_actdim_mjModel_int_int setter);
 
   // updates the actuator plugin's entries in act_dot
   // called after native act_dot is computed and before the compute callback
@@ -5621,7 +8271,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native void call(@Const mjModel m, mjData d, int instance);
   }
-  public native Actuator_act_dot_mjModel_mjData_int actuator_act_dot(); public native mjpPlugin_ actuator_act_dot(Actuator_act_dot_mjModel_mjData_int setter);
+  public native Actuator_act_dot_mjModel_mjData_int actuator_act_dot(); public native mjpPlugin actuator_act_dot(Actuator_act_dot_mjModel_mjData_int setter);
 
   // methods specific to signed distance fields (optional)
 
@@ -5634,7 +8284,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native @Cast("mjtNum") double call(@Cast("const mjtNum*") DoublePointer point, @Const mjData d, int instance);
   }
-  public native Sdf_distance_DoublePointer_mjData_int sdf_distance(); public native mjpPlugin_ sdf_distance(Sdf_distance_DoublePointer_mjData_int setter);
+  public native Sdf_distance_DoublePointer_mjData_int sdf_distance(); public native mjpPlugin sdf_distance(Sdf_distance_DoublePointer_mjData_int setter);
 
   // gradient of distance with respect to local coordinates
   public static class Sdf_gradient_DoublePointer_DoublePointer_mjData_int extends FunctionPointer {
@@ -5645,7 +8295,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native void call(@Cast("mjtNum*") DoublePointer gradient, @Cast("const mjtNum*") DoublePointer point, @Const mjData d, int instance);
   }
-  public native Sdf_gradient_DoublePointer_DoublePointer_mjData_int sdf_gradient(); public native mjpPlugin_ sdf_gradient(Sdf_gradient_DoublePointer_DoublePointer_mjData_int setter);
+  public native Sdf_gradient_DoublePointer_DoublePointer_mjData_int sdf_gradient(); public native mjpPlugin sdf_gradient(Sdf_gradient_DoublePointer_DoublePointer_mjData_int setter);
 
   // called during compilation for marching cubes
   public static class Sdf_staticdistance_DoublePointer_DoublePointer extends FunctionPointer {
@@ -5656,7 +8306,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native @Cast("mjtNum") double call(@Cast("const mjtNum*") DoublePointer point, @Cast("const mjtNum*") DoublePointer attributes);
   }
-  public native Sdf_staticdistance_DoublePointer_DoublePointer sdf_staticdistance(); public native mjpPlugin_ sdf_staticdistance(Sdf_staticdistance_DoublePointer_DoublePointer setter);
+  public native Sdf_staticdistance_DoublePointer_DoublePointer sdf_staticdistance(); public native mjpPlugin sdf_staticdistance(Sdf_staticdistance_DoublePointer_DoublePointer setter);
 
   // convert attributes and provide defaults if not present
   public static class Sdf_attribute_DoublePointer_PointerPointer_PointerPointer extends FunctionPointer {
@@ -5667,7 +8317,7 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native void call(@Cast("mjtNum*") DoublePointer attribute, @Cast("const char**") PointerPointer name, @Cast("const char**") PointerPointer value);
   }
-  public native Sdf_attribute_DoublePointer_PointerPointer_PointerPointer sdf_attribute(); public native mjpPlugin_ sdf_attribute(Sdf_attribute_DoublePointer_PointerPointer_PointerPointer setter);
+  public native Sdf_attribute_DoublePointer_PointerPointer_PointerPointer sdf_attribute(); public native mjpPlugin sdf_attribute(Sdf_attribute_DoublePointer_PointerPointer_PointerPointer setter);
 
   // bounding box of implicit surface
   public static class Sdf_aabb_DoublePointer_DoublePointer extends FunctionPointer {
@@ -5678,48 +8328,74 @@ public static class mjpPlugin_ extends Pointer {
       private native void allocate();
       public native void call(@Cast("mjtNum*") DoublePointer aabb, @Cast("const mjtNum*") DoublePointer attributes);
   }
-  public native Sdf_aabb_DoublePointer_DoublePointer sdf_aabb(); public native mjpPlugin_ sdf_aabb(Sdf_aabb_DoublePointer_DoublePointer setter);
+  public native Sdf_aabb_DoublePointer_DoublePointer sdf_aabb(); public native mjpPlugin sdf_aabb(Sdf_aabb_DoublePointer_DoublePointer setter);
 }
-@Opaque public static class mjpPlugin extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mjpPlugin() { super((Pointer)null); }
+
+public static class mjSDF extends Pointer {
+    static { Loader.load(); }
+    /** Default native constructor. */
+    public mjSDF() { super((Pointer)null); allocate(); }
+    /** Native array allocator. Access with {@link Pointer#position(long)}. */
+    public mjSDF(long size) { super((Pointer)null); allocateArray(size); }
     /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mjpPlugin(Pointer p) { super(p); }
+    public mjSDF(Pointer p) { super(p); }
+    private native void allocate();
+    private native void allocateArray(long size);
+    @Override public mjSDF position(long position) {
+        return (mjSDF)super.position(position);
+    }
+    @Override public mjSDF getPointer(long i) {
+        return new mjSDF((Pointer)this).offsetAddress(i);
+    }
+
+  public native @Const mjpPlugin plugin(int i); public native mjSDF plugin(int i, mjpPlugin setter);
+  @MemberGetter public native @Cast("const mjpPlugin**") PointerPointer plugin();
+  public native IntPointer id(); public native mjSDF id(IntPointer setter);
+  public native @Cast("mjtSDFType") int type(); public native mjSDF type(int setter);
+  public native @Cast("mjtNum*") DoublePointer relpos(); public native mjSDF relpos(DoublePointer setter);
+  public native @Cast("mjtNum*") DoublePointer relmat(); public native mjSDF relmat(DoublePointer setter);
+  public native @Cast("mjtGeom*") IntPointer geomtype(); public native mjSDF geomtype(IntPointer setter);
 }
+
+//------------------------------------ Initialization ----------------------------------------------
 
 // #if defined(__has_attribute)
-
 //   #if __has_attribute(constructor)
-//     #define mjPLUGIN_LIB_INIT __attribute__((constructor)) static void _mjplugin_init(void)
-//   #endif  // __has_attribute(constructor)
-
-// #elif defined(_MSC_VER)
-
-//   #ifndef mjDLLMAIN
-//     #define mjDLLMAIN DllMain
+//     #define mjPLUGIN_LIB_INIT(n)
+//       static void _mj_init_##n(void) __attribute__((constructor));
+//       static void _mj_init_##n(void)
 //   #endif
-
-//   #if !defined(mjEXTERNC)
-//     #if defined(__cplusplus)
-//       #define mjEXTERNC extern "C"
+// #elif defined(_MSC_VER)
+    // on x86, symbols are decorated with a leading underscore
+//     #ifdef _M_IX86
+      public static final String LINKER_NAME = "__mj_ptr_";
 //     #else
-//       #define mjEXTERNC
-//     #endif  // defined(__cplusplus)
-//   #endif  // !defined(mjEXTERNC)
+//     #endif
 
-  // NOLINTBEGIN(runtime/int)
-//   #define mjPLUGIN_LIB_INIT
-//     static void _mjplugin_dllmain(void);
-//     mjEXTERNC int __stdcall mjDLLMAIN(void* hinst, unsigned long reason, void* reserved) {
-//       if (reason == 1) {
-//         _mjplugin_dllmain();
-//       }
-//       return 1;
-//     }
-//     static void _mjplugin_dllmain(void)
-  // NOLINTEND(runtime/int)
+//     #pragma section(".CRT$XCU", read)
 
-// #endif  // defined(_MSC_VER)
+//     #if !defined(mjEXTERNC)
+//       #if defined(__cplusplus)
+//         #define mjEXTERNC extern "C"
+//       #else
+//         #define mjEXTERNC
+//       #endif  // defined(__cplusplus)
+//     #endif  // !defined(mjEXTERNC)
+
+//     #define mjPLUGIN_LIB_INIT(n)
+//       static void __cdecl _mj_init_##n(void);
+//       /* use mjEXTERNC to prevent C++ name mangling */
+//       /* allocate the function pointer to the .CRT$XCU section of the executable */
+//       /* functions in this section are executed on startup before calling main() */
+//       mjEXTERNC __declspec(allocate(".CRT$XCU"))
+//       void (__cdecl * _mj_ptr_##n)(void) = _mj_init_##n;
+//       /* Force the linker to include the pointer symbol */
+//       __pragma(comment(linker, "/include:" LINKER_NAME #n))
+//       static void __cdecl _mj_init_##n(void)
+
+// #else
+//     #error "Unknown compiler: Plugin registration not supported."
+// #endif
 
 // function pointer type for mj_loadAllPluginLibraries callback
 

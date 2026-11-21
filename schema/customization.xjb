@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings version="2.0" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb bindingschema_2_0.xsd ">
+	<jxb:bindings schemaLocation="file:mjcf.xsd">
+		<jxb:schemaBindings>
+			<jxb:package name="org.mujoco.xml" />
+		</jxb:schemaBindings>
+	</jxb:bindings>
+</jxb:bindings>

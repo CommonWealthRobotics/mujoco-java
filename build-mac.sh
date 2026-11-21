@@ -64,8 +64,9 @@ java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -c
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
 rm -rf $JAVADIR../resources/$TYPE
+mkdir -p $JAVADIR../resources/$TYPE
 find $SCRIPT_DIR|grep $TYPE
-mv $JAVADIR/org/mujoco/$TYPE/ $JAVADIR../resources/
+mv $JAVADIR/org/mujoco/$TYPE/* $JAVADIR../resources/$TYPE/
 cp $BUILDDIR/mujoco/lib/* $JAVADIR../resources/$TYPE/
 
 echo "ls -al $JAVADIR../resources/"

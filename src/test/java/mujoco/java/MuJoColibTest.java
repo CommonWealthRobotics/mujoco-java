@@ -11,14 +11,14 @@ import java.util.HashMap;
 import org.junit.Test;
 import org.mujoco.IMujocoController;
 import org.mujoco.MuJoCoLib;
-import org.mujoco.MuJoCoLib.mjData_;
-import org.mujoco.MuJoCoLib.mjModel_;
+import org.mujoco.MuJoCoLib.mjData;
+import org.mujoco.MuJoCoLib.mjModel;
 import org.mujoco.MuJoCoModelManager;
 
 public class MuJoColibTest {
 	IMujocoController controller = (manager) -> {
-		mjModel_ m=manager.getModel();
-		mjData_ d=manager.getData();
+		mjModel m=manager.getModel();
+		mjData d=manager.getData();
 		/**
 		 * This illustrates two concepts. First, we are checking 
 		 * if the number of controls mjModel.nu equals the number 

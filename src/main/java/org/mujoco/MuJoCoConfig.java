@@ -11,13 +11,14 @@ import org.bytedeco.javacpp.tools.*;
 						linkpath = { "/tmp/mujoco/lib/" }, 
 						
 						include = {
-							"mujoco/mjtnum.h",
+							// mjspec.h must precede mujoco.h: it declares the mjt enums
+							// that mujoco.h function signatures use by value
+							"mujoco/mjtype.h", "mujoco/mjspec.h",
 					
-							"mujoco/mjexport.h", "mujoco/mujoco.h", "mujoco/mjmacro.h", "mujoco/mjthread.h", "mujoco/mjdata.h",
+							"mujoco/mjexport.h", "mujoco/mujoco.h", "mujoco/mjmacro.h", "mujoco/mjdata.h",
 							"mujoco/mjmodel.h", "mujoco/mjrender.h", "mujoco/mjui.h", "mujoco/mjvisualize.h",
 					
-							"mujoco/mjplugin.h", 
-							//"mujoco/mjspec.h",
+							"mujoco/mjplugin.h",
 									// "mujoco/mjxmacro.h" // This will not work with JavaCPP
 						}, 
 						link = {

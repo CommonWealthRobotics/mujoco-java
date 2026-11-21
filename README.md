@@ -39,7 +39,7 @@ Maven:
 <dependency>
   <groupId>com.neuronrobotics</groupId>
   <artifactId>mujoco-java</artifactId>
-  <version>3.1.1-pre.1</version>
+  <version>4.0.1-pre.1</version>
   <type>module</type>
 </dependency>
 ```
@@ -51,7 +51,7 @@ repositories {
 }
 
 dependencies {
-	implementation group: 'com.neuronrobotics', name: 'mujoco-java', version: '3.1.1-pre.1'
+	implementation group: 'com.neuronrobotics', name: 'mujoco-java', version: '4.0.1-pre.1'
 }
 ```
 
@@ -65,7 +65,11 @@ https://www.microsoft.com/en-gb/download/details.aspx?id=48145
 
 # Build
 
-Windows `bash buiild-windows.sh`
+The binding tracks the MuJoCo release in `mujocoRelease.txt`. The XML schema
+`schema/mjcf.xsd` is vendored from that same release; regenerate the JAXB
+classes with `bash GenerateXMLClasses.sh` after upgrading it.
+
+Windows `bash build-windows.sh`
 
 Linux `bash build-linux.sh`
 

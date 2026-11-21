@@ -56,7 +56,9 @@ cp $BUILDDIR/mujoco/lib/* $JAVADIR/
 mv $BUILDDIR/mujoco/include/mujoco $JAVADIR/
 cd $JAVADIR
 java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar  org/mujoco/MuJoCoConfig.java
-java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
+# mjspec.h uses std::byte, and JavaCPP 1.5.7 ships no /std: flag for MSVC,
+# which then defaults to C++14
+java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.jar -copylibs -copyresources -Xcompiler "/std:c++17" -Xcompiler "-I$JAVADIR" -Xcompiler "-L$JAVADIR" org/mujoco/MuJoCoLib.java
 
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/

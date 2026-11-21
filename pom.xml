@@ -3,8 +3,9 @@
 	<artifactId>mujoco-java</artifactId>
 	<name>mujoco-java</name>
 
-	<groupId>org.mujoco</groupId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>com.neuronrobotics</groupId>
+	<version>4.0.1-pre1</version>
+	<description>JAXB code generation only; publishing is done by build.gradle</description>
 	<dependencies>
 		<dependency>
 			<groupId>net.codesup.util</groupId>

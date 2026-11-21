@@ -90,6 +90,10 @@ Mac x86 `bash build-mac.sh`
 
 Mac arm64 `bash build-mac-m1.sh`
 
+The mac scripts are architecture-specific: run the one matching `uname -m`.
+`macos-15` GitHub runners are arm64, so CI uses `build-mac-m1.sh`. Each script
+aborts if JavaCPP produced a different arch directory than it expects.
+
 
 
 # HOWTO set up Publish

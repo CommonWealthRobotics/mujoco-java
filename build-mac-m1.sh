@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 bash --version
 g++ --version
 echo "Mac M1 Build"
@@ -70,19 +72,24 @@ $JAVA_HOME/bin/java -jar $SCRIPT_DIR/javacpp-platform-$JAVACPP_VER-bin/javacpp.j
 
 LIBPATH=$PWD/../resources/$TYPE/
 mkdir -p $SCRIPT_DIR/src/main/resources/
-rm -rf $JAVADIR../resources/$TYPE
-mkdir -p $JAVADIR../resources/$TYPE
+rm -rf $JAVADIR/../resources/$TYPE
+mkdir -p $JAVADIR/../resources/$TYPE
 find $SCRIPT_DIR|grep $TYPE
-mv $JAVADIR/org/mujoco/$TYPE/* $JAVADIR../resources/$TYPE/
-cp $BUILDDIR/mujoco/lib/* $JAVADIR../resources/$TYPE/
+BUILT_TYPE=$(ls -d $JAVADIR/org/mujoco/macosx-* 2>/dev/null | xargs -n1 basename | head -1)
+[ "$BUILT_TYPE" = "$TYPE" ] || {
+	echo "JavaCPP built '$BUILT_TYPE' but this script expects '$TYPE'; run the script matching the host arch (uname -m: $(uname -m))" >&2
+	exit 1
+}
+mv $JAVADIR/org/mujoco/$TYPE/* $JAVADIR/../resources/$TYPE/
+cp $BUILDDIR/mujoco/lib/* $JAVADIR/../resources/$TYPE/
 
-echo "ls -al $JAVADIR../resources/"
-ls -al $JAVADIR../resources/
+echo "ls -al $JAVADIR/../resources/"
+ls -al $JAVADIR/../resources/
 
 cd $SCRIPT_DIR/
 echo "Resource Files: "
-ls -al $JAVADIR../resources/*
-ls -al $JAVADIR../resources/$TYPE
+ls -al $JAVADIR/../resources/*
+ls -al $JAVADIR/../resources/$TYPE
 ./gradlew jar  --stacktrace test
 
 

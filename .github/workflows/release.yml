@@ -60,12 +60,12 @@ jobs:
       with:
           submodules: recursive
     - name: Build
-      run: bash build-mac.sh
+      run: bash build-mac-m1.sh
     - name: Upload math result for job Mac
       uses: actions/upload-artifact@v4
       with:
           name: mac-lib
-          path: src/main/resources/macosx-x86_64/*
+          path: src/main/resources/macosx-arm64/*
   publish:
     runs-on: ubuntu-latest 
     needs: [macos,windows,linux,linux-arm]
@@ -106,7 +106,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mac-lib
-          path: src/main/resources/macosx-x86_64/
+          path: src/main/resources/macosx-arm64/
       - name: Print Working Dir
         run: |
              ls -al .

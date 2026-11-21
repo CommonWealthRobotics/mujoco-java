@@ -44,4 +44,4 @@ jobs:
       with:
           submodules: recursive
     - name: Build
-      run:  bash build-mac.sh
+      run: bash build-mac-m1.sh
